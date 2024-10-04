@@ -1,15 +1,16 @@
 import React from 'react'
-import Protected from './components/Protected'
+import DashboardUiProvider from '../components/DashboardUiProvider'
 
 type Props = {
   children: React.ReactNode
 }
+
 function layout({children}: Props) {
   return (
     <body>
-      <Protected>
-      {children}
-      </Protected>
+      <DashboardUiProvider>
+        {children}
+      </DashboardUiProvider>
     </body>
   )
 }
