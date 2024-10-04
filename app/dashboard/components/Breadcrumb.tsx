@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/breadcrumb"
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { ChevronRightIcon } from 'lucide-react'
 
 type Props = {}
 
@@ -27,12 +28,14 @@ function BreadcrumbCom({}: Props) {
                   <>
                   <BreadcrumbItem key={index}>
                     <BreadcrumbLink asChild>
-                      <Link className='' href={`/${item}`}>{item}</Link>
+                      <Link className='' href={`${path.slice(0, index + 1).join('/')}`}>{item}</Link>
                     </BreadcrumbLink>
                   </BreadcrumbItem>
                   {
                     index < path.length - 1 && index !== 0 &&
-                    <BreadcrumbSeparator key={index}>/</BreadcrumbSeparator>
+                    <BreadcrumbSeparator key={index}>
+                      <ChevronRightIcon size={28}/>
+                    </BreadcrumbSeparator>
                   }
                   </>
                 ))

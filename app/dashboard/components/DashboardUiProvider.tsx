@@ -79,7 +79,7 @@ export default function DashboardUiProvider({ children }: { children: React.Reac
             </DropdownMenu>
           </div>
         </header>
-        <main className="p-6 py-2 min-h-[80vh]">
+        <main className="p-6 py-2 pt-10 min-h-[80vh]">
           {children}
         </main>
       </div>
