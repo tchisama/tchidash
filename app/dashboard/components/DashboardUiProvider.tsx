@@ -4,15 +4,6 @@ import Link from "next/link"
 import {
   Search,
 } from "lucide-react"
-
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
 import { Button } from "@/components/ui/button"
 import {
 } from "@/components/ui/card"
@@ -28,6 +19,10 @@ import { Input } from "@/components/ui/input"
 import PhoneBar from "./PhoneBar"
 import SideBar from "./SideBar"
 import { signOut, useSession } from "next-auth/react"
+import Logout from "@/public/images/svgs/icons/logout.svg"
+import Help from "@/public/images/svgs/icons/help.svg"
+import Settings from "@/public/images/svgs/icons/settings.svg"
+import BreadcrumbCom from "./Breadcrumb"
 
 export const description =
   "An orders dashboard with a sidebar navigation. The sidebar has icon navigation. The content area has a breadcrumb and search in the header. The main area has a list of recent orders with a filter and export button. The main area also has a detailed view of a single order with order details, shipping information, billing information, customer information, and payment information."
@@ -42,25 +37,7 @@ export default function DashboardUiProvider({ children }: { children: React.Reac
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
           <div className="flex-1 ">
             <PhoneBar />
-            <Breadcrumb className="hidden md:flex">
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink asChild>
-                    <Link href="#">Dashboard</Link>
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbLink asChild>
-                    <Link href="#">Orders</Link>
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Recent Orders</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
+            <BreadcrumbCom/>
           </div>
           <div className="flex  flex-1  justify-center gap-4">
             <div className="relative min-w-[40%]  md:grow-0">
@@ -88,10 +65,16 @@ export default function DashboardUiProvider({ children }: { children: React.Reac
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Settings</DropdownMenuItem>
-                <DropdownMenuItem>Support</DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Image src={Settings} alt="Settings" className="mr-2 h-5 w-5" />
+                  Settings</DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Image src={Help} alt="Help" className="mr-2 h-5 w-5" />
+                  Support</DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={()=>signOut()}>Logout</DropdownMenuItem>
+                <DropdownMenuItem onClick={()=>signOut()}>
+                  <Image src={Logout} alt="Logout" className="mr-2 h-5 w-5" />
+                  Logout</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

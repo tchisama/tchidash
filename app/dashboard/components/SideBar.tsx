@@ -15,8 +15,12 @@ import Settings from "@/public/images/svgs/icons/settings.svg"
 import Product from "@/public/images/svgs/icons/product.svg"
 import Mail from "@/public/images/svgs/icons/mail.svg"
 import Customers from "@/public/images/svgs/icons/customers.svg"
+import Stars from "@/public/images/svgs/icons/stars.svg"
 import { cn } from '@/lib/utils';
 import {usePathname } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { addDoc, collection } from 'firebase/firestore';
+import { db } from '@/firebase';
 
 const iconsClass = "h-6 w-6 group-hover:scale-[1.05] duration-200 hover:cursor-pointer"
 type NavIconClass = {className?:string}
@@ -47,6 +51,11 @@ export const navLinks = [
     icon:({className}:NavIconClass) => <Image src={Mail} alt="Mail" className={cn( iconsClass,className)} />,
   },
   {
+    href: "/dashboard/reviews",
+    label: "Reviews",
+    icon:({className}:NavIconClass) => <Image src={Stars} alt="Mail" className={cn( iconsClass,className)} />,
+  },
+  {
     href: "/dashboard/customers",
     label: "Customers",
     icon:({className}:NavIconClass) => <Image src={Customers} alt="Customers" className={cn( iconsClass,className)} />,
@@ -66,15 +75,13 @@ export const navLinks = [
 function SideBar() {
   const pathname = usePathname();
   return (
-<aside className=" px-1 rounded-2xl h-[70vh] inset-y-0 left-0 z-10 hidden flex-col border m-2 shadow-sm bg-background sm:flex">
+<aside className=" px-1 rounded-2xl h-[80vh] overflow-y-auto inset-y-0 left-0 z-10 hidden flex-col border m-2 shadow-sm bg-background sm:flex">
         <nav className="flex flex-col  gap-1 px-1 sm:py-3">
-          <Link
-            href="#"
-            className="group mb-10 flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:h-8 md:w-8 md:text-base"
-          >
-            TD
+          <div className='mb-10 text-slate-700 px-2 font-bold'>
+            <div className='text-xs font-light text-slate-500'>powered by</div>
+            TchiDash
             <span className="sr-only">Acme Inc</span>
-          </Link>
+          </div>
           {navLinks.map((link, index) => (
             !link.isSettings && (
               <Tooltip key={index}>
@@ -95,13 +102,13 @@ function SideBar() {
             )
           ))}
         </nav>
-        <nav className="mt-auto flex w-full flex-col items-center gap-4 px-2 sm:py-5 sm:pb-3">
+        <nav className="mt-auto flex w-full  flex-col items-center gap-4 px-2 sm:py-5 sm:pb-3">
           {navLinks.filter(link => link.isSettings).map((link, index) => (
             <Tooltip key={index}>
               <TooltipTrigger asChild>
                 <Link
                   href={link.href}
-                    className={cn("flex px-2 pr-4 h-10  group duration-200 items-center border-slate-100 border gap-2 rounded-lg text-muted-foreground transition-colors hover:text-foreground",
+                    className={cn("flex w-full px-2 pr-4 h-10  group duration-200 items-center border-slate-100 border gap-2 rounded-lg text-muted-foreground transition-colors hover:text-foreground",
                       pathname === link.href ? "bg-slate-100 border border-slate-200" : "text-muted-foreground"
                     )}
                 >
