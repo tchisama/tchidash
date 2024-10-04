@@ -132,7 +132,7 @@ export default function Page() {
               Manage your products and view their sales performance.
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className='p-2'>
             <Table>
               <TableHeader>
                 <TableRow>
@@ -169,7 +169,7 @@ export default function Page() {
                             className="h-16 w-16 rounded-lg border"
                           />
                         ) : (
-                          <div className="h-16 w-16 flex border justify-center items-center  rounded-lg bg-muted">
+                          <div className="h-16 w-16 flex border justify-center items-center  rounded-lg bg-slate-100">
                             <Image
                               src={Photo}
                               alt={product.name}
