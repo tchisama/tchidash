@@ -26,16 +26,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
+        <AuthProvider>
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} `}
       >
-        <AuthProvider>
           <TooltipProvider>
             {children}
           </TooltipProvider>
-        </AuthProvider>
       </body>
     </html>
+      </AuthProvider>
   );
 }

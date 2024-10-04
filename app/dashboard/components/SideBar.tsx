@@ -42,8 +42,8 @@ export const navLinks = [
     icon:({className}:NavIconClass) => <Image src={Graph} alt="Graph" className={cn( iconsClass,className)} />,
   },
   {
-    href: "/dashboard/contact",
-    label: "contact",
+    href: "/dashboard/contacts",
+    label: "contacts",
     icon:({className}:NavIconClass) => <Image src={Mail} alt="Mail" className={cn( iconsClass,className)} />,
   },
   {
@@ -81,7 +81,7 @@ function SideBar() {
                 <TooltipTrigger asChild>
                   <Link
                     href={link.href}
-                    className={cn("flex px-2 hover:bg-slate-50 pr-4 h-10  group duration-200 items-center border-slate-100 border gap-2 rounded-lg text-muted-foreground transition-colors hover:text-foreground",
+                    className={cn("flex px-2 hover:bg-slate-50 pr-8 h-10  group duration-200 items-center border-slate-100 border gap-2 rounded-lg text-muted-foreground transition-colors hover:text-foreground",
                       pathname === link.href ? "bg-slate-100 border border-slate-200" : "text-muted-foreground"
                     )}
                   >
