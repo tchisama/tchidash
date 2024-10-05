@@ -21,14 +21,59 @@ import ProductImagesCard from "./components/ProductImage";
 import ProductDiscount from "./components/ProductDiscount";
 import { useEffect } from "react";
 import { useProducts } from "@/store/products";
-import { addDoc, collection, doc } from "firebase/firestore";
+import {
+  addDoc,
+  and,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  updateDoc,
+  where,
+} from "firebase/firestore";
 import { db } from "@/firebase";
+import { Product } from "@/types/product";
+//import { useQuery } from "@tanstack/react-query";
+import { useStore } from "@/store/storeInfos";
+import { useQuery } from "@tanstack/react-query";
+import Link from "next/link";
 
-function Page({}: { params: { product: string } }) {
-  const { currentProduct } = useProducts();
+function Page({ params }: { params: { product: string } }) {
+  const { currentProduct, setCurrentProduct } = useProducts();
+  const { storeId } = useStore();
+  const productId = params.product;
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: [productId],
+    queryFn: async () => {
+      const q = query(
+        collection(db, "products"),
+        and(
+          where("storeId", "==", storeId),
+          where("title", "==", productId.replaceAll("_", " ")),
+        ),
+      );
+      if (productId == "new") return null;
+      const response = await getDocs(q);
+      console.log(response.docs[0].data());
+      if (response.docs.length === 0) return null;
+      const productData = {
+        ...(response.docs[0].data() as Product),
+        id: response.docs[0].id,
+      };
+      return productData;
+    },
+  });
+
   useEffect(() => {
-    console.log(currentProduct);
-  }, [currentProduct]);
+    if (productId == "new") return;
+    if (!data) return;
+    setCurrentProduct(data as Product);
+  }, [data, setCurrentProduct, productId]);
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
 
   const saveProduct = () => {
     console.log(currentProduct);
@@ -41,7 +86,13 @@ function Page({}: { params: { product: string } }) {
     // Check if all the required fields are present
     if (title && description && price && status) {
       // Save the product using setDoc
-      addDoc(collection(db, "products"), currentProduct);
+      if (productId == "new") {
+        // Create a new product
+        addDoc(collection(db, "products"), currentProduct);
+      } else {
+        // Update an existing product
+        updateDoc(doc(db, "products", currentProduct.id), currentProduct);
+      }
     } else {
       // Handle missing fields (e.g., show an error or notification)
       console.error("Missing required product fields");
@@ -50,10 +101,12 @@ function Page({}: { params: { product: string } }) {
   return (
     <div className="mx-auto grid max-w-[90rem]  flex-1 auto-rows-max gap-4">
       <div className="flex items-center gap-4">
-        <Button variant="outline" size="icon" className="h-7 w-7">
-          <ChevronLeft className="h-4 w-4" />
-          <span className="sr-only">Back</span>
-        </Button>
+        <Link href="/dashboard/products">
+          <Button variant="outline" size="icon" className="h-7 w-7">
+            <ChevronLeft className="h-4 w-4" />
+            <span className="sr-only">Back</span>
+          </Button>
+        </Link>
         <h1 className="flex-1 shrink-0 whitespace-nowrap text-xl font-semibold tracking-tight sm:grow-0">
           Pro Controller
         </h1>
