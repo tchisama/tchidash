@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import AuthProvider from "./AuthProvider";
+import Providers from "./Providers";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -26,16 +27,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-        <AuthProvider>
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} `}
-      >
+    <AuthProvider>
+      <html lang="en">
+        <body className={`${geistSans.variable} ${geistMono.variable} `}>
           <TooltipProvider>
-            {children}
+            <Providers>{children}</Providers>
           </TooltipProvider>
-      </body>
-    </html>
-      </AuthProvider>
+        </body>
+      </html>
+    </AuthProvider>
   );
 }

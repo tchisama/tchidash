@@ -1,16 +1,11 @@
 import { Timestamp } from "firebase/firestore";
 
 // Enum for product status
-enum ProductStatus {
-  ACTIVE = "active",
-  DRAFT = "draft",
-  ARCHIVED = "archived",
-}
 
 // Type for variant option values
 interface VariantValue {
   option: string; // e.g., "Size" or "Color"
-  value: string;  // e.g., "Large" or "Red"
+  value: string; // e.g., "Large" or "Red"
 }
 
 // Type for product variant
@@ -42,7 +37,6 @@ interface Discount {
   endDate?: Timestamp;
 }
 
-
 // Type for product bundle
 interface ProductBundle {
   id: string;
@@ -53,17 +47,17 @@ interface ProductBundle {
   imageUrl?: string;
 }
 
-
 // Main Product type
 export type Product = {
   id: string;
   title: string;
+  storeId: string;
   description: string;
   tags?: string[];
-  vendor: string; // e.g., Brand or Seller
+  vendor?: string; // e.g., Brand or Seller
   category: string;
-  status: ProductStatus;
-  variants: Variant[];
+  status: "draft" | "active" | "archived";
+  variants?: Variant[];
   options?: Option[]; // Customizable product options (size, color)
   images?: string[];
   createdAt: Timestamp;
@@ -72,12 +66,7 @@ export type Product = {
   discount?: Discount; // Optional discount
   stockQuantity: number; // Total stock of all variants
   hasInfiniteStock?: boolean; // If true, stock management is ignored
-  priceRange: {
-    minPrice: number;
-    maxPrice: number;
-  };
-  taxable: boolean;
+  price: number;
   bundle?: boolean;
-  bundles?: ProductBundle[]; 
+  bundles?: ProductBundle[];
 };
-
