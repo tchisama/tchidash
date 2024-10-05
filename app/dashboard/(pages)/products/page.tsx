@@ -1,14 +1,9 @@
-import React from 'react'
+import React from "react";
 
-import Image from "next/image"
-import {
-  File,
-  ListFilter,
-  MoreHorizontal,
-  PlusCircle,
-} from "lucide-react"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import Image from "next/image";
+import { File, ListFilter, MoreHorizontal, PlusCircle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -16,7 +11,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -25,7 +20,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   Table,
   TableBody,
@@ -33,15 +28,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs"
-import Photo from "@/public/images/svgs/icons/photo.svg"
-import Link from 'next/link'
+} from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Photo from "@/public/images/svgs/icons/photo.svg";
+import Link from "next/link";
 // Sample product data
 const productDemoData = [
   {
@@ -72,11 +62,11 @@ const productDemoData = [
     imageUrl: "",
   },
   // Add more products as needed
-]
+];
 
 export default function Page() {
   return (
-    <Tabs defaultValue="all" className=''>
+    <Tabs defaultValue="all" className="">
       <div className="flex items-center">
         <TabsList>
           <TabsTrigger value="all">All</TabsTrigger>
@@ -103,9 +93,7 @@ export default function Page() {
                 Active
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem>Draft</DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem>
-                Archived
-              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem>Archived</DropdownMenuCheckboxItem>
             </DropdownMenuContent>
           </DropdownMenu>
           <Button size="sm" variant="outline" className="h-8 gap-1">
@@ -115,12 +103,12 @@ export default function Page() {
             </span>
           </Button>
           <Link href={"/dashboard/products/new"}>
-          <Button  size="sm" className="h-8 gap-1">
-            <PlusCircle className="h-3.5 w-3.5" />
-            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-              Add Product
-            </span>
-          </Button>
+            <Button size="sm" className="h-8 gap-1">
+              <PlusCircle className="h-3.5 w-3.5" />
+              <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                Add Product
+              </span>
+            </Button>
           </Link>
         </div>
       </div>
@@ -132,7 +120,7 @@ export default function Page() {
               Manage your products and view their sales performance.
             </CardDescription>
           </CardHeader>
-          <CardContent className='p-2'>
+          <CardContent className="p-2">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -141,9 +129,7 @@ export default function Page() {
                   </TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead className="hidden md:table-cell">
-                    Price
-                  </TableHead>
+                  <TableHead className="hidden md:table-cell">Price</TableHead>
                   <TableHead className="hidden md:table-cell">
                     Total Sales
                   </TableHead>
@@ -158,28 +144,26 @@ export default function Page() {
               <TableBody>
                 {productDemoData.map((product) => (
                   <TableRow key={product.id}>
-                    <TableCell className="hidden sm:table-cell">
-                      {
-                        product.imageUrl ? (
+                    <TableCell className="hidden sm:table-cell ">
+                      {product.imageUrl ? (
+                        <Image
+                          src={product.imageUrl}
+                          alt={product.name}
+                          width={100}
+                          height={100}
+                          className="h-16 w-16 rounded-lg border"
+                        />
+                      ) : (
+                        <div className="h-16 w-16 flex  border justify-center items-center  rounded-lg bg-slate-50">
                           <Image
-                            src={product.imageUrl}
+                            src={Photo}
                             alt={product.name}
                             width={100}
                             height={100}
-                            className="h-16 w-16 rounded-lg border"
+                            className="h-8 w-8 rounded opacity-50"
                           />
-                        ) : (
-                          <div className="h-16 w-16 flex border justify-center items-center  rounded-lg bg-slate-100">
-                            <Image
-                              src={Photo}
-                              alt={product.name}
-                              width={100}
-                              height={100}
-                              className="h-8 w-8 rounded opacity-50"
-                            />
-                          </div>
-                        )
-                      }
+                        </div>
+                      )}
                     </TableCell>
                     <TableCell className="font-medium">
                       {product.name}
@@ -196,7 +180,7 @@ export default function Page() {
                     <TableCell className="hidden md:table-cell">
                       {product.createdAt}
                     </TableCell>
-                    <TableCell className='flex justify-end h-full '>
+                    <TableCell className="flex justify-end h-full ">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button
@@ -222,11 +206,12 @@ export default function Page() {
           </CardContent>
           <CardFooter>
             <div className="text-xs text-muted-foreground">
-              Showing <strong>1-10</strong> of <strong>{productDemoData.length}</strong> products
+              Showing <strong>1-10</strong> of{" "}
+              <strong>{productDemoData.length}</strong> products
             </div>
           </CardFooter>
         </Card>
       </TabsContent>
     </Tabs>
-  )
+  );
 }
