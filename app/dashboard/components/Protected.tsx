@@ -1,6 +1,6 @@
 "use client"
 import { db } from '@/firebase'
-import { addDoc, collection,  doc,  getDoc,  getDocs, query, setDoc, Timestamp, updateDoc, where } from 'firebase/firestore'
+import {   doc,  getDoc , setDoc, Timestamp} from 'firebase/firestore'
 import { useSession } from 'next-auth/react'
 import { redirect } from 'next/navigation'
 import React, { useEffect } from 'react'
@@ -16,11 +16,19 @@ function Protected({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (session) {
-      handleFirstTimeRegistration(session.user)
+      handleFirstTimeRegistration(session.user as {
+        email: string
+        name: string
+        image: string
+      })
     }
   }, [session])
 
-  const handleFirstTimeRegistration = async (user:any) => {
+  const handleFirstTimeRegistration = async (user:{
+    email: string
+    name: string
+    image: string
+  }) => {
     try {
       const userEmail = user.email
       if (!userEmail) {

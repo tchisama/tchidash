@@ -5,16 +5,14 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
-  BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ChevronRightIcon } from 'lucide-react'
 
-type Props = {}
 
-function BreadcrumbCom({}: Props) {
+function BreadcrumbCom() {
   const pathname = usePathname()
   const [path, setPath] = React.useState<string[]>([])
   useEffect(() => {
