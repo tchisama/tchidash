@@ -34,7 +34,6 @@ import {
 } from "@/components/ui/chart"
 import { Separator } from "@/components/ui/separator"
 
-export const description = "A collection of health charts."
 
 export default function page() {
   return (

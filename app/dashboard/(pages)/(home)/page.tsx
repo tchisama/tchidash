@@ -35,10 +35,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-export const description =
-  "An application shell with a header and main content area. The header has a navbar, a search input and and a user nav dropdown. The user nav is toggled by a button with an avatar image."
-
-export default function Dashboard() {
+export default function page() {
   return (
     <main className="flex flex-1 flex-col gap-4  md:gap-8 ">
       <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
