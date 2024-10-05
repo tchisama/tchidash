@@ -11,9 +11,11 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import GoogleSignInButton from "@/components/GoogleSignInButton"
+import { Suspense } from "react"
 
 export default function Login() {
   return (
+    <Suspense fallback={<div>Loading...</div>}>
     <div className="flex min-h-screen items-center justify-center bg-slate-100">
     <Card className="mx-auto max-w-sm shadow-none">
       <CardHeader>
@@ -56,5 +58,6 @@ export default function Login() {
       </CardContent>
     </Card>
     </div>
+    </Suspense>
   )
 }
