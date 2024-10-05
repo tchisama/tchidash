@@ -1,7 +1,16 @@
 import React from "react";
 
 import Image from "next/image";
-import { ChevronLeft, PlusCircle, Upload } from "lucide-react";
+import {ChevronLeft, MoreHorizontal, Upload } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,7 +18,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -22,17 +30,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import Photo from "@/public/images/svgs/icons/photo.svg";
+import { Checkbox } from "@/components/ui/checkbox";
 
 function page() {
   return (
@@ -86,118 +86,18 @@ function page() {
               </div>
             </CardContent>
           </Card>
-          <Card x-chunk="dashboard-07-chunk-1">
-            <CardHeader>
-              <CardTitle>Stock</CardTitle>
-              <CardDescription>
-                Lipsum dolor sit amet, consectetur adipiscing elit
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[100px]">SKU</TableHead>
-                    <TableHead>Stock</TableHead>
-                    <TableHead>Price</TableHead>
-                    <TableHead className="w-[100px]">Size</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  <TableRow>
-                    <TableCell className="font-semibold">GGPC-001</TableCell>
-                    <TableCell>
-                      <Label htmlFor="stock-1" className="sr-only">
-                        Stock
-                      </Label>
-                      <Input id="stock-1" type="number" defaultValue="100" />
-                    </TableCell>
-                    <TableCell>
-                      <Label htmlFor="price-1" className="sr-only">
-                        Price
-                      </Label>
-                      <Input id="price-1" type="number" defaultValue="99.99" />
-                    </TableCell>
-                    <TableCell>
-                      <ToggleGroup
-                        type="single"
-                        defaultValue="s"
-                        variant="outline"
-                      >
-                        <ToggleGroupItem value="s">S</ToggleGroupItem>
-                        <ToggleGroupItem value="m">M</ToggleGroupItem>
-                        <ToggleGroupItem value="l">L</ToggleGroupItem>
-                      </ToggleGroup>
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-semibold">GGPC-002</TableCell>
-                    <TableCell>
-                      <Label htmlFor="stock-2" className="sr-only">
-                        Stock
-                      </Label>
-                      <Input id="stock-2" type="number" defaultValue="143" />
-                    </TableCell>
-                    <TableCell>
-                      <Label htmlFor="price-2" className="sr-only">
-                        Price
-                      </Label>
-                      <Input id="price-2" type="number" defaultValue="99.99" />
-                    </TableCell>
-                    <TableCell>
-                      <ToggleGroup
-                        type="single"
-                        defaultValue="m"
-                        variant="outline"
-                      >
-                        <ToggleGroupItem value="s">S</ToggleGroupItem>
-                        <ToggleGroupItem value="m">M</ToggleGroupItem>
-                        <ToggleGroupItem value="l">L</ToggleGroupItem>
-                      </ToggleGroup>
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-semibold">GGPC-003</TableCell>
-                    <TableCell>
-                      <Label htmlFor="stock-3" className="sr-only">
-                        Stock
-                      </Label>
-                      <Input id="stock-3" type="number" defaultValue="32" />
-                    </TableCell>
-                    <TableCell>
-                      <Label htmlFor="price-3" className="sr-only">
-                        Stock
-                      </Label>
-                      <Input id="price-3" type="number" defaultValue="99.99" />
-                    </TableCell>
-                    <TableCell>
-                      <ToggleGroup
-                        type="single"
-                        defaultValue="s"
-                        variant="outline"
-                      >
-                        <ToggleGroupItem value="s">S</ToggleGroupItem>
-                        <ToggleGroupItem value="m">M</ToggleGroupItem>
-                        <ToggleGroupItem value="l">L</ToggleGroupItem>
-                      </ToggleGroup>
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </CardContent>
-            <CardFooter className="justify-center border-t p-4">
-              <Button size="sm" variant="ghost" className="gap-1">
-                <PlusCircle className="h-3.5 w-3.5" />
-                Add Variant
-              </Button>
-            </CardFooter>
-          </Card>
+
           <Card x-chunk="dashboard-07-chunk-2">
-            <CardHeader>
+            <CardHeader >
+              <div className="flex items-center justify-between">
               <CardTitle>Product Category</CardTitle>
+              <Button variant="outline" size={"sm"}>
+                Add Category
+              </Button>
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-6 sm:grid-cols-3">
+              <div className="">
                 <div className="grid gap-3">
                   <Label htmlFor="category">Category</Label>
                   <Select>
@@ -211,27 +111,137 @@ function page() {
                     </SelectContent>
                   </Select>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card x-chunk="dashboard-07-chunk-1">
+            <CardHeader>
+              <CardTitle>Options</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="">
                 <div className="grid gap-3">
-                  <Label htmlFor="subcategory">Subcategory (optional)</Label>
-                  <Select>
-                    <SelectTrigger
-                      id="subcategory"
-                      aria-label="Select subcategory"
-                    >
-                      <SelectValue placeholder="Select subcategory" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="t-shirts">T-Shirts</SelectItem>
-                      <SelectItem value="hoodies">Hoodies</SelectItem>
-                      <SelectItem value="sweatshirts">Sweatshirts</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="flex items-center justify-between">
+                  <Label htmlFor="category">Options List</Label>
+                  <Button variant="outline" size={"sm"}>Add Option</Button>
+                  </div>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[100px]">Name</TableHead>
+                        <TableHead>Options</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell className="font-medium">Color</TableCell>
+                        <TableCell className="space-x-2">
+                          <Badge variant="outline">Black</Badge>
+                          <Badge variant="outline">White</Badge>
+                          <Badge variant="outline">Red</Badge>
+                          <Badge variant="outline">Blue</Badge>
+                        </TableCell>
+                        <TableCell className="flex gap-2 justify-end items-center">
+                          <Button variant="ghost" size="sm">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell className="font-medium">Size</TableCell>
+                        <TableCell className="space-x-2 ">
+                          <Badge variant="outline">S</Badge>
+                          <Badge variant="outline">M</Badge>
+                          <Badge variant="outline">L</Badge>
+                          <Badge variant="outline">XL</Badge>
+                        </TableCell>
+                        <TableCell className="flex gap-2 justify-end items-center">
+                          <Button variant="ghost" size="sm">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
                 </div>
               </div>
             </CardContent>
           </Card>
+
+
+
+          <Card x-chunk="dashboard-07-chunk-2">
+            <CardHeader>
+              <CardTitle>Product Variants</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="">
+                <div className="grid gap-3">
+                  <div className="flex justify-between items-center">
+                  <Label htmlFor="category">Variants List</Label>
+                  </div>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Select</TableHead>
+                        <TableHead>Variant</TableHead>
+                        <TableHead>Price</TableHead>
+                        <TableHead>Stock</TableHead>
+                        <TableHead className="w-[100px]">SKU</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {
+                        [{
+                          name: "Color",
+                          options: ["Black", "White", "Red", "Blue"]
+                          },{
+                          name: "Size",
+                          options: ["S", "M", "L", "XL"]
+                          }].flat().map((item, index) => (
+                            <TableRow key={index}>
+                              <TableCell>
+                                <Checkbox />
+                              </TableCell>
+                              <TableCell className="font-medium">{item.name}</TableCell>
+                              <TableCell className="font-medium">
+                                <Input
+                                  type="text"
+                                  className="w-full"
+                                  defaultValue="100"
+                                />
+                              </TableCell>
+                              <TableCell className="font-medium">
+                                <Input
+                                  type="text"
+                                  className="w-full"
+                                  defaultValue="100"
+                                />
+                              </TableCell>
+                              <TableCell className="font-medium flex justify-end items-end">
+                                <Button
+                                  size={"sm"}
+                                  variant="outline"
+                                >Edit</Button>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                      }
+                    </TableBody>
+                  </Table>
+
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+
+
         </div>
         <div className="grid auto-rows-max items-start gap-4 lg:gap-8">
+
           <Card x-chunk="dashboard-07-chunk-3">
             <CardHeader>
               <CardTitle>Product Status</CardTitle>
@@ -263,10 +273,10 @@ function page() {
             </CardHeader>
             <CardContent>
               <div className="grid gap-2">
-                <div className="aspect-square w-full rounded-md object-cover flex items-center justify-center bg-slate-50">
+                <div className="aspect-square w-full border rounded-md object-cover flex items-center justify-center bg-slate-50">
                   <Image
                     alt="Product image"
-                    className="aspect-square w-12 object-cover opacity-50"
+                    className="aspect-square w-10 object-cover opacity-50"
                     height="300"
                     src={Photo}
                     width="300"
@@ -274,10 +284,10 @@ function page() {
                 </div>
                 <div className="grid grid-cols-3 gap-2">
                   <button>
-                    <div className="aspect-square w-full rounded-md object-cover flex items-center justify-center bg-slate-50">
+                    <div className="aspect-square border w-full rounded-md object-cover flex items-center justify-center bg-slate-50">
                       <Image
                         alt="Product image"
-                        className="aspect-square w-12 object-cover opacity-50"
+                        className="aspect-square w-6 object-cover opacity-50"
                         height="84"
                         src={Photo}
                         width="84"
@@ -285,10 +295,10 @@ function page() {
                     </div>
                   </button>
                   <button>
-                    <div className="aspect-square w-full rounded-md object-cover flex items-center justify-center bg-slate-50">
+                    <div className="aspect-square border w-full rounded-md object-cover flex items-center justify-center bg-slate-50">
                       <Image
                         alt="Product image"
-                        className="aspect-square w-12 object-cover opacity-50"
+                        className="aspect-square w-6 object-cover opacity-50"
                         height="84"
                         src={Photo}
                         width="84"
@@ -303,6 +313,57 @@ function page() {
               </div>
             </CardContent>
           </Card>
+          <Card x-chunk="dashboard-07-chunk-3">
+            <CardHeader>
+              <CardTitle>Product Discount</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-6">
+                <div className="grid gap-3">
+                  <Label htmlFor="discount">Discount</Label>
+                  <div className="grid gap-3 md:grid-cols-1">
+                    <Select>
+                      <SelectTrigger id="discount" aria-label="Select type discount">
+                        <SelectValue placeholder="discount type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="fixed">Fixed</SelectItem>
+                        <SelectItem value="percentage">Percentage</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Input
+                      id="discount"
+                      type="number"
+                      className="w-full"
+                      defaultValue="10"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    {
+                      Array.from({ length: 2 }).map((_, index) => (
+                        <div key={index}>
+                          <Label htmlFor="discount">Date {index == 0 ? 'Start' : 'End'}</Label>
+                          <div className="gap-2 mt-2 flex" >
+                            <Input
+                              id="discount"
+                              type="date"
+                              className="w-full"
+                            />
+                            <Input
+                              id="discount"
+                              type="time"
+                              className="w-full"
+                            />
+                          </div>
+                        </div>
+                      ))
+                    }
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           <Card x-chunk="dashboard-07-chunk-5">
             <CardHeader>
               <CardTitle>Archive Product</CardTitle>

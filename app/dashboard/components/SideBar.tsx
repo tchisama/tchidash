@@ -113,7 +113,7 @@ function SideBar() {
                     href={link.href}
                     className={cn(
                       "flex px-2 hover:bg-slate-50 pr-12 h-10  group duration-200 items-center border-slate-100 border gap-2 rounded-lg text-muted-foreground transition-colors hover:text-foreground",
-                      pathname === link.href
+                      (link.href === "/dashboard" ? link.href===pathname : pathname.includes(link.href)) 
                         ? "bg-primary/20 border border-primary/40 hover:bg-primary/30"
                         : "",
                     )}
