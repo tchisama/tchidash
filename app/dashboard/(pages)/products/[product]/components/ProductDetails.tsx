@@ -51,19 +51,23 @@ const ProductDetailsCard = () => {
               }
               value={currentProduct.description}
             />
-            <Label htmlFor="price">Price</Label>
-            <Input
-              id="price"
-              type="number"
-              className="w-full max-w-[300px]"
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setCurrentProduct({
-                  ...currentProduct,
-                  price: parseFloat(e.target.value) ?? 0,
-                } as Product)
-              }
-              value={currentProduct.price}
-            />
+            {currentProduct.options && currentProduct.options.length == 0 && (
+              <div>
+                <Label htmlFor="price">Price</Label>
+                <Input
+                  id="price"
+                  type="number"
+                  className="w-full max-w-[300px]"
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setCurrentProduct({
+                      ...currentProduct,
+                      price: parseFloat(e.target.value) ?? 0,
+                    } as Product)
+                  }
+                  value={currentProduct.price}
+                />
+              </div>
+            )}
           </div>
         </div>
       </CardContent>

@@ -9,51 +9,79 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Product } from "@/types/product";
+import { useProducts } from "@/store/products";
 
 function ProductDiscount() {
+  const { setCurrentProduct, currentProduct } = useProducts();
+
   return (
-    <Card x-chunk="dashboard-07-chunk-3">
-      <CardHeader>
-        <CardTitle>Product Discount</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid gap-6">
-          <div className="grid gap-3">
-            <Label htmlFor="discount">Discount</Label>
-            <div className="grid gap-3 md:grid-cols-1">
-              <Select>
-                <SelectTrigger id="discount" aria-label="Select type discount">
-                  <SelectValue placeholder="discount type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="fixed">Fixed</SelectItem>
-                  <SelectItem value="percentage">Percentage</SelectItem>
-                </SelectContent>
-              </Select>
-              <Input
-                id="discount"
-                type="number"
-                className="w-full"
-                defaultValue="10"
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              {Array.from({ length: 2 }).map((_, index) => (
-                <div key={index}>
-                  <Label htmlFor="discount">
-                    Date {index == 0 ? "Start" : "End"}
-                  </Label>
-                  <div className="gap-2 mt-2 flex">
-                    <Input id="discount" type="date" className="w-full" />
-                    <Input id="discount" type="time" className="w-full" />
+    currentProduct && (
+      <Card x-chunk="dashboard-07-chunk-3">
+        <CardHeader>
+          <CardTitle>Product Discount</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-6">
+            <div className="grid gap-3">
+              <Label htmlFor="discount">Discount</Label>
+              <div className="grid gap-3 md:grid-cols-1">
+                <Select
+                  value={
+                    currentProduct?.discount && currentProduct?.discount.type
+                  }
+                  onValueChange={(value) =>
+                    setCurrentProduct({
+                      ...currentProduct,
+                      discount: {
+                        ...currentProduct.discount,
+                        type: value as "percentage" | "fixed",
+                      },
+                    } as Product)
+                  }
+                >
+                  <SelectTrigger
+                    id="discount"
+                    aria-label="Select type discount"
+                  >
+                    <SelectValue placeholder="discount type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="fixed">Fixed</SelectItem>
+                    <SelectItem value="percentage">Percentage</SelectItem>
+                  </SelectContent>
+                </Select>
+                <div className="flex items-center gap-2">
+                  <Input
+                    id="discount"
+                    type="number"
+                    className="w-full"
+                    defaultValue="10"
+                    value={
+                      currentProduct?.discount && currentProduct.discount.amount
+                    }
+                    onChange={(e) =>
+                      setCurrentProduct({
+                        ...currentProduct,
+                        discount: {
+                          ...currentProduct.discount,
+                          amount: Number(e.target.value),
+                        },
+                      } as Product)
+                    }
+                  />
+                  <div className="w-10">
+                    {currentProduct?.discount?.type === "percentage"
+                      ? ` %`
+                      : ` Dh`}
                   </div>
                 </div>
-              ))}
+              </div>
             </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    )
   );
 }
 
