@@ -23,7 +23,12 @@ const ProductStatusCard = () => {
           onValueChange={(value) => {
             setCurrentProduct({
               ...currentProduct,
-              status: value as "draft" | "published" | "archived",
+              status: value as
+                | "draft"
+                | "active"
+                | "archived"
+                | "deleted"
+                | "out_of_stock",
             } as Product);
           }}
           value={currentProduct.status}
@@ -32,7 +37,7 @@ const ProductStatusCard = () => {
             <SelectValue placeholder="Select status" />
           </SelectTrigger>
           <SelectContent>
-            {["draft", "published", "archived"].map((status) => (
+            {["draft", "active", "archived"].map((status) => (
               <SelectItem key={status} value={status}>
                 {status}
               </SelectItem>

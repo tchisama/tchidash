@@ -9,17 +9,29 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useProducts } from "@/store/products";
 import { Option, Product, Variant, VariantValue } from "@/types/product";
-import { RefreshCw } from "lucide-react";
+import { MoreVertical, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 
-const ProductVariantsCard = () => {
+const ProductVariantsCard = ({ saveProduct }: { saveProduct: () => void }) => {
   const { currentProduct, setCurrentProduct } = useProducts();
   const [productVariants, setProductVariants] = useState<Variant[]>([]);
   const [selectedVariants, setSelectedVariants] = useState<string[]>([]);
+  const router = useRouter();
 
   // Helper function to generate all combinations of options
   const generateVariants = (options: Option[]): VariantValue[][] => {
@@ -60,7 +72,7 @@ const ProductVariantsCard = () => {
       inventoryQuantity: 100, // Default inventory (modifiable)
       variantValues: variantValues,
       taxable: true, // Default taxability (modifiable)
-    }));
+    })) as Variant[];
   };
 
   // Using useMemo to avoid unnecessary updates
@@ -79,6 +91,7 @@ const ProductVariantsCard = () => {
       setProductVariants(currentProduct.variants || []);
     }
   }, [currentProduct]);
+  const [editMode, setEditMode] = useState(false);
 
   return (
     <Card>
@@ -86,15 +99,24 @@ const ProductVariantsCard = () => {
         <CardTitle>
           <div className="flex items-center gap-1 justify-between">
             Product Variants
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={generateAction}
-              className="flex items-center gap-2"
-            >
-              <RefreshCw className="h-3 w-3" />
-              Generate Variants
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={generateAction}
+                className="flex items-center gap-2"
+              >
+                <RefreshCw className="h-3 w-3" />
+                Generate Variants
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setEditMode((p) => !p)}
+              >
+                {editMode ? "done" : "Edit"}
+              </Button>
+            </div>
           </div>
         </CardTitle>
       </CardHeader>
@@ -103,10 +125,12 @@ const ProductVariantsCard = () => {
           <TableHeader>
             <TableRow>
               <TableHead>Select</TableHead>
-              <TableHead>Variant</TableHead>
+              <TableHead>Image</TableHead>
+              <TableHead>Title</TableHead>
               <TableHead>Price</TableHead>
               <TableHead>Stock</TableHead>
               <TableHead>SKU</TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -133,67 +157,123 @@ const ProductVariantsCard = () => {
                     />
                   </div>
                 </TableCell>
+                <TableCell>
+                  <Image
+                    src={variant.image ?? ""}
+                    alt={""}
+                    width={60}
+                    height={60}
+                    className="rounded-md w-14 h-14 p-1 bg-slate-50 border"
+                  />
+                </TableCell>
                 <TableCell>{variant.title}</TableCell>
                 <TableCell>
-                  <Input
-                    type="text"
-                    defaultValue={variant.price}
-                    value={variant.price}
-                    onChange={(e) => {
-                      const newPrice = parseFloat(e.target.value);
-                      setProductVariants((prev) =>
-                        prev.map((v) =>
-                          v.id === variant.id ? { ...v, price: newPrice } : v,
-                        ),
-                      );
-                    }}
-                    onBlur={(e) => {
-                      const newPrice = parseFloat(e.target.value);
-                      const vrnts = productVariants.map((v) =>
-                        selectedVariants.includes(v.id)
-                          ? { ...v, price: newPrice }
-                          : v,
-                      );
+                  {editMode ? (
+                    <Input
+                      type="text"
+                      defaultValue={variant.price}
+                      value={variant.price}
+                      onChange={(e) => {
+                        const newPrice = parseFloat(e.target.value);
+                        setProductVariants((prev) =>
+                          prev.map((v) =>
+                            v.id === variant.id ? { ...v, price: newPrice } : v,
+                          ),
+                        );
+                      }}
+                      onBlur={(e) => {
+                        const newPrice = parseFloat(e.target.value);
+                        const vrnts = productVariants.map((v) =>
+                          selectedVariants.includes(v.id)
+                            ? { ...v, price: newPrice }
+                            : v,
+                        );
 
-                      setProductVariants(vrnts);
-                      setCurrentProduct({
-                        ...currentProduct,
-                        variants: vrnts as Variant[],
-                      } as Product);
-                    }}
-                  />
+                        setProductVariants(vrnts);
+                        setCurrentProduct({
+                          ...currentProduct,
+                          variants: vrnts as Variant[],
+                        } as Product);
+                      }}
+                    />
+                  ) : (
+                    <>
+                      <b>{variant.price}</b> Dh
+                    </>
+                  )}
                 </TableCell>
                 <TableCell>
-                  <Input
-                    defaultValue={variant.inventoryQuantity}
-                    value={variant.inventoryQuantity}
-                    onChange={(e) => {
-                      const newQuantity = parseInt(e.target.value);
-                      setProductVariants((prev) =>
-                        prev.map((v) =>
-                          v.id === variant.id
+                  {editMode ? (
+                    <Input
+                      defaultValue={variant.inventoryQuantity}
+                      value={variant.inventoryQuantity}
+                      onChange={(e) => {
+                        const newQuantity = parseInt(e.target.value);
+                        setProductVariants((prev) =>
+                          prev.map((v) =>
+                            v.id === variant.id
+                              ? { ...v, inventoryQuantity: newQuantity }
+                              : v,
+                          ),
+                        );
+                      }}
+                      type="text"
+                      onBlur={(e) => {
+                        const newQuantity = parseInt(e.target.value);
+                        const vrnts = productVariants.map((v) =>
+                          selectedVariants.includes(v.id)
                             ? { ...v, inventoryQuantity: newQuantity }
                             : v,
-                        ),
-                      );
-                    }}
-                    type="text"
-                    onBlur={(e) => {
-                      const newQuantity = parseInt(e.target.value);
-                      const vrnts = productVariants.map((v) =>
-                        selectedVariants.includes(v.id)
-                          ? { ...v, inventoryQuantity: newQuantity }
-                          : v,
-                      );
-                      setProductVariants(vrnts);
-                      setCurrentProduct({
-                        ...currentProduct,
-                        variants: vrnts as Variant[],
-                      } as Product);
-                    }}
-                  />
+                        );
+                        setProductVariants(vrnts);
+                        setCurrentProduct({
+                          ...currentProduct,
+                          variants: vrnts as Variant[],
+                        } as Product);
+                      }}
+                    />
+                  ) : (
+                    <>
+                      <b>{variant.inventoryQuantity}</b> in stock
+                    </>
+                  )}
                 </TableCell>
                 <TableCell>{variant.sku}</TableCell>
+                <TableCell className="flex justify-end">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="icon">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                      <DropdownMenuItem
+                        onClick={() => {
+                          console.log("Edit variant", variant);
+                          if (!currentProduct) return;
+                          if (!currentProduct.title) return;
+                          saveProduct();
+                          router.push(
+                            `/dashboard/products/${currentProduct.title.replaceAll(" ", "_")}/${variant.sku}`,
+                          );
+                        }}
+                      >
+                        Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => {
+                          console.log("Delete variant", variant);
+                          setProductVariants((prev) =>
+                            prev.filter((v) => v.id !== variant.id),
+                          );
+                        }}
+                      >
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

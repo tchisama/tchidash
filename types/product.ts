@@ -12,6 +12,7 @@ export interface VariantValue {
 export interface Variant {
   id: string;
   title: string;
+  description?: string;
   sku: string;
   price: number;
   compareAtPrice?: number;
@@ -19,7 +20,7 @@ export interface Variant {
   inventoryQuantity: number;
   taxable: boolean;
   barcode?: string;
-  imageUrl?: string;
+  image: string;
   variantValues: VariantValue[]; // Array of option and value pairs
 }
 
@@ -57,7 +58,7 @@ export type Product = {
   tags?: string[];
   vendor?: string; // e.g., Brand or Seller
   category: string;
-  status: "draft" | "active" | "archived";
+  status: "draft" | "active" | "archived" | "deleted" | "out_of_stock";
   variants?: Variant[];
   options?: Option[]; // Customizable product options (size, color)
   images?: string[];

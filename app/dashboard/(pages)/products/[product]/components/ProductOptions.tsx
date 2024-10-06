@@ -1,6 +1,15 @@
 "use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+import {
   Table,
   TableBody,
   TableCell,
@@ -10,11 +19,11 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, MoreVertical } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { useProducts } from "@/store/products";
 import { Input } from "@/components/ui/input";
-import { Product } from "@/types/product";
+import { Product, Variant } from "@/types/product";
 import { useState } from "react";
 
 const ProductOptionsCard = () => {
@@ -169,9 +178,34 @@ const OptionRow = ({
               Edit
             </Button>
           )}
-          <Button variant="ghost" size="sm">
-            <MoreHorizontal className="h-4 w-4" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon">
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuItem
+                onClick={() => {
+                  const newOptions = [
+                    ...(currentProduct.options as {
+                      name: string;
+                      values: string[];
+                    }[]),
+                  ];
+                  newOptions.splice(index, 1);
+                  setCurrentProduct({
+                    ...currentProduct,
+                    options: newOptions,
+                    variants: [] as Variant[],
+                  } as Product);
+                }}
+              >
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </TableCell>
       </TableRow>
     )

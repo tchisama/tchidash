@@ -135,7 +135,9 @@ function Page({ params }: { params: { product: string } }) {
           <ProductOptionsCard />
           {currentProduct &&
             currentProduct?.options &&
-            currentProduct.options.length > 0 && <ProductVariantsCard />}
+            currentProduct.options.length > 0 && (
+              <ProductVariantsCard saveProduct={saveProduct} />
+            )}
         </div>
         <div className="grid auto-rows-max items-start gap-4 lg:gap-8">
           <ProductImagesCard />

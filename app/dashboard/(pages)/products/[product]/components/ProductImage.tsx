@@ -66,7 +66,7 @@ const ImageView = ({ index }: { index: number }) => {
           alt="Product image"
           height="84"
           src={currentProduct.images[index]}
-          width="84"
+          width={600}
           className="w-full h-full object-contain border rounded-md p-2"
         />
       ) : (

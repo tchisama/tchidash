@@ -1,5 +1,8 @@
 "use client";
+
 import React, { useEffect } from "react";
+
+import { useRouter } from "next/navigation";
 
 import Image from "next/image";
 import { File, ListFilter, MoreHorizontal, PlusCircle } from "lucide-react";
@@ -33,7 +36,17 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Photo from "@/public/images/svgs/icons/photo.svg";
 import Link from "next/link";
-import { collection, getDocs, Timestamp } from "firebase/firestore";
+import {
+  addDoc,
+  and,
+  collection,
+  doc,
+  getDocs,
+  query,
+  Timestamp,
+  updateDoc,
+  where,
+} from "firebase/firestore";
 import { useProducts } from "@/store/products";
 import { useQuery } from "@tanstack/react-query";
 import { db } from "@/firebase";
@@ -45,15 +58,20 @@ export default function Page() {
   const { data, error, isLoading } = useQuery({
     queryKey: ["products"],
     queryFn: async () => {
-      const response = await getDocs(collection(db, "products"));
+      const q = query(
+        collection(db, "products"),
+        and(where("storeId", "==", "test"), where("status", "!=", "deleted")),
+      );
+      const response = await getDocs(q);
       const data = response.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
       return data;
     },
+    staleTime: 20000, // Data stays fresh for 10 seconds
   });
-
+  const router = useRouter();
   useEffect(() => {
     setCurrentProduct(null);
     if (Array.isArray(data)) {
@@ -62,13 +80,18 @@ export default function Page() {
     }
   }, [data, setProducts, setCurrentProduct]);
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading)
+    return (
+      <div className="w-full h-[50vh] flex justify-center items-center">
+        Loading...
+      </div>
+    );
   if (error) return <div>Error: {error.message}</div>;
 
   const addProduct = () => {
-    setCurrentProduct({
-      id: "new product",
-      title: "new product",
+    const productName = "new product " + Math.random().toString().slice(3, 9);
+    addDoc(collection(db, "products"), {
+      title: productName,
       status: "draft",
       createdAt: Timestamp.now(),
       images: [],
@@ -82,6 +105,25 @@ export default function Page() {
       updatedAt: Timestamp.now(),
       stockQuantity: 0,
       storeId: "test",
+    }).then((docRef) => {
+      setCurrentProduct({
+        title: productName,
+        status: "draft",
+        createdAt: Timestamp.now(),
+        images: [],
+        price: 100,
+        description: "description of the product",
+        tags: [],
+        vendor: "",
+        category: "",
+        variants: [],
+        options: [],
+        updatedAt: Timestamp.now(),
+        stockQuantity: 0,
+        storeId: "test",
+        id: docRef.id,
+      });
+      router.push(`/dashboard/products/${productName.replaceAll(" ", "_")}`);
     });
   };
 
@@ -123,14 +165,12 @@ export default function Page() {
                 Export
               </span>
             </Button>
-            <Link href={"/dashboard/products/new"}>
-              <Button onClick={addProduct} size="sm" className="h-8 gap-1">
-                <PlusCircle className="h-3.5 w-3.5" />
-                <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                  Add Product
-                </span>
-              </Button>
-            </Link>
+            <Button onClick={addProduct} size="sm" className="h-8 gap-1">
+              <PlusCircle className="h-3.5 w-3.5" />
+              <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                Add Product
+              </span>
+            </Button>
           </div>
         </div>
         <TabsContent value="all">
@@ -178,7 +218,7 @@ export default function Page() {
                               alt={product.title || "Product Image"} // Provide a default alt text if title is undefined
                               width={100}
                               height={100}
-                              className="w-16 h-16 object-contain border rounded-md p-2 group-hover:p-1 duration-300"
+                              className="w-16 h-16 object-contain border rounded-md p-[5px] group-hover:p-[3px] duration-300"
                             />
                           ) : (
                             <div className="w-[70px] rounded-xl border bg-slate-50 h-[70px] flex justify-center items-center">
@@ -207,7 +247,15 @@ export default function Page() {
                           <Badge variant="outline">{product.status}</Badge>
                         </TableCell>
                         <TableCell className="hidden md:table-cell">
-                          {product.price} Dh
+                          {product.variants && product.variants.length > 0
+                            ? // get the mini and max price of the variants
+                              Math.min(
+                                ...product.variants.map((v) => v.price),
+                              ) +
+                              " - " +
+                              Math.max(...product.variants.map((v) => v.price))
+                            : product.price}{" "}
+                          Dh
                         </TableCell>
                         <TableCell className="hidden md:table-cell">
                           0
@@ -218,14 +266,52 @@ export default function Page() {
                         <TableCell>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm">
+                              <Button size="icon" variant="outline">
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem>Edit</DropdownMenuItem>
-                              <DropdownMenuItem>Archive</DropdownMenuItem>
-                              <DropdownMenuItem>Delete</DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  router.push(
+                                    `/dashboard/products/${product.title.replaceAll(" ", "_")}`,
+                                  );
+                                }}
+                              >
+                                Edit
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  console.log("Archive", product);
+                                  updateDoc(doc(db, "products", product.id), {
+                                    ...product,
+                                    status: "archived",
+                                  });
+                                  setProducts(
+                                    products.map((p) =>
+                                      p.id === product.id
+                                        ? { ...product, status: "archived" }
+                                        : p,
+                                    ),
+                                  );
+                                }}
+                              >
+                                Archive
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  console.log("Delete", product);
+                                  setProducts(
+                                    products.filter((p) => p.id !== product.id),
+                                  );
+                                  updateDoc(doc(db, "products", product.id), {
+                                    ...product,
+                                    status: "deleted",
+                                  });
+                                }}
+                              >
+                                Delete
+                              </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>
