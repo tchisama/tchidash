@@ -28,7 +28,7 @@ const ProductDetailsCard = () => {
             <Input
               id="title"
               type="text"
-              className="w-full"
+              className="w-full "
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setCurrentProduct({
                   ...currentProduct,
@@ -55,7 +55,7 @@ const ProductDetailsCard = () => {
             <Input
               id="price"
               type="number"
-              className="w-full"
+              className="w-full max-w-[300px]"
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setCurrentProduct({
                   ...currentProduct,

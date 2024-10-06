@@ -27,6 +27,7 @@ interface Variant {
 interface Option {
   name: string; // e.g., "Size"
   values: string[]; // e.g., ["Small", "Medium", "Large"]
+  id: string;
 }
 
 // Type for discount

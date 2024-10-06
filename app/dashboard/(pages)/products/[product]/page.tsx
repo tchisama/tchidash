@@ -5,13 +5,6 @@ import { ChevronLeft } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import ProductDetailsCard from "./components/ProductDetails";
 import ProductCategoryCard from "./components/ProductCategory";
 import ProductOptionsCard from "./components/ProductOptions";
@@ -26,7 +19,6 @@ import {
   and,
   collection,
   doc,
-  getDoc,
   getDocs,
   query,
   updateDoc,
@@ -38,11 +30,13 @@ import { Product } from "@/types/product";
 import { useStore } from "@/store/storeInfos";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 function Page({ params }: { params: { product: string } }) {
   const { currentProduct, setCurrentProduct } = useProducts();
   const { storeId } = useStore();
   const productId = params.product;
+  const router = useRouter();
 
   const { data, isLoading, error } = useQuery({
     queryKey: [productId],
@@ -98,6 +92,11 @@ function Page({ params }: { params: { product: string } }) {
       console.error("Missing required product fields");
     }
   };
+  const discard = () => {
+    setCurrentProduct(null);
+    router.push("/dashboard/products");
+  };
+
   return (
     <div className="mx-auto grid max-w-[90rem]  flex-1 auto-rows-max gap-4">
       <div className="flex items-center gap-4">
@@ -108,13 +107,13 @@ function Page({ params }: { params: { product: string } }) {
           </Button>
         </Link>
         <h1 className="flex-1 shrink-0 whitespace-nowrap text-xl font-semibold tracking-tight sm:grow-0">
-          Pro Controller
+          {currentProduct?.title ?? "New Product"}
         </h1>
         <Badge variant="outline" className="ml-auto sm:ml-0">
-          In stock
+          {currentProduct?.status ?? "draft"}
         </Badge>
         <div className="hidden items-center gap-2 md:ml-auto md:flex">
-          <Button variant="outline" size="sm">
+          <Button onClick={discard} variant="outline" size="sm">
             Discard
           </Button>
           <Button size="sm" onClick={saveProduct}>
@@ -129,28 +128,14 @@ function Page({ params }: { params: { product: string } }) {
           <ProductCategoryCard />
 
           <ProductOptionsCard />
-
-          <ProductVariantsCard />
+          {currentProduct &&
+            currentProduct?.options &&
+            currentProduct.options.length > 0 && <ProductVariantsCard />}
         </div>
         <div className="grid auto-rows-max items-start gap-4 lg:gap-8">
           <ProductImagesCard />
           <ProductStatusCard />
           <ProductDiscount />
-
-          <Card x-chunk="dashboard-07-chunk-5">
-            <CardHeader>
-              <CardTitle>Archive Product</CardTitle>
-              <CardDescription>
-                Lipsum dolor sit amet, consectetur adipiscing elit.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div></div>
-              <Button size="sm" variant="secondary">
-                Archive Product
-              </Button>
-            </CardContent>
-          </Card>
         </div>
       </div>
       <div className="flex items-center justify-center gap-2 md:hidden">
