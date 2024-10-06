@@ -8,10 +8,11 @@ import {
 } from "@/components/ui/card";
 import Image from "next/image";
 import Photo from "@/public/images/svgs/icons/photo.svg";
-import { Upload } from "lucide-react";
+import { Upload, X } from "lucide-react";
 import UploadImageProvider from "@/components/UploadImageProvider";
 import { useProducts } from "@/store/products";
 import { Product } from "@/types/product";
+import { Button } from "@/components/ui/button";
 
 const ProductImagesCard = () => {
   const { setCurrentProduct, currentProduct } = useProducts();
@@ -26,49 +27,15 @@ const ProductImagesCard = () => {
         </CardHeader>
         <CardContent>
           <div className="grid gap-2">
-            <div className="aspect-square w-full border rounded-md flex items-center justify-center bg-slate-50">
-              {currentProduct?.images && currentProduct?.images.length > 0 ? (
-                <Image
-                  alt="Product image"
-                  height="84"
-                  src={currentProduct.images[0]}
-                  width="84"
-                  className="w-full h-full object-contain p-3 border rounded-md"
-                />
-              ) : (
-                <PlasholderImage />
-              )}
-            </div>
+            <ImageView index={0} />
             <div className="grid grid-cols-3 gap-2 overflow-hidden ">
-              <div className="aspect-square border w-full rounded-md flex items-center justify-center bg-slate-50">
-                {currentProduct?.images && currentProduct?.images.length > 1 ? (
-                  <Image
-                    alt="Product image"
-                    height="84"
-                    src={currentProduct.images[1]}
-                    width="84"
-                    className="w-full h-full object-contain border rounded-md p-2"
-                  />
-                ) : (
-                  <PlasholderImage />
-                )}
-              </div>
-              <div className="aspect-square border w-full rounded-md flex items-center justify-center bg-slate-50">
-                {currentProduct?.images && currentProduct?.images.length > 2 ? (
-                  <Image
-                    alt="Product image"
-                    height="84"
-                    src={currentProduct.images[2]}
-                    width="84"
-                    className="w-full h-full object-contain border rounded-md p-2"
-                  />
-                ) : (
-                  <PlasholderImage />
-                )}
-              </div>
+              <ImageView index={1} />
+              <ImageView index={2} />
               <UploadImageProvider
                 folder="products"
-                name="product-image-1"
+                name={
+                  "product-" + currentProduct.id + "-image-" + Math.random()
+                }
                 callback={(url) => {
                   if (!currentProduct) return;
                   setCurrentProduct({
@@ -86,6 +53,44 @@ const ProductImagesCard = () => {
         </CardContent>
       </Card>
     )
+  );
+};
+
+const ImageView = ({ index }: { index: number }) => {
+  const { currentProduct, setCurrentProduct } = useProducts();
+
+  return (
+    <div className="aspect-square border relative overflow-hidden w-full group rounded-md flex items-center justify-center bg-slate-50">
+      {currentProduct?.images && currentProduct?.images.length > index ? (
+        <Image
+          alt="Product image"
+          height="84"
+          src={currentProduct.images[index]}
+          width="84"
+          className="w-full h-full object-contain border rounded-md p-2"
+        />
+      ) : (
+        <PlasholderImage />
+      )}
+      {currentProduct?.images && currentProduct?.images.length > index && (
+        <div className="absolute -top-12 group-hover:top-2 duration-200 right-2 ">
+          <Button
+            className=""
+            size="icon"
+            variant={"outline"}
+            onClick={() => {
+              if (!currentProduct) return;
+              const images = currentProduct.images?.filter(
+                (_, i) => i !== index,
+              );
+              setCurrentProduct({ ...currentProduct, images } as Product);
+            }}
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
+    </div>
   );
 };
 const PlasholderImage = () => {

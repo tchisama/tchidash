@@ -149,6 +149,7 @@ export default function Page() {
                       <span className="sr-only">Image</span>
                     </TableHead>
                     <TableHead>Title</TableHead>
+                    <TableHead>Variants</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead className="hidden md:table-cell">
                       Price
@@ -167,7 +168,7 @@ export default function Page() {
                 <TableBody>
                   {products &&
                     products.map((product) => (
-                      <TableRow key={product.id}>
+                      <TableRow key={product.id} className="group">
                         <TableCell className="hidden sm:table-cell">
                           {Array.isArray(product.images) &&
                           product.images.length > 0 &&
@@ -177,7 +178,7 @@ export default function Page() {
                               alt={product.title || "Product Image"} // Provide a default alt text if title is undefined
                               width={100}
                               height={100}
-                              className="w-16 h-16"
+                              className="w-16 h-16 object-contain border rounded-md p-2 group-hover:p-1 duration-300"
                             />
                           ) : (
                             <div className="w-[70px] rounded-xl border bg-slate-50 h-[70px] flex justify-center items-center">
@@ -198,6 +199,9 @@ export default function Page() {
                           >
                             {product.title}
                           </Link>
+                        </TableCell>
+                        <TableCell>
+                          {product.variants?.length || 1} Variants
                         </TableCell>
                         <TableCell>
                           <Badge variant="outline">{product.status}</Badge>

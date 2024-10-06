@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 
 import { ChevronLeft } from "lucide-react";
 
@@ -66,7 +66,12 @@ function Page({ params }: { params: { product: string } }) {
     setCurrentProduct(data as Product);
   }, [data, setCurrentProduct, productId]);
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading)
+    return (
+      <div className="w-full h-[50vh] flex justify-center items-center">
+        Loading...
+      </div>
+    );
   if (error) return <div>Error: {error.message}</div>;
 
   const saveProduct = () => {

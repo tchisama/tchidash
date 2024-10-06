@@ -3,13 +3,13 @@ import { Timestamp } from "firebase/firestore";
 // Enum for product status
 
 // Type for variant option values
-interface VariantValue {
+export interface VariantValue {
   option: string; // e.g., "Size" or "Color"
   value: string; // e.g., "Large" or "Red"
 }
 
 // Type for product variant
-interface Variant {
+export interface Variant {
   id: string;
   title: string;
   sku: string;
@@ -24,14 +24,14 @@ interface Variant {
 }
 
 // Type for product option (general options like size, color)
-interface Option {
+export interface Option {
   name: string; // e.g., "Size"
   values: string[]; // e.g., ["Small", "Medium", "Large"]
   id: string;
 }
 
 // Type for discount
-interface Discount {
+export interface Discount {
   amount: number; // Discount value
   type: "percentage" | "fixed"; // Discount type
   startDate: Timestamp;
@@ -39,7 +39,7 @@ interface Discount {
 }
 
 // Type for product bundle
-interface ProductBundle {
+export interface ProductBundle {
   id: string;
   title: string;
   products: Array<{ productId: string; quantity: number }>; // List of products and their quantities in the bundle

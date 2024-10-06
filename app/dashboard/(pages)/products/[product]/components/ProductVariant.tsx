@@ -59,6 +59,7 @@ const ProductVariantsCard = () => {
       weight: 0, // Default weight (can be modified)
       inventoryQuantity: 100, // Default inventory (modifiable)
       variantValues: variantValues,
+      taxable: true, // Default taxability (modifiable)
     }));
   };
 
@@ -111,7 +112,13 @@ const ProductVariantsCard = () => {
           <TableBody>
             {/* Map variants data */}
             {productVariants.map((variant) => (
-              <TableRow key={variant.id}>
+              <TableRow
+                key={variant.id}
+                style={{
+                  opacity: variant.inventoryQuantity == 0 ? 0.8 : 1,
+                  background: variant.inventoryQuantity == 0 ? "#ff00008" : "",
+                }}
+              >
                 <TableCell>
                   <div className="w-4 h-4 flex justify-between items-center">
                     <Checkbox
