@@ -21,6 +21,7 @@ import {
   doc,
   getDocs,
   query,
+  Timestamp,
   updateDoc,
   where,
 } from "firebase/firestore";
@@ -66,6 +67,36 @@ function Page({ params }: { params: { product: string } }) {
     setCurrentProduct(data as Product);
   }, [data, setCurrentProduct, productId]);
 
+  const saveProduct = () => {
+    console.log(currentProduct);
+    // Ensure currentProduct exists
+    if (!currentProduct) return;
+
+    // Destructure necessary fields from the currentProduct object
+    const { title, price } = currentProduct;
+    console.log(currentProduct);
+    // Check if all the required fields are present
+    if (title && price) {
+      // Update an existing product
+      updateDoc(doc(db, "products", currentProduct.id), {
+        ...currentProduct,
+        updatedAt: Timestamp.now(),
+      });
+    } else {
+      // Handle missing fields (e.g., show an error or notification)
+      console.error("Missing required product fields");
+    }
+  };
+
+  //useEffect(() => {
+  //  // Auto-save if the current product is changed, but the save needs to happen after 20 seconds
+  //  if (!currentProduct) return;
+  //
+  //  const updatedAt = currentProduct.updatedAt?.toDate().getTime(); // Get the timestamp in milliseconds
+  //  //saveProduct();
+  //  console.log("Auto-saved product", updatedAt);
+  //}, [currentProduct]);
+
   if (isLoading)
     return (
       <div className="w-full h-[50vh] flex justify-center items-center">
@@ -74,29 +105,6 @@ function Page({ params }: { params: { product: string } }) {
     );
   if (error) return <div>Error: {error.message}</div>;
 
-  const saveProduct = () => {
-    console.log(currentProduct);
-    // Ensure currentProduct exists
-    if (!currentProduct) return;
-
-    // Destructure necessary fields from the currentProduct object
-    const { title, description, price, status } = currentProduct;
-    console.log(currentProduct);
-    // Check if all the required fields are present
-    if (title && description && price && status) {
-      // Save the product using setDoc
-      if (productId == "new") {
-        // Create a new product
-        addDoc(collection(db, "products"), currentProduct);
-      } else {
-        // Update an existing product
-        updateDoc(doc(db, "products", currentProduct.id), currentProduct);
-      }
-    } else {
-      // Handle missing fields (e.g., show an error or notification)
-      console.error("Missing required product fields");
-    }
-  };
   const discard = () => {
     setCurrentProduct(null);
     router.push("/dashboard/products");

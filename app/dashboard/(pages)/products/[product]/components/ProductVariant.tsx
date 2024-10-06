@@ -267,6 +267,13 @@ const ProductVariantsCard = ({ saveProduct }: { saveProduct: () => void }) => {
                           setProductVariants((prev) =>
                             prev.filter((v) => v.id !== variant.id),
                           );
+                          if (!currentProduct) return;
+                          setCurrentProduct({
+                            ...currentProduct,
+                            variants: currentProduct.variants?.filter(
+                              (v) => v.id !== variant.id,
+                            ) as Variant[],
+                          } as Product);
                         }}
                       >
                         Delete

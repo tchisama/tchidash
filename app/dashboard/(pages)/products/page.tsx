@@ -177,9 +177,6 @@ export default function Page() {
           <Card x-chunk="dashboard-06-chunk-0">
             <CardHeader>
               <CardTitle>Products</CardTitle>
-              <CardDescription>
-                Manage your products and view their sales performance.
-              </CardDescription>
             </CardHeader>
             <CardContent className="p-2">
               <Table>
@@ -237,7 +234,7 @@ export default function Page() {
                           <Link
                             href={`/dashboard/products/${product.title.replaceAll(" ", "_")}`}
                           >
-                            {product.title}
+                            <b>{product.title}</b>
                           </Link>
                         </TableCell>
                         <TableCell>
