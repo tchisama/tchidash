@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 
 import { ChevronLeft } from "lucide-react";
 
@@ -15,7 +15,6 @@ import ProductDiscount from "./components/ProductDiscount";
 import { useEffect } from "react";
 import { useProducts } from "@/store/products";
 import {
-  addDoc,
   and,
   collection,
   doc,
@@ -32,6 +31,7 @@ import { useStore } from "@/store/storeInfos";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import ProductDangerZone from "./components/ProductDangerZone";
 
 function Page({ params }: { params: { product: string } }) {
   const { currentProduct, setCurrentProduct } = useProducts();
@@ -151,6 +151,7 @@ function Page({ params }: { params: { product: string } }) {
           <ProductImagesCard />
           <ProductStatusCard />
           <ProductDiscount />
+          <ProductDangerZone />
         </div>
       </div>
       <div className="flex items-center justify-center gap-2 md:hidden">

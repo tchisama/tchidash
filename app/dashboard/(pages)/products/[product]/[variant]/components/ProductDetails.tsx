@@ -8,9 +8,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useProducts } from "@/store/products";
-import { Product, Variant } from "@/types/product";
-import { useEffect } from "react";
+import { Variant } from "@/types/product";
 
 const ProductDetailsCard = ({
   variantState,
@@ -21,7 +19,6 @@ const ProductDetailsCard = ({
     setVariantProduct: (variant: Variant) => void;
   };
 }) => {
-  const { setCurrentProduct, currentProduct } = useProducts();
   return variantState.variantProduct ? (
     <Card>
       <CardHeader>

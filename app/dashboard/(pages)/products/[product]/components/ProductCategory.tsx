@@ -128,7 +128,7 @@ const ProductCategoryCard = () => {
             </div>
           )}
           {categories && categories.length > 0 ? (
-            <>
+            <div>
               <Label htmlFor="category">Category</Label>
               <Select
                 value={currentProduct?.category}
@@ -152,7 +152,7 @@ const ProductCategoryCard = () => {
                     ))}
                 </SelectContent>
               </Select>
-            </>
+            </div>
           ) : (
             <div>No category found</div>
           )}

@@ -5,7 +5,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
@@ -19,7 +18,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MoreHorizontal, MoreVertical } from "lucide-react";
+import { MoreVertical } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { useProducts } from "@/store/products";
 import { Input } from "@/components/ui/input";

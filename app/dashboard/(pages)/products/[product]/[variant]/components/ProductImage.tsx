@@ -11,11 +11,10 @@ import Photo from "@/public/images/svgs/icons/photo.svg";
 import { Upload, X } from "lucide-react";
 import UploadImageProvider from "@/components/UploadImageProvider";
 import { useProducts } from "@/store/products";
-import { Product, Variant } from "@/types/product";
+import {  Variant } from "@/types/product";
 import { Button } from "@/components/ui/button";
 
 const ProductImagesCard = ({
-  variant,
   variantState,
 }: {
   variant?: string;
@@ -24,7 +23,7 @@ const ProductImagesCard = ({
     setVariantProduct: (variant: Variant) => void;
   };
 }) => {
-  const { setCurrentProduct, currentProduct } = useProducts();
+  const { currentProduct } = useProducts();
   return (
     currentProduct && (
       <Card>

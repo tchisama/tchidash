@@ -14,7 +14,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
@@ -197,9 +196,9 @@ const ProductVariantsCard = ({ saveProduct }: { saveProduct: () => void }) => {
                       }}
                     />
                   ) : (
-                    <>
+                    <div>
                       <b>{variant.price}</b> Dh
-                    </>
+                    </div>
                   )}
                 </TableCell>
                 <TableCell>
@@ -233,9 +232,9 @@ const ProductVariantsCard = ({ saveProduct }: { saveProduct: () => void }) => {
                       }}
                     />
                   ) : (
-                    <>
+                    <div>
                       <b>{variant.inventoryQuantity}</b> in stock
-                    </>
+                    </div>
                   )}
                 </TableCell>
                 <TableCell>{variant.sku}</TableCell>

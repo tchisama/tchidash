@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -51,10 +50,12 @@ import { useProducts } from "@/store/products";
 import { useQuery } from "@tanstack/react-query";
 import { db } from "@/firebase";
 import { Product } from "@/types/product";
+import { useStore } from "@/store/storeInfos";
 // Sample product data
 
 export default function Page() {
   const { setCurrentProduct, products = [], setProducts } = useProducts();
+  const { storeId } = useStore();
   const { data, error, isLoading } = useQuery({
     queryKey: ["products"],
     queryFn: async () => {
@@ -69,7 +70,7 @@ export default function Page() {
       }));
       return data;
     },
-    staleTime: 20000, // Data stays fresh for 10 seconds
+    // staleTime: 20000, // Data stays fresh for 10 seconds
   });
   const router = useRouter();
   useEffect(() => {
@@ -90,7 +91,7 @@ export default function Page() {
 
   const addProduct = () => {
     const productName = "new product " + Math.random().toString().slice(3, 9);
-    addDoc(collection(db, "products"), {
+    const newProduct = {
       title: productName,
       status: "draft",
       createdAt: Timestamp.now(),
@@ -103,26 +104,12 @@ export default function Page() {
       variants: [],
       options: [],
       updatedAt: Timestamp.now(),
+      storeId,
       stockQuantity: 0,
-      storeId: "test",
-    }).then((docRef) => {
-      setCurrentProduct({
-        title: productName,
-        status: "draft",
-        createdAt: Timestamp.now(),
-        images: [],
-        price: 100,
-        description: "description of the product",
-        tags: [],
-        vendor: "",
-        category: "",
-        variants: [],
-        options: [],
-        updatedAt: Timestamp.now(),
-        stockQuantity: 0,
-        storeId: "test",
-        id: docRef.id,
-      });
+    }
+    addDoc(collection(db, "products"), newProduct).then((docRef) => {
+      setCurrentProduct({...newProduct, id: docRef.id} as Product);
+      setProducts([...products, {...newProduct, id: docRef.id} as Product]);
       router.push(`/dashboard/products/${productName.replaceAll(" ", "_")}`);
     });
   };
