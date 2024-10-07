@@ -8,6 +8,9 @@ interface State {
 
   currentProduct: Product | null;
   setCurrentProduct: (product: Product | null) => void;
+
+  lastUploadedProduct: Product | null;
+  setLastUploadedProduct: (product: Product | null) => void;
 }
 
 // Create the Zustand store
@@ -18,4 +21,9 @@ export const useProducts = create<State>((set) => ({
   currentProduct: null,
   setCurrentProduct: (product: Product | null) =>
     set(() => ({ currentProduct: product })),
+
+  lastUploadedProduct: null,
+  setLastUploadedProduct: (product: Product | null) =>
+    set(() => ({ lastUploadedProduct: product })),
+
 }));

@@ -6,11 +6,11 @@ type Props = {
 }
 function layout({children}: Props) {
   return (
-    <body>
+    <div>
       <Protected>
       {children}
       </Protected>
-    </body>
+    </div>
   )
 }
 

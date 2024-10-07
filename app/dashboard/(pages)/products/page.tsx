@@ -54,7 +54,7 @@ import { useStore } from "@/store/storeInfos";
 // Sample product data
 
 export default function Page() {
-  const { setCurrentProduct, products = [], setProducts } = useProducts();
+  const { setCurrentProduct,setLastUploadedProduct, products = [], setProducts } = useProducts();
   const { storeId } = useStore();
   const { data, error, isLoading } = useQuery({
     queryKey: ["products"],
@@ -220,6 +220,10 @@ export default function Page() {
                         <TableCell>
                           <Link
                             href={`/dashboard/products/${product.title.replaceAll(" ", "_")}`}
+                            onClick={()=>{
+                              setCurrentProduct(product);
+                              setLastUploadedProduct(product);
+                            }}
                           >
                             <b>{product.title}</b>
                           </Link>
@@ -257,6 +261,8 @@ export default function Page() {
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem
                                 onClick={() => {
+                                  setCurrentProduct(product);
+                                  setLastUploadedProduct(product);
                                   router.push(
                                     `/dashboard/products/${product.title.replaceAll(" ", "_")}`,
                                   );

@@ -7,11 +7,11 @@ type Props = {
 
 function layout({children}: Props) {
   return (
-    <body>
+    <div>
       <DashboardUiProvider>
         {children}
       </DashboardUiProvider>
-    </body>
+    </div>
   )
 }
 

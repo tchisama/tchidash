@@ -100,7 +100,7 @@ function SideBar() {
     <aside className=" px-1 sticky top-4 rounded-2xl h-[80vh] overflow-y-auto inset-y-0 left-0 z-10 hidden flex-col border m-2 shadow-sm bg-background sm:flex">
       <nav className="flex flex-col  gap-1 px-1 sm:py-3">
         <div className="mb-10 text-slate-700 px-2 font-bold">
-          <div className="text-xs font-light text-slate-500">powered by</div>
+          <p className="text-xs font-light text-slate-500">powered by</p>
           TchiDash
           <span className="sr-only">Acme Inc</span>
         </div>

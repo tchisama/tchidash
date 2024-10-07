@@ -30,14 +30,15 @@ import { Product } from "@/types/product";
 import { useStore } from "@/store/storeInfos";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import ProductDangerZone from "./components/ProductDangerZone";
+import { isEqual } from "lodash";
+import { useNavbar } from "@/store/navbar";
 
 function Page({ params }: { params: { product: string } }) {
-  const { currentProduct, setCurrentProduct } = useProducts();
+  const { currentProduct, setCurrentProduct , lastUploadedProduct, setLastUploadedProduct } = useProducts();
   const { storeId } = useStore();
+  const {setActions} = useNavbar();
   const productId = params.product;
-  const router = useRouter();
 
   const { data, isLoading, error } = useQuery({
     queryKey: [productId],
@@ -71,7 +72,6 @@ function Page({ params }: { params: { product: string } }) {
     console.log(currentProduct);
     // Ensure currentProduct exists
     if (!currentProduct) return;
-
     // Destructure necessary fields from the currentProduct object
     const { title, price } = currentProduct;
     console.log(currentProduct);
@@ -82,20 +82,51 @@ function Page({ params }: { params: { product: string } }) {
         ...currentProduct,
         updatedAt: Timestamp.now(),
       });
+      setLastUploadedProduct(currentProduct);
+      setActions([]);
     } else {
       // Handle missing fields (e.g., show an error or notification)
       console.error("Missing required product fields");
     }
   };
 
-  //useEffect(() => {
-  //  // Auto-save if the current product is changed, but the save needs to happen after 20 seconds
-  //  if (!currentProduct) return;
-  //
-  //  const updatedAt = currentProduct.updatedAt?.toDate().getTime(); // Get the timestamp in milliseconds
-  //  //saveProduct();
-  //  console.log("Auto-saved product", updatedAt);
-  //}, [currentProduct]);
+  const areProductsEqual = isEqual(lastUploadedProduct, currentProduct);
+
+  useEffect(() => {
+    if (!lastUploadedProduct && currentProduct) {
+      setLastUploadedProduct(currentProduct);
+    }
+  }, [lastUploadedProduct, currentProduct,setLastUploadedProduct]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      // Check if scroll position is greater than 100px
+      if (window.scrollY > 80) {
+        setActions([
+          <>
+            {!areProductsEqual && (
+              <Button size="sm" onClick={saveProduct}>
+                Save Product
+              </Button>
+            )}
+          </>
+        ]);
+      } else {
+        // If scroll is less than 100px, clear actions
+        setActions([]);
+      }
+    };
+
+    // Attach scroll event listener
+    window.addEventListener("scroll", handleScroll);
+
+    // Clean up the event listener on component unmount
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [areProductsEqual, currentProduct]);
+
+
 
   if (isLoading)
     return (
@@ -104,11 +135,6 @@ function Page({ params }: { params: { product: string } }) {
       </div>
     );
   if (error) return <div>Error: {error.message}</div>;
-
-  const discard = () => {
-    setCurrentProduct(null);
-    router.push("/dashboard/products");
-  };
 
   return (
     <div className="mx-auto grid max-w-[90rem]  flex-1 auto-rows-max gap-4">
@@ -126,12 +152,12 @@ function Page({ params }: { params: { product: string } }) {
           {currentProduct?.status ?? "draft"}
         </Badge>
         <div className="hidden items-center gap-2 md:ml-auto md:flex">
-          <Button onClick={discard} variant="outline" size="sm">
-            Discard
-          </Button>
-          <Button size="sm" onClick={saveProduct}>
-            Save Product
-          </Button>
+          {
+            !areProductsEqual &&
+            <Button size="sm" onClick={saveProduct}>
+              Save Product
+            </Button>
+          }
         </div>
       </div>
       <div className="grid gap-4 md:grid-cols-[1fr_250px] lg:grid-cols-3 lg:gap-8">
@@ -155,12 +181,12 @@ function Page({ params }: { params: { product: string } }) {
         </div>
       </div>
       <div className="flex items-center justify-center gap-2 md:hidden">
-        <Button variant="outline" size="sm">
-          Discard
-        </Button>
-        <Button size="sm" onClick={saveProduct}>
-          Save Product
-        </Button>
+        {
+          !areProductsEqual &&
+          <Button size="sm" onClick={saveProduct}>
+            Save Product
+          </Button>
+        }
       </div>
     </div>
   );
