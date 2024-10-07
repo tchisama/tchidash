@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -31,11 +31,11 @@ import { useStore } from "@/store/storeInfos";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import ProductDangerZone from "./components/ProductDangerZone";
-import { isEqual } from "lodash";
+import { isEqual} from "lodash";
 import { useNavbar } from "@/store/navbar";
 
 function Page({ params }: { params: { product: string } }) {
-  const { currentProduct, setCurrentProduct , lastUploadedProduct, setLastUploadedProduct } = useProducts();
+  const { products,setProducts,currentProduct, setCurrentProduct , lastUploadedProduct, setLastUploadedProduct } = useProducts();
   const { storeId } = useStore();
   const {setActions} = useNavbar();
   const productId = params.product;
@@ -83,6 +83,7 @@ function Page({ params }: { params: { product: string } }) {
         updatedAt: Timestamp.now(),
       });
       setLastUploadedProduct(currentProduct);
+      setProducts(products.map((p) => (p.id === currentProduct.id ? currentProduct : p)));
       setActions([]);
     } else {
       // Handle missing fields (e.g., show an error or notification)
@@ -127,6 +128,23 @@ function Page({ params }: { params: { product: string } }) {
     };
   }, [areProductsEqual, currentProduct]);
 
+  const [preProduct, setPreProduct] = React.useState<Product | null>(null);
+  const [nextProduct, setNextProduct] = React.useState<Product | null>(null);
+
+  useEffect(() => {
+    if (!products) return;
+    const index = products.findIndex((p) => p.title == currentProduct?.title);
+    if (index > 0) {
+      setPreProduct(products[index - 1]);
+    }else{
+      setPreProduct(null);
+    }
+    if (index < products.length - 1) {
+      setNextProduct(products[index + 1]);
+    }else{
+      setNextProduct(null);
+    }
+  }, [products, currentProduct]);
 
 
   if (isLoading)
@@ -160,14 +178,28 @@ function Page({ params }: { params: { product: string } }) {
             </Button>
           }
         </div>
-        <div>
+        <div className="flex gap-2 ">
           <Button
             size="sm"
             variant={"outline"}
+            disabled={preProduct == null}
             onClick={() => {
+              setCurrentProduct(preProduct);
+              setLastUploadedProduct(preProduct);
             }}
           >
             <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <Button
+            size="sm"
+            variant={"outline"}
+            disabled={nextProduct == null}
+            onClick={() => {
+              setCurrentProduct(nextProduct);
+              setLastUploadedProduct(nextProduct);
+            }}
+          >
+            <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
       </div>
