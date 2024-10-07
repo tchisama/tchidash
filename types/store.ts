@@ -1,11 +1,5 @@
 import { Timestamp } from "firebase/firestore";
 
-// Enum for store status
-enum StoreStatus {
-    ACTIVE = "active",
-    INACTIVE = "inactive",
-    PENDING_APPROVAL = "pending_approval",
-}
   
   
   // Type for store owner
@@ -30,7 +24,7 @@ enum StoreStatus {
     name: string;
     owner: StoreOwner;
     ownerEmail:string;
-    status: StoreStatus;
+    status: "active" | "inactive" | "pending_approval";
     createdAt: Timestamp;
     updatedAt?: Timestamp;
     description?: string; // Optional store description

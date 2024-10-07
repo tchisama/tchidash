@@ -21,6 +21,8 @@ import Settings from "@/public/images/svgs/icons/settings.svg";
 import Store from "@/public/images/svgs/icons/shop.svg";
 import BreadcrumbCom from "./Breadcrumb";
 import { useNavbar } from "@/store/navbar";
+import { useRouter } from "next/navigation";
+import useClean from "@/hooks/useClean";
 
 export const description =
   "An orders dashboard with a sidebar navigation. The sidebar has icon navigation. The content area has a breadcrumb and search in the header. The main area has a list of recent orders with a filter and export button. The main area also has a detailed view of a single order with order details, shipping information, billing information, customer information, and payment information.";
@@ -31,6 +33,8 @@ export default function DashboardUiProvider({
   children: React.ReactNode;
 }) {
   const { data: session } = useSession();
+  const router = useRouter();
+  const {cleanAll} = useClean();
   const {actions} = useNavbar();
   return (
     <div className="flex min-h-screen w-full  bg-muted/40">
@@ -78,7 +82,12 @@ export default function DashboardUiProvider({
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
 
-                <DropdownMenuItem>
+                <DropdownMenuItem 
+                onClick={() => {
+                  cleanAll()
+                  router.push("/dashboard/switch-store")
+                }}
+                >
                   <Image src={Store} alt="Settings" className="mr-2 h-5 w-5" />
                   Switch Store
                 </DropdownMenuItem>

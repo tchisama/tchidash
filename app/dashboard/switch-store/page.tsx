@@ -10,7 +10,10 @@ import { cn } from "@/lib/utils"
 import { and, collection, getDocs, query, where } from "firebase/firestore"
 import { db } from "@/firebase"
 import { useSession } from "next-auth/react"
-import { redirect } from "next/navigation"
+import { redirect, useRouter } from "next/navigation"
+import Link from "next/link"
+import { useStore } from "@/store/storeInfos"
+import useClean from "@/hooks/useClean"
 
 interface Store {
   id: string
@@ -22,6 +25,8 @@ interface Store {
 export default function StoreSwitchCard() {
   const [selectedStore, setSelectedStore] = useState<string>("")
   const [stores,setStores] = useState<Store[]>([])
+  const {cleanAll} = useClean()
+  const {setStoreId} = useStore();
     const { data: session } = useSession({
     required: true,
     onUnauthenticated() {
@@ -34,9 +39,10 @@ export default function StoreSwitchCard() {
     if(! session?.user?.email) return
     const fetchStores = async () => {
       try {
-        const q = query(collection(db, "stores"), and(where("status", "==", "active"), where("ownerEmail", "==", session?.user?.email)))
+        const q = query(collection(db, "stores"), and(where("ownerEmail", "==", session?.user?.email)))
         const querySnapshot = await getDocs(q)
-        const stores = querySnapshot.docs.map((doc) => doc.data() as Store)
+        const stores = querySnapshot.docs.map((doc) => ({...doc.data(), id: doc.id} as Store))
+        cleanAll();
         setStores(stores)
       } catch (error) {
         console.error("Error fetching stores:", error)
@@ -44,12 +50,14 @@ export default function StoreSwitchCard() {
     }
 
     fetchStores()
-  }, [session])
-
+  }, [session, cleanAll])
+  const router = useRouter();
 
   const handleContinue = () => {
     console.log(`Continuing to dashboard for store: ${selectedStore}`)
     // Add your logic here to navigate to the dashboard or perform any other action
+    setStoreId(selectedStore)
+    router.push("/dashboard");
   }
 
   return (
@@ -77,14 +85,20 @@ export default function StoreSwitchCard() {
             </div>
           ))}
         </RadioGroup>
-        <Button variant={"outline"} className="w-full py-6 mt-6">
-            Add New Store
-        </Button>
+        <Link href={"/dashboard/create-store"} >
+          <Button variant={"outline"} className="w-full py-6 mt-6">
+              Add New Store
+          </Button>
+        </Link>
       </CardContent>
       <CardFooter>
-        <Button onClick={handleContinue} className="w-full py-6">
-          Continue to Dashboard
-        </Button>
+        {
+          stores.length > 0 && (
+            <Button disabled={!selectedStore} onClick={handleContinue} className="w-full py-6">
+              Continue to Dashboard
+            </Button>
+          )
+        }
       </CardFooter>
     </Card>
     </div>

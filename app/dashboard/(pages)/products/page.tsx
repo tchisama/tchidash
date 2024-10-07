@@ -61,7 +61,7 @@ export default function Page() {
     queryFn: async () => {
       const q = query(
         collection(db, "products"),
-        and(where("storeId", "==", "test"), where("status", "!=", "deleted")),
+        and(where("storeId", "==", storeId), where("status", "!=", "deleted")),
       );
       const response = await getDocs(q);
       const data = response.docs.map((doc) => ({
