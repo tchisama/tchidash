@@ -137,12 +137,12 @@ function Page({ params }: { params: { product: string } }) {
     if (index > 0) {
       setPreProduct(products[index - 1]);
     }else{
-      setPreProduct(null);
+      setPreProduct(products[products.length - 1]);
     }
     if (index < products.length - 1) {
       setNextProduct(products[index + 1]);
     }else{
-      setNextProduct(null);
+      setNextProduct(products[0]);
     }
   }, [products, currentProduct]);
 
@@ -178,6 +178,9 @@ function Page({ params }: { params: { product: string } }) {
             </Button>
           }
         </div>
+        {
+          products &&
+          products.length > 1 &&
         <div className="flex gap-2 ">
           <Button
             size="sm"
@@ -202,6 +205,7 @@ function Page({ params }: { params: { product: string } }) {
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
+        }
       </div>
       <div className="grid gap-4 md:grid-cols-[1fr_250px] lg:grid-cols-3 lg:gap-8">
         <div className="grid auto-rows-max items-start gap-4 lg:col-span-2 lg:gap-8">
