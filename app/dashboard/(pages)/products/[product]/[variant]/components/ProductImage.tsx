@@ -102,7 +102,7 @@ const ImageView = ({
           height="84"
           src={url}
           width={600}
-          className="w-full"
+          className="w-full aspect-square p-2 object-contain"
         />
       ) : (
         <PlasholderImage />

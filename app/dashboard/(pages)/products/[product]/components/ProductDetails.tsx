@@ -5,6 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -52,12 +53,12 @@ const ProductDetailsCard = () => {
               value={currentProduct.description}
             />
             {currentProduct.options && currentProduct.options.length == 0 && (
-              <div>
+              <>
                 <Label htmlFor="price">Price</Label>
                 <Input
                   id="price"
                   type="number"
-                  className="w-full max-w-[300px]"
+                  className="w-full max-w-[300px] mb-4 mt-2"
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setCurrentProduct({
                       ...currentProduct,
@@ -66,7 +67,40 @@ const ProductDetailsCard = () => {
                   }
                   value={currentProduct.price}
                 />
-              </div>
+                  <Label htmlFor="price" className="">Inventory Quantity</Label>
+                <Input
+                  id="inventoryQuantity"
+                  type="number"
+                  className="w-full max-w-[300px] mt-2"
+                  disabled={currentProduct?.hasInfiniteStock}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setCurrentProduct({
+                      ...currentProduct,
+                      stockQuantity: parseFloat(e.target.value) ?? 0,
+                    } as Product)
+                  }
+                  value={currentProduct.stockQuantity}
+                />
+                <div className="flex gap-2 items-center">
+                <Checkbox
+                  id="hasInfiniteStock"
+                  checked={currentProduct?.hasInfiniteStock}
+                  onCheckedChange={
+                    (value) =>
+                      setCurrentProduct({
+                        ...currentProduct,
+                        hasInfiniteStock: value,
+                      } as Product)
+                  }
+                ></Checkbox>
+                <Label
+                  htmlFor="hasInfiniteStock"
+                  className="ml-2"
+                >
+                  has Infinite Stock ?
+                </Label>
+                </div>
+              </>
             )}
           </div>
         </div>

@@ -195,10 +195,15 @@ export default function Page() {
                       <TableRow key={product.id} className="group">
                         <TableCell className="hidden sm:table-cell">
                           {Array.isArray(product.images) &&
-                          product.images.length > 0 &&
-                          product.images[0] ? (
+                          (product.images[0] ||
+                          product.variants?.find((v) => v.image)
+                          ) 
+                          ? (
                             <Image
-                              src={product.images[0]} // Directly use the first image
+                              src={product.images[0]??
+                              // get the first image in variants
+                                product.variants?.find(v=>v.image)?.image
+                              } // Directly use the first image
                               alt={product.title || "Product Image"} // Provide a default alt text if title is undefined
                               width={100}
                               height={100}

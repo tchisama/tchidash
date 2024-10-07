@@ -26,7 +26,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
-const ProductVariantsCard = ({ saveProduct }: { saveProduct: () => void }) => {
+const ProductVariantsCard = ({  }: { saveProduct: () => void }) => {
   const { currentProduct, setCurrentProduct } = useProducts();
   const [productVariants, setProductVariants] = useState<Variant[]>([]);
   const [selectedVariants, setSelectedVariants] = useState<string[]>([]);
@@ -162,7 +162,7 @@ const ProductVariantsCard = ({ saveProduct }: { saveProduct: () => void }) => {
                     alt={""}
                     width={60}
                     height={60}
-                    className="rounded-md w-14 h-14 p-1 bg-slate-50 border"
+                    className="rounded-md w-14 object-contain h-14 p-1 bg-slate-50 border"
                   />
                 </TableCell>
                 <TableCell>{variant.title}</TableCell>
@@ -202,7 +202,11 @@ const ProductVariantsCard = ({ saveProduct }: { saveProduct: () => void }) => {
                   )}
                 </TableCell>
                 <TableCell>
-                  {editMode ? (
+                  {
+                    variant?.hasInfiniteStock ? (
+                      <div>Infinite</div>
+                    ):
+                  (editMode ? (
                     <Input
                       defaultValue={variant.inventoryQuantity}
                       value={variant.inventoryQuantity}
@@ -235,7 +239,7 @@ const ProductVariantsCard = ({ saveProduct }: { saveProduct: () => void }) => {
                     <div>
                       <b>{variant.inventoryQuantity}</b> in stock
                     </div>
-                  )}
+                  ))}
                 </TableCell>
                 <TableCell>{variant.sku}</TableCell>
                 <TableCell className="flex justify-end">
@@ -252,7 +256,6 @@ const ProductVariantsCard = ({ saveProduct }: { saveProduct: () => void }) => {
                           console.log("Edit variant", variant);
                           if (!currentProduct) return;
                           if (!currentProduct.title) return;
-                          saveProduct();
                           router.push(
                             `/dashboard/products/${currentProduct.title.replaceAll(" ", "_")}/${variant.sku}`,
                           );

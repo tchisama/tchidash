@@ -18,6 +18,7 @@ export interface Variant {
   compareAtPrice?: number;
   weight: number; // Weight in grams or other unit
   inventoryQuantity: number;
+  hasInfiniteStock?: boolean; // If true, stock management is ignored
   taxable: boolean;
   barcode?: string;
   image: string;

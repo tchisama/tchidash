@@ -96,6 +96,7 @@ function Page({ params }: { params: { product: string } }) {
     if (!lastUploadedProduct && currentProduct) {
       setLastUploadedProduct(currentProduct);
     }
+    window.history.pushState(null, "", `/dashboard/products/${currentProduct?.title.replaceAll(" ", "_")}`);
   }, [lastUploadedProduct, currentProduct,setLastUploadedProduct]);
 
   useEffect(() => {
@@ -158,6 +159,16 @@ function Page({ params }: { params: { product: string } }) {
               Save Product
             </Button>
           }
+        </div>
+        <div>
+          <Button
+            size="sm"
+            variant={"outline"}
+            onClick={() => {
+            }}
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
         </div>
       </div>
       <div className="grid gap-4 md:grid-cols-[1fr_250px] lg:grid-cols-3 lg:gap-8">

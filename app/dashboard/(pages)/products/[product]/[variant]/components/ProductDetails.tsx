@@ -5,6 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -57,7 +58,7 @@ const ProductDetailsCard = ({
               }
               value={variantState.variantProduct.description}
             />
-            <div className="flex gap-2">
+            <div className="space-y-2">
               <div>
                 <Label className="mb-2" htmlFor="price">
                   Price
@@ -76,13 +77,14 @@ const ProductDetailsCard = ({
                 />
               </div>
               <div>
-                <Label className="mb-2" htmlFor="inventoryQuantity">
-                  Inventory Quantity
+                <Label className="mb-2" htmlFor="price">
+                  Stock
                 </Label>
                 <Input
-                  id="inventoryQuantity"
+                  id="stock"
                   type="number"
                   className="w-full "
+                  disabled={variantState?.variantProduct?.hasInfiniteStock}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     variantState.setVariantProduct({
                       ...variantState.variantProduct,
@@ -92,6 +94,29 @@ const ProductDetailsCard = ({
                   value={variantState.variantProduct.inventoryQuantity}
                 />
               </div>
+
+                  
+                <div className="flex gap-2 items-center">
+                <Checkbox
+                  id="hasInfiniteStock"
+                  checked={
+                    variantState?.variantProduct
+                    ?.hasInfiniteStock}
+                  onCheckedChange={
+                    (value) =>
+                      variantState.setVariantProduct({
+                        ...variantState.variantProduct,
+                        hasInfiniteStock: value
+                      } as Variant)
+                  }
+                ></Checkbox>
+                <Label
+                  htmlFor="hasInfiniteStock"
+                  className="ml-2"
+                >
+                  has Infinite Stock ?
+                </Label>
+                </div>
             </div>
           </div>
           <div></div>
