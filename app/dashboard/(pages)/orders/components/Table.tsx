@@ -9,6 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { db } from "@/firebase"
+import { cn } from "@/lib/utils"
 import { useOrderStore } from "@/store/orders"
 // import { cn } from "@/lib/utils"
 import { useStore } from "@/store/storeInfos"
@@ -19,7 +20,7 @@ import React, { useEffect } from "react"
 
 export function OrdersTable() {
   const {storeId} = useStore()
-  const { orders , setOrders} = useOrderStore()
+  const { orders , setOrders , currentOrder, setCurrentOrder} = useOrderStore()
   const { data } = useQuery({
     queryKey: ["orders", storeId],
     queryFn: async () => {
@@ -30,8 +31,8 @@ export function OrdersTable() {
         ),
       );
       const data = response.docs.map((doc) => ({
-        id: doc.id,
         ...doc.data(),
+        id: doc.id,
       }));
       return data;
     },
@@ -55,7 +56,14 @@ export function OrdersTable() {
       <TableBody>
         {
           orders?.map((order) => (
-            <TableRow key={order.id}>
+            <TableRow key={order.id}
+              onClick={() => setCurrentOrder(order.id)}
+              className={cn(
+                "cursor-pointer",
+                (currentOrder &&
+                currentOrder.id === order.id) && "bg-muted"
+              )}
+            >
               <TableCell>
                <div className="font-medium">{order.customer.firstName} {" "}
                {order.customer.lastName}
