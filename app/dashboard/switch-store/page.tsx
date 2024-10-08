@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Store } from "lucide-react"
+import { Loader2, Store } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { and, collection, getDocs, query, where } from "firebase/firestore"
+import { and, collection,  getDocs, query,  where } from "firebase/firestore"
 import { db } from "@/firebase"
 import { useSession } from "next-auth/react"
 import { redirect, useRouter } from "next/navigation"
@@ -27,7 +27,8 @@ export default function StoreSwitchCard() {
   const [stores,setStores] = useState<Store[]>([])
   const {cleanAll} = useClean()
   const {setStoreId} = useStore();
-    const { data: session } = useSession({
+  const [loading,setLoading] = useState(false)
+  const { data: session } = useSession({
     required: true,
     onUnauthenticated() {
       redirect('/signin')
@@ -54,6 +55,7 @@ export default function StoreSwitchCard() {
   const router = useRouter();
 
   const handleContinue = () => {
+    setLoading(true)
     console.log(`Continuing to dashboard for store: ${selectedStore}`)
     // Add your logic here to navigate to the dashboard or perform any other action
     setStoreId(selectedStore)
@@ -94,8 +96,12 @@ export default function StoreSwitchCard() {
       <CardFooter>
         {
           stores.length > 0 && (
-            <Button disabled={!selectedStore} onClick={handleContinue} className="w-full py-6">
+            <Button disabled={!selectedStore} onClick={handleContinue} className="w-full py-6 flex gap-4">
               Continue to Dashboard
+              {
+                loading &&
+                <Loader2 className="animate-spin ml-2" />
+              }
             </Button>
           )
         }

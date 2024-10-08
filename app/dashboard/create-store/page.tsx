@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react";
-import { StoreIcon, Upload, PlusCircle  } from "lucide-react";
+import { StoreIcon, Upload, PlusCircle, Loader2  } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -33,8 +33,10 @@ export default function CreateNewStore() {
   };
   const router = useRouter();
   const {setStoreId} = useStore()
+  const [loading,setLoading] = useState(false)
 
   const handleSubmit = async (event: React.FormEvent) => {
+    setLoading(true)
     event.preventDefault();
     if(!storeName || !storeDescription) {
       return;
@@ -140,10 +142,15 @@ export default function CreateNewStore() {
               </div>
             </CardContent>
             <CardFooter>
-              <Button type="submit" className="w-full">
+
+            <Button disabled={!storeName || !storeDescription} type="submit" className="w-full py-6 flex gap-4">
                 <PlusCircle className="h-5 w-5 mr-2" />
                 Create Store
-              </Button>
+              {
+                loading &&
+                <Loader2 className="animate-spin ml-2" />
+              }
+            </Button>
             </CardFooter>
           </form>
         </Card>
