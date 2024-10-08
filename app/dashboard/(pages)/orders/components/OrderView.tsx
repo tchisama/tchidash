@@ -24,15 +24,16 @@ import { useOrderStore } from '@/store/orders'
 function OrderView() {
   const {currentOrder} = useOrderStore()
   return (
-    currentOrder &&
-    <div className="h-full">
-<Card
-          className="overflow-hidden sticky top-20" x-chunk="dashboard-05-chunk-4"
+    currentOrder && (
+      <div className="h-full">
+        <Card
+          className="overflow-hidden sticky top-20"
+          x-chunk="dashboard-05-chunk-4"
         >
           <CardHeader className="flex flex-row items-start bg-muted/50">
             <div className="grid gap-0.5">
               <CardTitle className="group flex items-center gap-2 text-lg">
-                Order {currentOrder?.id}
+                Order {currentOrder?.id.slice(0, 8)}..
                 <Button
                   size="icon"
                   variant="outline"
@@ -42,7 +43,14 @@ function OrderView() {
                   <span className="sr-only">Copy Order ID</span>
                 </Button>
               </CardTitle>
-              <CardDescription>Date: {currentOrder?.createdAt.toDate().toLocaleDateString().replaceAll("/",",")} at {currentOrder?.createdAt.toDate().toLocaleTimeString()}</CardDescription>
+              <CardDescription>
+                Date:{" "}
+                {currentOrder?.createdAt
+                  .toDate()
+                  .toLocaleDateString()
+                  .replaceAll("/", ",")}{" "}
+                at {currentOrder?.createdAt.toDate().toLocaleTimeString()}
+              </CardDescription>
             </div>
             <div className="ml-auto flex items-center gap-1">
               <Button size="sm" variant="outline" className="h-8 gap-1">
@@ -77,18 +85,20 @@ function OrderView() {
                   </span>
                   <span>$250.00</span>
                 </li> */}
-                {
-                  currentOrder?.items?.map((item, index) => {
-                    return (
-                      <li key={index} className="flex items-center justify-between">
-                        <span className="text-muted-foreground">
-                          {item.title} x <span className='font-semibold'>{item.quantity}</span>
-                        </span>
-                        <span>${item.price}</span>
-                      </li>
-                    )
-                  })
-                }
+                {currentOrder?.items?.map((item, index) => {
+                  return (
+                    <li
+                      key={index}
+                      className="flex items-center justify-between"
+                    >
+                      <span className="text-muted-foreground">
+                        {item.title} x{" "}
+                        <span className="font-semibold">{item.quantity}</span>
+                      </span>
+                      <span>${item.price}</span>
+                    </li>
+                  );
+                })}
               </ul>
               <Separator className="my-2" />
               <ul className="grid gap-3">
@@ -104,9 +114,7 @@ function OrderView() {
                   <span className="text-muted-foreground">Total</span>
                   <span>$329.00</span>
                 </li> */}
-                {
-                  
-                }
+                {}
               </ul>
             </div>
             <Separator className="my-4" />
@@ -152,8 +160,7 @@ function OrderView() {
             <div className="grid gap-3">
               <div className="font-semibold">Payment Information</div>
               <dl className="grid gap-3">
-                <div className="flex items-center justify-between">
-                </div>
+                <div className="flex items-center justify-between"></div>
               </dl>
             </div>
           </CardContent>
@@ -163,8 +170,9 @@ function OrderView() {
             </div>
           </CardFooter>
         </Card>
-    </div>
-  )
+      </div>
+    )
+  );
 }
 
 export default OrderView

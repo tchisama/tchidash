@@ -68,9 +68,8 @@ export function OrdersTable() {
                <div className="font-medium">{order.customer.firstName} {" "}
                {order.customer.lastName}
                </div>
+
                <div className="hidden text-sm text-muted-foreground md:inline">{order.customer.phoneNumber}</div>
-</TableCell>
-              <TableCell className="hidden sm:table-cell">
                 <Badge >{order.orderStatus}</Badge>
                 </TableCell>
               <TableCell className="hidden sm:table-cell">{order.items.reduce((total, item) => total + item.quantity, 0)} items</TableCell>
