@@ -5,11 +5,11 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Loader2, Store } from "lucide-react"
+import { Loader2, PlusCircle, Store } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { and, collection,  getDocs, query,  where } from "firebase/firestore"
 import { db } from "@/firebase"
-import { useSession } from "next-auth/react"
+import { signOut, useSession } from "next-auth/react"
 import { redirect, useRouter } from "next/navigation"
 import Link from "next/link"
 import { useStore } from "@/store/storeInfos"
@@ -63,10 +63,15 @@ export default function StoreSwitchCard() {
   }
 
   return (
-    <div className="flex justify-center items-center w-full h-screen bg-slate-100">
+    <div className="flex justify-center items-center w-full h-screen bg-muted">
     <Card className="w-full  max-w-lg mx-auto">
-      <CardHeader>
+      <CardHeader className="flex flex-row justify-between items-start">
         <CardTitle className="text-2xl font-bold">Switch Store</CardTitle>
+        <Link href={"/dashboard/create-store"} >
+          <Button variant={"outline"} className="w-full">
+              <PlusCircle className="h-4 w-4 mr-2" />Create Store
+          </Button>
+        </Link>
       </CardHeader>
       <CardContent>
         <RadioGroup value={selectedStore} onValueChange={setSelectedStore}>
@@ -87,13 +92,8 @@ export default function StoreSwitchCard() {
             </div>
           ))}
         </RadioGroup>
-        <Link href={"/dashboard/create-store"} >
-          <Button variant={"outline"} className="w-full py-6 mt-6">
-              Add New Store
-          </Button>
-        </Link>
       </CardContent>
-      <CardFooter>
+      <CardFooter className="flex gap-2 flex-col">
         {
           stores.length > 0 && (
             <Button disabled={!selectedStore} onClick={handleContinue} className="w-full py-6 flex gap-4">
@@ -105,6 +105,13 @@ export default function StoreSwitchCard() {
             </Button>
           )
         }
+        <p className="mt-4">signed in as {session?.user?.name}, 
+          <Link href={"/api/auth/signin"}
+            onClick={()=>signOut()}
+            className="text-primary hover:underline">
+            {" "} sign out
+          </Link>
+        </p>
       </CardFooter>
     </Card>
     </div>

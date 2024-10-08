@@ -1,3 +1,4 @@
+"use client"
 import { Badge } from "@/components/ui/badge"
 import {
   Table,
@@ -7,86 +8,116 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { db } from "@/firebase"
+import { useOrderStore } from "@/store/orders"
+// import { cn } from "@/lib/utils"
+import { useStore } from "@/store/storeInfos"
+import { Order } from "@/types/order"
+import { useQuery } from "@tanstack/react-query"
+import { and, collection, getDocs, query, where } from "firebase/firestore"
+import React, { useEffect } from "react"
 
 export function OrdersTable() {
+  const {storeId} = useStore()
+  const { orders , setOrders} = useOrderStore()
+  const { data } = useQuery({
+    queryKey: ["orders", storeId],
+    queryFn: async () => {
+      const response = await getDocs(
+        query(
+          collection(db, "orders"),
+          and(where("storeId", "==", storeId)),
+        ),
+      );
+      const data = response.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      return data;
+    },
+  })
+  useEffect(() => {
+    if(data) setOrders(data as Order[])
+  },[data,setOrders])
+
   return (
     <Table>
       <TableHeader>
         <TableRow>
           <TableHead>Customer</TableHead>
-          <TableHead className="hidden sm:table-cell">Type</TableHead>
           <TableHead className="hidden sm:table-cell">Status</TableHead>
+          <TableHead className="hidden sm:table-cell">Product</TableHead>
+          <TableHead className="hidden md:table-cell">Address</TableHead>
           <TableHead className="hidden md:table-cell">Date</TableHead>
           <TableHead className="text-right">Amount</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        <TableRow className="bg-accent">
-          <TableCell>
-            <div className="font-medium">Liam Johnson</div>
-            <div className="hidden text-sm text-muted-foreground md:inline">
-                068997864
-            </div>
-          </TableCell>
-          <TableCell className="hidden sm:table-cell">Sale</TableCell>
-          <TableCell className="hidden sm:table-cell">
-            <Badge className="text-xs" variant="secondary">
-              Fulfilled
-            </Badge>
-          </TableCell>
-          <TableCell className="hidden md:table-cell">2023-06-23</TableCell>
-          <TableCell className="text-right">$250.00</TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell>
-            <div className="font-medium">Olivia Smith</div>
-            <div className="hidden text-sm text-muted-foreground md:inline">
-                068997864
-            </div>
-          </TableCell>
-          <TableCell className="hidden sm:table-cell">Refund</TableCell>
-          <TableCell className="hidden sm:table-cell">
-            <Badge className="text-xs" variant="outline">
-              Declined
-            </Badge>
-          </TableCell>
-          <TableCell className="hidden md:table-cell">2023-06-24</TableCell>
-          <TableCell className="text-right">$150.00</TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell>
-            <div className="font-medium">Noah Williams</div>
-            <div className="hidden text-sm text-muted-foreground md:inline">
-                068997864
-            </div>
-          </TableCell>
-          <TableCell className="hidden sm:table-cell">Subscription</TableCell>
-          <TableCell className="hidden sm:table-cell">
-            <Badge className="text-xs" variant="secondary">
-              Fulfilled
-            </Badge>
-          </TableCell>
-          <TableCell className="hidden md:table-cell">2023-06-25</TableCell>
-          <TableCell className="text-right">$350.00</TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell>
-            <div className="font-medium">Emma Brown</div>
-            <div className="hidden text-sm text-muted-foreground md:inline">
-                068997864
-            </div>
-          </TableCell>
-          <TableCell className="hidden sm:table-cell">Sale</TableCell>
-          <TableCell className="hidden sm:table-cell">
-            <Badge className="text-xs" variant="secondary">
-              Fulfilled
-            </Badge>
-          </TableCell>
-          <TableCell className="hidden md:table-cell">2023-06-26</TableCell>
-          <TableCell className="text-right">$450.00</TableCell>
-        </TableRow>
-        {/* Add more rows as necessary */}
+        {
+          orders?.map((order) => (
+            <TableRow key={order.id}>
+              <TableCell>
+               <div className="font-medium">{order.customer.firstName} {" "}
+               {order.customer.lastName}
+               </div>
+               <div className="hidden text-sm text-muted-foreground md:inline">{order.customer.phoneNumber}</div>
+</TableCell>
+              <TableCell className="hidden sm:table-cell">
+                <Badge >{order.orderStatus}</Badge>
+                </TableCell>
+              <TableCell className="hidden sm:table-cell">{order.items.reduce((total, item) => total + item.quantity, 0)} items</TableCell>
+              <TableCell className="hidden md:table-cell">
+                <div className="text-sm">{order.customer.shippingAddress.city}</div>
+                <div className="text-xs text-muted-foreground">{order.customer.shippingAddress.address}</div>
+              </TableCell>
+              <TableCell className="hidden md:table-cell">
+                <div className="text-sm">{order.createdAt.toDate().toDateString()}</div>
+                <div className="text-xs text-muted-foreground">{order.createdAt.toDate().toLocaleTimeString()}</div>
+              </TableCell>
+              <TableCell className="text-right">{order.totalPrice} Dh</TableCell>
+            </TableRow>
+          ))
+        }
       </TableBody>
     </Table>
   )
 }
+
+
+
+
+      //  {
+      //   new Array(100).fill(0).map((_, index) => (
+      //     <TableRow 
+      //     onClick={() => setSelected([index])}
+      //     className={cn("rounded-xl cursor-pointer ",index === selected[0] ? "bg-slate-100 hover:bg-slate-100" : "")}
+      //      key={index}>
+      //       <TableCell>
+      //         <div className="font-medium">Emma Brown</div>
+      //         <div className="hidden text-sm text-muted-foreground md:inline">
+      //           068997864
+      //         </div>
+      //       </TableCell>
+      //       <TableCell className="hidden sm:table-cell">
+      //         <Badge className="text-xs" variant="secondary">
+      //           Fulfilled
+      //         </Badge>
+      //       </TableCell>
+      //       <TableCell className="hidden sm:table-cell">
+      //         React T-Shirt
+      //       </TableCell>
+      //       <TableCell className="hidden md:table-cell">
+      //         <div className="font-medium">Marrakech</div>
+      //         <div className="hidden text-sm text-muted-foreground md:inline">
+      //           sidi mousa boulevard 5 boulevard
+      //         </div>
+      //       </TableCell>
+      //       <TableCell className="hidden md:table-cell">
+      //         <div className="text-sm">12/12/2022</div>
+      //         <div className="text-muted-foreground">02:00 PM</div>
+      //       </TableCell>
+
+      //       <TableCell className="text-right">$450.00</TableCell>
+      //     </TableRow>
+      //   ))
+      //  } 

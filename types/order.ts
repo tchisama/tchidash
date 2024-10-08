@@ -1,51 +1,53 @@
 import { Timestamp } from "firebase/firestore";
 
 // Type for order status
-type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "cancelled" | "returned";
+export type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "cancelled" | "returned";
 
 // Type for shipping status
-type ShippingStatus = "pending" | "shipped" | "delivered" | "returned";
+export type ShippingStatus = "pending" | "shipped" | "delivered" | "returned";
 
 // Type for payment methods
-type PaymentMethod =  "cash_on_delivery";
+export type PaymentMethod =  "cash_on_delivery";
 
 // Type for currency
-type Currency = "USD" | "MAD" | "EUR";
+export type Currency = "USD" | "MAD" | "EUR";
 
 // Type for shipping address
-interface ShippingAddress {
-  street: string;
+export interface ShippingAddress {
+  address: string;
   city: string;
-  country: string;
-  postalCode: string;
 }
 
 // Type for customer information
-interface CustomerInfo {
+export interface CustomerInfo {
   id: string;
   name: string;
+  firstName?: string;
+  lastName?: string;
   email?: string;
   phoneNumber?: string;
   shippingAddress: ShippingAddress;
 }
 
 // Type for order line item
-interface OrderItem {
+export interface OrderItem {
   productId: string;
   variantId?: string; // Optional variant ID if the product has variants
+  // image?: string;
+  title: string;
   quantity: number;
   price: number; // Price of a single unit
   totalPrice: number; // Total price for the item (price * quantity)
 }
 
 // Type for discount
-interface Discount {
+export interface Discount {
   amount: number; // Discount value
   type: "percentage" | "fixed"; // Discount type
 }
 
 // Type for shipping information
-interface ShippingInfo {
+export interface ShippingInfo {
   method: string; // e.g., 'standard', 'express'
   cost: number; // Shipping cost
   trackingNumber?: string;
@@ -67,4 +69,5 @@ export type Order = {
   orderStatus: OrderStatus;
   createdAt: Timestamp;
   updatedAt?: Timestamp;
+  storeId: string;
 };

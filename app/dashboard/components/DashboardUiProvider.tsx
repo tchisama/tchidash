@@ -37,10 +37,10 @@ export default function DashboardUiProvider({
   const {cleanAll} = useClean();
   const {actions} = useNavbar();
   return (
-    <div className="flex min-h-screen w-full  bg-muted/40">
+    <div className="flex min-h-screen w-full  bg-muted">
       <SideBar />
       <div className="flex-col relative flex-1 sm:gap-4 sm:py-4 ">
-        <header className="sticky  top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:py-3  sm:h-auto sm:border-0 sm:bg-[#fafbfb] sm:px-6">
+        <header className="sticky  top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:py-3  sm:h-auto sm:border-0 sm:bg-muted sm:px-6">
           <div className="flex-1 ">
             <PhoneBar />
             <BreadcrumbCom />
