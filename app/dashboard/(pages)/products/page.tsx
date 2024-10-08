@@ -54,7 +54,12 @@ import { useStore } from "@/store/storeInfos";
 // Sample product data
 
 export default function Page() {
-  const { setCurrentProduct,setLastUploadedProduct, products = [], setProducts } = useProducts();
+  const {
+    setCurrentProduct,
+    setLastUploadedProduct,
+    products = [],
+    setProducts,
+  } = useProducts();
   const { storeId } = useStore();
   const { data, error, isLoading } = useQuery({
     queryKey: ["products", storeId],
@@ -106,10 +111,10 @@ export default function Page() {
       updatedAt: Timestamp.now(),
       storeId,
       stockQuantity: 0,
-    }
+    };
     addDoc(collection(db, "products"), newProduct).then((docRef) => {
-      setCurrentProduct({...newProduct, id: docRef.id} as Product);
-      setProducts([...products, {...newProduct, id: docRef.id} as Product]);
+      setCurrentProduct({ ...newProduct, id: docRef.id } as Product);
+      setProducts([...products, { ...newProduct, id: docRef.id } as Product]);
       router.push(`/dashboard/products/${productName.replaceAll(" ", "_")}`);
     });
   };
@@ -196,21 +201,20 @@ export default function Page() {
                         <TableCell className="hidden sm:table-cell">
                           {Array.isArray(product.images) &&
                           (product.images[0] ||
-                          product.variants?.find((v) => v.image)
-                          ) 
-                          ? (
+                            product.variants?.find((v) => v.image)) ? (
                             <Image
-                              src={product.images[0]??
-                              // get the first image in variants
-                                product.variants?.find(v=>v.image)?.image
+                              src={
+                                product.images[0] ??
+                                // get the first image in variants
+                                product.variants?.find((v) => v.image)?.image
                               } // Directly use the first image
                               alt={product.title || "Product Image"} // Provide a default alt text if title is undefined
                               width={100}
                               height={100}
-                              className="w-16 h-16 object-contain border rounded-md p-[5px] group-hover:p-[3px] duration-300"
+                              className="w-14 aspect-square object-contain border rounded-md p-[2px]  duration-300"
                             />
                           ) : (
-                            <div className="w-[70px] rounded-xl border bg-slate-50 h-[70px] flex justify-center items-center">
+                            <div className="w-14 aspect-square rounded-xl border bg-slate-50 flex justify-center items-center">
                               <Image
                                 src={Photo} // Ensure Photo is a valid imported image
                                 alt={product.title || "Placeholder Image"} // Provide a default alt text
@@ -225,7 +229,7 @@ export default function Page() {
                         <TableCell>
                           <Link
                             href={`/dashboard/products/${product.title.replaceAll(" ", "_")}`}
-                            onClick={()=>{
+                            onClick={() => {
                               setCurrentProduct(product);
                               setLastUploadedProduct(product);
                             }}

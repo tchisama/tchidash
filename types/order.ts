@@ -1,13 +1,19 @@
 import { Timestamp } from "firebase/firestore";
 
 // Type for order status
-export type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "cancelled" | "returned";
+export type OrderStatus =
+  | "pending"
+  | "processing"
+  | "shipped"
+  | "delivered"
+  | "cancelled"
+  | "returned";
 
 // Type for shipping status
 export type ShippingStatus = "pending" | "shipped" | "delivered" | "returned";
 
 // Type for payment methods
-export type PaymentMethod =  "cash_on_delivery";
+export type PaymentMethod = "cash_on_delivery";
 
 // Type for currency
 export type Currency = "USD" | "MAD" | "EUR";
@@ -38,6 +44,7 @@ export interface OrderItem {
   quantity: number;
   price: number; // Price of a single unit
   totalPrice: number; // Total price for the item (price * quantity)
+  discount?: Discount; // Optional discount for the item
 }
 
 // Type for discount
@@ -52,6 +59,11 @@ export interface ShippingInfo {
   cost: number; // Shipping cost
   trackingNumber?: string;
   shippingStatus: ShippingStatus;
+}
+export interface Note {
+  creator: string;
+  creatorId: string;
+  content: string;
 }
 
 // Main Order type
@@ -70,4 +82,5 @@ export type Order = {
   createdAt: Timestamp;
   updatedAt?: Timestamp;
   storeId: string;
+  note?: Note;
 };
