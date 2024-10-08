@@ -66,6 +66,7 @@ export function OrdersTable() {
               Fulfilled
             </Badge>
           </TableCell>
+          <TableCell className="hidden md:table-cell">2023-06-25</TableCell>
           <TableCell className="text-right">$350.00</TableCell>
         </TableRow>
         <TableRow>
