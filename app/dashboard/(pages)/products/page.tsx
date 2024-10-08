@@ -57,7 +57,7 @@ export default function Page() {
   const { setCurrentProduct,setLastUploadedProduct, products = [], setProducts } = useProducts();
   const { storeId } = useStore();
   const { data, error, isLoading } = useQuery({
-    queryKey: ["products"],
+    queryKey: ["products", storeId],
     queryFn: async () => {
       const q = query(
         collection(db, "products"),
