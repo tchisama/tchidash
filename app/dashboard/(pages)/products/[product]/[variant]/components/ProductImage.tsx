@@ -69,6 +69,11 @@ const ImageView = ({
             size="icon"
             onClick={() => {
               console.log("Remove image");
+              if (!variantState.variantProduct) return;
+              variantState.setVariantProduct({
+                ...variantState.variantProduct as Variant,
+                image: "",
+              } as Variant);
             }}
           >
             <X className="h-4 w-4" />

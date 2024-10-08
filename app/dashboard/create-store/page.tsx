@@ -60,7 +60,7 @@ export default function CreateNewStore() {
       description: storeDescription,
       logoUrl: "", // This will be populated after uploading the logo
       settings: {
-        currency: "USD", // Default currency
+        currency: "MAD", // Default currency
         taxRate: 0, // Default tax rate
       },
       productCount: 0, // Default product count

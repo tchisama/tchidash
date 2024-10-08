@@ -12,7 +12,7 @@ import { Timestamp } from "firebase/firestore";
   
   // Type for store settings (e.g., localization, payments)
   interface StoreSettings {
-    currency: "USD" | "DH" | "EUR" ;
+    currency: "USD" | "MAD" | "EUR" ;
     taxRate: number; // Tax rate applied to products
     // shippingEnabled: boolean;
     // paymentMethods: string[]; // e.g., ['paypal', 'credit_card']
