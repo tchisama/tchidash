@@ -121,6 +121,8 @@ function OrderView() {
                     <dt className="text-muted-foreground">Customer</dt>
                     <dd>{currentOrder.customer.name}</dd>
                   </div>
+                  {
+                  currentOrder.customer.email &&
                   <div className="flex items-center justify-between">
                     <dt className="text-muted-foreground">Email</dt>
                     <dd>
@@ -129,10 +131,11 @@ function OrderView() {
                       </a>
                     </dd>
                   </div>
+                  }
                   <div className="flex items-center justify-between">
                     <dt className="text-muted-foreground">Phone</dt>
                     <dd>
-                      <a href="tel:">{currentOrder.customer.phoneNumber}</a>
+                      <a href="tel:" className="font-semibold">{currentOrder.customer.phoneNumber}</a>
                     </dd>
                   </div>
                 </dl>

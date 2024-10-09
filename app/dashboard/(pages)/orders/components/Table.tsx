@@ -16,6 +16,7 @@ import { useStore } from "@/store/storeInfos";
 import { Order } from "@/types/order";
 import { useQuery } from "@tanstack/react-query";
 import { and, collection, getDocs, query, where } from "firebase/firestore";
+import Image from "next/image";
 import React, { useEffect } from "react";
 
 export function OrdersTable() {
@@ -43,9 +44,9 @@ export function OrdersTable() {
     <Table>
       <TableHeader>
         <TableRow>
+          <TableHead className="">Product</TableHead>
           <TableHead>Customer</TableHead>
           <TableHead className="">Status</TableHead>
-          <TableHead className="">Product</TableHead>
           <TableHead className="">Address</TableHead>
           <TableHead className="">Date</TableHead>
           <TableHead className="text-right">Amount</TableHead>
@@ -61,6 +62,25 @@ export function OrdersTable() {
               currentOrder && currentOrder.id === order.id && "bg-muted",
             )}
           >
+            <TableCell className="">
+              <div className="relative h-10 w-20">
+              {
+                order.items.slice(0, 3).map((item,i) => {
+                  return (
+                        <div key={item.id} className={cn("mask absolute top-0 w-10 aspect-auto",i===0 &&"left-0",i===1&& "left-6",i===2&& "left-12" )}>
+                          <Image
+                            width={50}
+                            height={50}
+                            src={item.imageUrl??""}
+                            alt="Avatar Tailwind CSS Component"
+                            className="w-10 rounded-xl border-[3px] aspect-square  shadow-lg object-cover"
+                          />
+                        </div>
+                  );
+                })
+              }
+              </div>
+            </TableCell>
             <TableCell>
               <div className="font-medium">
                 {order.customer.firstName} {order.customer.lastName}
@@ -72,10 +92,6 @@ export function OrdersTable() {
             </TableCell>
             <TableCell className="">
               <Badge>{order.orderStatus}</Badge>
-            </TableCell>
-            <TableCell className="">
-              {order.items.reduce((total, item) => total + item.quantity, 0)}{" "}
-              items
             </TableCell>
             <TableCell className="">
               <div className="text-sm">
@@ -100,39 +116,3 @@ export function OrdersTable() {
     </Table>
   );
 }
-
-//  {
-//   new Array(100).fill(0).map((_, index) => (
-//     <TableRow
-//     onClick={() => setSelected([index])}
-//     className={cn("rounded-xl cursor-pointer ",index === selected[0] ? "bg-slate-100 hover:bg-slate-100" : "")}
-//      key={index}>
-//       <TableCell>
-//         <div className="font-medium">Emma Brown</div>
-//         <div className="hidden text-sm text-muted-foreground md:inline">
-//           068997864
-//         </div>
-//       </TableCell>
-//       <TableCell className="hidden sm:table-cell">
-//         <Badge className="text-xs" variant="secondary">
-//           Fulfilled
-//         </Badge>
-//       </TableCell>
-//       <TableCell className="hidden sm:table-cell">
-//         React T-Shirt
-//       </TableCell>
-//       <TableCell className="hidden md:table-cell">
-//         <div className="font-medium">Marrakech</div>
-//         <div className="hidden text-sm text-muted-foreground md:inline">
-//           sidi mousa boulevard 5 boulevard
-//         </div>
-//       </TableCell>
-//       <TableCell className="hidden md:table-cell">
-//         <div className="text-sm">12/12/2022</div>
-//         <div className="text-muted-foreground">02:00 PM</div>
-//       </TableCell>
-
-//       <TableCell className="text-right">$450.00</TableCell>
-//     </TableRow>
-//   ))
-//  }

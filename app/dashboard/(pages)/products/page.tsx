@@ -51,6 +51,7 @@ import { useQuery } from "@tanstack/react-query";
 import { db } from "@/firebase";
 import { Product } from "@/types/product";
 import { useStore } from "@/store/storeInfos";
+import { uniqueId } from "lodash";
 // Sample product data
 
 export default function Page() {
@@ -281,6 +282,22 @@ export default function Page() {
                               >
                                 Edit
                               </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  console.log("Dublicate", product);
+                                  setProducts([
+                                    ...products,
+                                    { ...product,title: product.title + " copy", id: uniqueId() },
+                                  ]);
+                                  addDoc(collection(db, "products"), {
+                                    ...product,
+                                    title: product.title + " copy",
+                                  });
+                                }}
+                              >
+                                Dublicate
+                              </DropdownMenuItem>
+
                               <DropdownMenuItem
                                 onClick={() => {
                                   console.log("Archive", product);

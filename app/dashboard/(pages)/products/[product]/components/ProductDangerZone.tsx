@@ -19,10 +19,11 @@ const ProductDangerZone = () => {
           onClick={()=>{
             deleteDoc(
               doc(db, "products", currentProduct.id)
-            )
-            setCurrentProduct(null)
-            setProducts(products.filter((p) => p.id !== currentProduct.id))
-            router.push("/dashboard/products")
+            ).then(()=>{
+              setCurrentProduct(null)
+              router.push("/dashboard/products")
+              setProducts(products.filter((p) => p.id !== currentProduct.id))
+            })
           }}
           variant="destructive"
         >Delete Product</Button>

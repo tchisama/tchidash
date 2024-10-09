@@ -16,6 +16,8 @@ import { Timestamp } from "firebase/firestore";
     taxRate: number; // Tax rate applied to products
     // shippingEnabled: boolean;
     // paymentMethods: string[]; // e.g., ['paypal', 'credit_card']
+    paymentMethod: "cash_on_delivery";
+    shippingCost: number;
   }
   
   // Main Store type
@@ -31,5 +33,6 @@ import { Timestamp } from "firebase/firestore";
     logoUrl?: string; // Optional logo for branding
     settings: StoreSettings; // Store-related settings
     productCount: number; // Total number of products
+    shipping: ShippingInfo;
 };
   
