@@ -67,6 +67,7 @@ export type Product = {
   updatedAt: Timestamp;
   publishedAt?: Timestamp;
   discount?: Discount; // Optional discount
+  hasDiscount: boolean;
   stockQuantity: number; // Total stock of all variants
   hasInfiniteStock?: boolean; // If true, stock management is ignored
   price: number;

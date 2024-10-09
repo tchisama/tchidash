@@ -75,7 +75,7 @@ export type Order = {
   items: OrderItem[]; // List of ordered items
   totalItems: number; // Total number of items in the order
   subtotal: number; // Total price without discount and shipping
-  discount?: Discount; // Optional discount applied to the order
+  discountAmount?: number; // Optional discount applied to the order
   shippingInfo: ShippingInfo; // Shipping method, cost, and status
   totalPrice: number; // Final total price after discount and shipping
   currency: Currency;

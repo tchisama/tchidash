@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Product } from "@/types/product";
 import { useProducts } from "@/store/products";
+import { Checkbox } from "@/components/ui/checkbox";
 
 function ProductDiscount() {
   const { setCurrentProduct, currentProduct } = useProducts();
@@ -24,59 +25,80 @@ function ProductDiscount() {
         <CardContent>
           <div className="grid gap-6">
             <div className="grid gap-3">
-              <Label htmlFor="discount">Discount</Label>
-              <div className="grid gap-3 md:grid-cols-1">
-                <Select
-                  value={
-                    currentProduct?.discount && currentProduct?.discount.type
-                  }
-                  onValueChange={(value) =>
+              <div className="flex gap-2 mb-2 items-center">
+                <Checkbox
+                  id="hasDiscount"
+                  checked={currentProduct.hasDiscount}
+                  onCheckedChange={(e) =>
                     setCurrentProduct({
                       ...currentProduct,
-                      discount: {
-                        ...currentProduct.discount,
-                        type: value as "percentage" | "fixed",
-                      },
+                      hasDiscount: e,
                     } as Product)
                   }
-                >
-                  <SelectTrigger
-                    id="discount"
-                    aria-label="Select type discount"
-                  >
-                    <SelectValue placeholder="discount type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="fixed">Fixed</SelectItem>
-                    <SelectItem value="percentage">Percentage</SelectItem>
-                  </SelectContent>
-                </Select>
-                <div className="flex items-center gap-2">
-                  <Input
-                    id="discount"
-                    type="number"
-                    className="w-full"
-                    defaultValue="10"
-                    value={
-                      currentProduct?.discount && currentProduct.discount.amount
-                    }
-                    onChange={(e) =>
-                      setCurrentProduct({
-                        ...currentProduct,
-                        discount: {
-                          ...currentProduct.discount,
-                          amount: Number(e.target.value),
-                        },
-                      } as Product)
-                    }
-                  />
-                  <div className="w-10">
-                    {currentProduct?.discount?.type === "percentage"
-                      ? ` %`
-                      : ` Dh`}
-                  </div>
-                </div>
+                />
+                <Label htmlFor="hasDiscount">Has discount</Label>
               </div>
+              {
+                currentProduct?.hasDiscount &&
+                (
+                  <div>
+                    <Label htmlFor="discount">Discount</Label>
+                    <div className="grid gap-3 md:grid-cols-1">
+                      <Select
+                        value={
+                          currentProduct?.discount && currentProduct?.discount.type
+                        }
+                        onValueChange={(value) =>
+                          setCurrentProduct({
+                            ...currentProduct,
+                            discount: {
+                              ...currentProduct.discount,
+                              type: value as "percentage" | "fixed",
+                            },
+                          } as Product)
+                        }
+                      >
+                        <SelectTrigger
+                          id="discount"
+                          aria-label="Select type discount"
+                        >
+                          <SelectValue placeholder="discount type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="fixed">Fixed</SelectItem>
+                          <SelectItem value="percentage">Percentage</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          id="discount"
+                          type="number"
+                          className="w-full"
+                          defaultValue="10"
+                          value={
+                            currentProduct?.discount && currentProduct.discount.amount
+                          }
+                          onChange={(e) =>
+                            setCurrentProduct({
+                              ...currentProduct,
+                              discount: {
+                                ...currentProduct.discount,
+                                amount: Number(e.target.value),
+                              },
+                            } as Product)
+                          }
+                        />
+                        <div className="w-10">
+                          {currentProduct?.discount?.type === "percentage"
+                            ? ` %`
+                            : ` Dh`}
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                )
+              }
             </div>
           </div>
         </CardContent>

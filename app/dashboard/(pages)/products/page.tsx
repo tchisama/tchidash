@@ -111,6 +111,7 @@ export default function Page() {
       updatedAt: Timestamp.now(),
       storeId,
       stockQuantity: 0,
+      hasDiscount: false,
     };
     addDoc(collection(db, "products"), newProduct).then((docRef) => {
       setCurrentProduct({ ...newProduct, id: docRef.id } as Product);

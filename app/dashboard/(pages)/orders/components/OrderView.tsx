@@ -160,14 +160,14 @@ function OrderView() {
                   return (
                     <li
                       key={index}
-                      className="flex items-center justify-between"
+                      className="flex border-t pt-1 border-slate-100 items-center justify-between"
                     >
                       <span className="text-muted-foreground">
                         {item.title} x{" "}
                         <span className="font-semibold">{item.quantity}</span>
                         <br />
                         {item.discount && (
-                          <span className="text-xs text-green-500">
+                          <span className="text-xs text-green-600">
                             Discount: {item.discount.amount}{" "}
                             {item.discount.type === "percentage" ? "%" : "Dh"}
                           </span>
@@ -200,24 +200,37 @@ function OrderView() {
                   <span className="text-muted-foreground">Subtotal</span>
                   <span>{currentOrder.subtotal} Dh</span>
                 </li>
+                {
+                  currentOrder?.discountAmount ?
+                  <li className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Discount Amount</span>
+                    <span>- {currentOrder?.discountAmount} Dh</span>
+                  </li>
+                  : null
+                }
                 <li className="flex items-center justify-between">
                   <span className="text-muted-foreground">Shipping</span>
-                  <span>{currentOrder.shippingInfo.cost} Dh</span>
+                  <span>+ {currentOrder.shippingInfo.cost} Dh</span>
                 </li>
                 <li className="flex items-center justify-between font-semibold">
                   <span className="text-muted-foreground">Total</span>
                   <span>{currentOrder.totalPrice} Dh</span>
                 </li>
-                {}
               </ul>
             </div>
-            <Separator className="my-4" />
-            <div className="grid gap-3">
-              <div className="font-semibold">Note</div>
-              <p className="text-muted-foreground">
-                {currentOrder.note?.content ?? "No note"}
-              </p>
-            </div>
+            {
+              currentOrder.note &&
+              currentOrder.note?.content &&
+              <div>
+                <Separator className="my-4" />
+                <div className="grid gap-3">
+                  <div className="font-semibold">Note</div>
+                  <p className="text-muted-foreground">
+                    {currentOrder.note?.content ?? "No note"}
+                  </p>
+                </div>
+              </div>
+            }
           </CardContent>
           <CardFooter className="flex flex-row items-center border-t bg-muted/50 px-6 py-3">
             <div className="text-xs text-muted-foreground">

@@ -1,16 +1,27 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { AlertCircle } from "lucide-react"
 
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@/components/ui/alert"
 
 import { Order } from "@/types/order";
-import { Timestamp } from "firebase/firestore";
+import { addDoc, collection, Timestamp } from "firebase/firestore";
 import { useOrderStore } from '@/store/orders'
 import ItemsTable from './components/ItemsTable'
+import { getTotalPriceFromItem } from '@/lib/orders'
+import { db } from '@/firebase'
+import { useRouter } from 'next/navigation'
+import { useStore } from '@/store/storeInfos'
+import { useSession } from 'next-auth/react'
 
 
 // Default canvas for a new order
@@ -31,11 +42,9 @@ export const defaultOrder: Order = {
   items: [], // Empty array for ordered items
   totalItems: 0, // Default to zero items
   subtotal: 0, // Default subtotal as 0
-  discount: undefined, // No discount by default
   shippingInfo: {
     method: "standard", // Default shipping method
-    cost: 0, // Default shipping cost
-    trackingNumber: undefined, // No tracking number by default
+    cost: 40, // Default shipping cost
     shippingStatus: "pending",
   },
   totalPrice: 0, // Default total price is 0
@@ -43,7 +52,6 @@ export const defaultOrder: Order = {
   paymentMethod: "cash_on_delivery",
   orderStatus: "pending",
   createdAt: Timestamp.now(), // Use the current timestamp for creation time
-  updatedAt: undefined, // No update time initially
   storeId: "", // Placeholder store ID
   note: {
     creator: "",
@@ -54,20 +62,66 @@ export const defaultOrder: Order = {
 
 
 export default function CreateOrder() {
-  const {newOrder:order, setNewOrder:setOrder} = useOrderStore()
+  const { newOrder: order, setNewOrder: setOrder } = useOrderStore()
+  const { storeId } = useStore()
+  const { data: session } = useSession();
   useEffect(() => {
     setOrder(defaultOrder)
   }, [setOrder])
 
+  const router = useRouter()
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log('Submitted order:', order)
-    // Here you would typically send the order to your backend
+  const [error, setError] = useState<string | undefined>("")
+
+
+  const handleSubmit = () => {
+    console.log(order)
+    if (!order) return
+    if (!storeId) return
+    if (!session) return
+    if (!session.user?.email) return
+    if (!order.customer.firstName) return setError("Please enter the first name")
+    if (!order.customer.lastName) return setError("Please enter the last name")
+    // if(!order.customer.email) return setError("Please enter the email")
+    if (!order.customer.phoneNumber) return setError("Please enter the phone number")
+    if (!order.customer.shippingAddress.address) return setError("Please enter the shipping address")
+    if (!order.customer.shippingAddress.city) return setError("Please enter the shipping city")
+
+    if (!order.items.length) return setError("Please add at least one item")
+
+
+    const orderForUpdate: Order = {
+      ...order,
+      updatedAt: Timestamp.now(),
+      customer: {
+        ...order.customer,
+        name: order.customer.firstName + " " + order.customer.lastName,
+      },
+      orderStatus: "pending",
+      items: order.items.map((item) => {
+        return {
+          ...item,
+          totalPrice: getTotalPriceFromItem(item)
+        }
+      }),
+      storeId: storeId,
+      totalPrice: order.items.reduce((acc, item) => acc + getTotalPriceFromItem(item), 0) + order.shippingInfo.cost,
+      subtotal: order.items.reduce((acc, item) => acc + item.price * item.quantity, 0),
+      totalItems: order.items.reduce((acc, item) => acc + item.quantity, 0),
+      discountAmount: order.items.reduce((acc, item) => acc + (item.discount?.type == "fixed" ? item.discount.amount : item.price * (item.discount?.amount || 0) / 100) * item.quantity, 0),
+      note: {
+        creator: session.user?.name || "anonymous",
+        creatorId: session.user?.email,
+        content: order.note?.content || ""
+      }
+    }
+    addDoc(collection(db, "orders"), orderForUpdate).then(() => {
+      router.push('/dashboard/orders')
+    })
   }
   return (
     order &&
-    <form onSubmit={handleSubmit} className="space-y-6  mx-auto p-6 bg-white rounded-lg shadow">
+    <div className="space-y-6  mx-auto p-6 bg-white rounded-lg shadow">
       <div className='flex gap-4'>
         <div className="space-y-4 flex-1 max-w-3xl">
           <h2 className="text-lg font-bold">Customer Information</h2>
@@ -120,7 +174,7 @@ export default function CreateOrder() {
         </div>
       </div>
       <ItemsTable />
-      <div>
+      <div className='max-w-[800px]'>
         <Label htmlFor="note">Order Note (Optional)</Label>
         <Textarea id="note" name="note" value={order.note?.content} onChange={
           (e) => {
@@ -130,9 +184,21 @@ export default function CreateOrder() {
           }
         } />
       </div>
+      {
+        error &&
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>
+            {
+              error
+            }
+          </AlertDescription>
+        </Alert>
+      }
 
-      <Button type="submit" className="min-w-xl">Place Order</Button>
-    </form>
+      <Button onClick={handleSubmit} className="min-w-xl">Place Order</Button>
+    </div>
   );
 }
 
