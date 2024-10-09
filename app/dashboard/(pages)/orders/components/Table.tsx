@@ -33,6 +33,7 @@ export function OrdersTable() {
       }));
       return data;
     },
+    refetchOnWindowFocus:false,
   });
   useEffect(() => {
     if (data) setOrders(data as Order[]);

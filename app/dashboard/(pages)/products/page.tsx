@@ -75,6 +75,7 @@ export default function Page() {
       }));
       return data;
     },
+    refetchOnWindowFocus: false,
     // staleTime: 20000, // Data stays fresh for 10 seconds
   });
   const router = useRouter();

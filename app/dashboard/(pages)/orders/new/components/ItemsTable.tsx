@@ -125,11 +125,17 @@ function ItemsTable() {
 
 							{/* Discount */}
 							<TableCell>
-								<div className="font-medium">
-									{item.discount?.type === "percentage"
-										? `${item.discount.amount} %`
-										: `${item.discount?.amount} ${newOrder.currency}`}
-								</div>
+								{
+									item.discount && 
+									item.discount.amount > 0 ?
+									<div className="font-medium">
+										{item.discount?.type === "percentage"
+											? `${item.discount.amount} %`
+											: `${item.discount?.amount} ${newOrder.currency}`}
+									</div>
+									:
+									<div className="font-medium">-</div>
+								}
 							</TableCell>
 
 							{/* Total Price */}
