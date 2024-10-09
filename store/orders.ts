@@ -9,6 +9,11 @@ interface OrderState {
   orders: Order[]; // List of all orders
   setOrders: (orders: Order[]) => void;
   currentOrder: Order | null; // The current order being worked on
+
+  newOrder: Order | null;
+  setNewOrder: (order: Order | null) => void;
+
+
   addOrder: (order: Order) => void; // Function to add a new order
   setCurrentOrder: (orderId: string) => void; // Set the current order by id
   updateOrderStatus: (orderId: string, status: OrderStatus) => void; // Update the status of an order
@@ -19,6 +24,10 @@ export const useOrderStore = create<OrderState>((set) => ({
   orders: [],
   setOrders: (orders: Order[]) => set({ orders }),
   currentOrder: null,
+
+  newOrder:null,
+  setNewOrder: (order: Order | null) => set({ newOrder: order }),
+
   // Add a new order to the store
   addOrder: (order: Order) => set((state) => ({ orders: [...state.orders, order] })),
 

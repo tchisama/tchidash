@@ -45,6 +45,8 @@ export interface OrderItem {
   price: number; // Price of a single unit
   totalPrice: number; // Total price for the item (price * quantity)
   discount?: Discount; // Optional discount for the item
+  id: string;
+  imageUrl?: string;
 }
 
 // Type for discount

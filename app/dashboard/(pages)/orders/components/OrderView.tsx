@@ -21,8 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Copy, MoreVertical, Truck, X } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { useOrderStore } from "@/store/orders";
-import { Badge } from "@/components/ui/badge";
-import { orderStatusValues, shippingStatusValues } from "@/constents/order";
+import { orderStatusValues } from "@/constents/order";
 
 function OrderView() {
   const { currentOrder, setCurrentOrder } = useOrderStore();
