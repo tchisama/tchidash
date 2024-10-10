@@ -26,15 +26,15 @@ const ProductImagesCard = ({
   const { currentProduct } = useProducts();
   return (
     currentProduct && (
-      <Card>
+      <Card className="w-fit">
         <CardHeader>
           <CardTitle>Product Images</CardTitle>
           <CardDescription>
             Lipsum dolor sit amet, consectetur adipiscing elit
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="grid gap-2">
+        <CardContent className="w-fit">
+          <div className="grid  w-[200px]  gap-2">
             <ImageView
               variantState={variantState}
               url={

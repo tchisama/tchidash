@@ -11,6 +11,7 @@ import { useProducts } from "@/store/products";
 import { Product, Variant } from "@/types/product";
 import { db } from "@/firebase";
 import { doc, updateDoc } from "firebase/firestore";
+import ProductVariantsCard from "./components/ProductVariants";
 
 function Page({ params }: { params: { product: string; variant: string } }) {
   const { currentProduct, setCurrentProduct } = useProducts();
@@ -28,9 +29,6 @@ function Page({ params }: { params: { product: string; variant: string } }) {
     } as Product;
     setCurrentProduct(newProduct);
     updateDoc(doc(db, "products", newProduct.id), newProduct).then(() => {
-      router.push(
-        "/dashboard/products/" + newProduct.title.replaceAll(" ", "_"),
-      );
     });
   };
   const [variantProduct, setVariantProduct] = React.useState<Variant | null>(
@@ -74,19 +72,18 @@ function Page({ params }: { params: { product: string; variant: string } }) {
             Discard
           </Button>
           <Button size="sm" onClick={saveVariant}>
-            Save and Back
+            Save 
           </Button>
         </div>
       </div>
-      <div className="grid gap-4 md:grid-cols-[1fr_250px] lg:grid-cols-3 lg:gap-8">
-        <div className="grid auto-rows-max items-start gap-4 lg:col-span-2 lg:gap-8">
-          <ProductDetailsCard
+      <div className="grid gap-4 md:grid-cols-[1fr_250px] lg:grid-cols-2 lg:gap-8">
+        <ProductVariantsCard sku={variantId} />
+        <div className="grid sticky top-2 auto-rows-max items-start gap-4  lg:gap-8">
+          <ProductImagesCard
             variant={variantId}
             variantState={{ variantProduct, setVariantProduct }}
           />
-        </div>
-        <div className="grid auto-rows-max items-start gap-4 lg:gap-8">
-          <ProductImagesCard
+          <ProductDetailsCard
             variant={variantId}
             variantState={{ variantProduct, setVariantProduct }}
           />
