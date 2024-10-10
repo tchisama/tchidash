@@ -3,8 +3,8 @@ import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
+  TableCaption,
   TableCell,
-  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -27,19 +27,21 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
+import { collection, query, where } from "firebase/firestore";
+import { db } from "@/firebase";
 
 
-export function OrdersTable() {
+
+export function OrdersTable({pageSize, setPageSize}:{pageSize:number, setPageSize:React.Dispatch<React.SetStateAction<number>>}) {
   const { storeId } = useStore();
   const { orders, setOrders, currentOrder, setCurrentOrder } = useOrderStore();
   const [currentPage, setCurrentPage] = React.useState(1);
   const [totalPages, setTotalPages] = React.useState(0);
-  const [pageSize, setPageSize] = React.useState(3);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["orders", storeId, currentPage, pageSize],
     queryFn: async () => {
-      const response = await getPage("orders", currentPage, pageSize);
+      const response = await getPage(query(collection(db, "orders"), where("storeId", "==", storeId)), currentPage??1, pageSize??10);
       return response;
     },
     refetchOnWindowFocus:false,
@@ -98,6 +100,7 @@ export function OrdersTable() {
   if (error) return <p className="text-xs text-red-600">Error {error.message}</p>;
 
   return (
+    <div>
     <Table>
       <TableHeader>
         <TableRow>
@@ -170,11 +173,11 @@ export function OrdersTable() {
           </TableRow>
         ))}
       </TableBody>
-      <TableFooter>
+      <TableCaption className="">
 
 
 
-      <Pagination >
+      <Pagination className=" flex justify-end">
       <PaginationContent className="bg-slate-50 mt-2 w-fit border rounded-xl">
         <PaginationItem>
           <PaginationPrevious href="#" onClick={handlePreviousPage}  />
@@ -189,7 +192,8 @@ export function OrdersTable() {
         </PaginationItem>
       </PaginationContent>
     </Pagination>
-      </TableFooter>
+      </TableCaption>
     </Table>
+    </div>
   );
 }

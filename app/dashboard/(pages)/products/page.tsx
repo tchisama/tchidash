@@ -4,9 +4,7 @@ import React, { useEffect } from "react";
 
 import { useRouter } from "next/navigation";
 
-import Image from "next/image";
-import { File, ListFilter, MoreHorizontal, PlusCircle } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { File, ListFilter, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -19,7 +17,6 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -27,23 +24,18 @@ import {
 import {
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import Photo from "@/public/images/svgs/icons/photo.svg";
-import Link from "next/link";
 import {
   addDoc,
   and,
   collection,
-  doc,
   getDocs,
   query,
   Timestamp,
-  updateDoc,
   where,
 } from "firebase/firestore";
 import { useProducts } from "@/store/products";
@@ -51,13 +43,12 @@ import { useQuery } from "@tanstack/react-query";
 import { db } from "@/firebase";
 import { Product } from "@/types/product";
 import { useStore } from "@/store/storeInfos";
-import { uniqueId } from "lodash";
+import {ProductLine} from "./components/ProductLine";
 // Sample product data
 
 export default function Page() {
   const {
     setCurrentProduct,
-    setLastUploadedProduct,
     products = [],
     setProducts,
   } = useProducts();
@@ -197,145 +188,10 @@ export default function Page() {
                     </TableHead>
                   </TableRow>
                 </TableHeader>
-                <TableBody>
-                  {products &&
-                    products.map((product) => (
-                      <TableRow key={product.id} className="group">
-                        <TableCell className="hidden sm:table-cell">
-                          {Array.isArray(product.images) &&
-                          (product.images[0] ||
-                            product.variants?.find((v) => v.image)) ? (
-                            <Image
-                              src={
-                                product.images[0] ??
-                                // get the first image in variants
-                                product.variants?.find((v) => v.image)?.image
-                              } // Directly use the first image
-                              alt={product.title || "Product Image"} // Provide a default alt text if title is undefined
-                              width={100}
-                              height={100}
-                              className="w-14 aspect-square object-contain border rounded-md p-[2px]  duration-300"
-                            />
-                          ) : (
-                            <div className="w-14 aspect-square rounded-xl border bg-slate-50 flex justify-center items-center">
-                              <Image
-                                src={Photo} // Ensure Photo is a valid imported image
-                                alt={product.title || "Placeholder Image"} // Provide a default alt text
-                                width={40}
-                                height={40}
-                                className="w-6 h-6 opacity-50"
-                              />
-                            </div>
-                          )}
-                        </TableCell>
+<TableBody>
+  {products && products.map((product) => <ProductLine key={product.id} product={product} />)}
+</TableBody>
 
-                        <TableCell>
-                          <Link
-                            href={`/dashboard/products/${product.title.replaceAll(" ", "_")}`}
-                            onClick={() => {
-                              setCurrentProduct(product);
-                              setLastUploadedProduct(product);
-                            }}
-                          >
-                            <b>{product.title}</b>
-                          </Link>
-                        </TableCell>
-                        <TableCell>
-                          {product.variants?.length || 1} Variants
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline">{product.status}</Badge>
-                        </TableCell>
-                        <TableCell className="hidden md:table-cell">
-                          {product.variants && product.variants.length > 0
-                            ? // get the mini and max price of the variants
-                              Math.min(
-                                ...product.variants.map((v) => v.price),
-                              ) +
-                              " - " +
-                              Math.max(...product.variants.map((v) => v.price))
-                            : product.price}{" "}
-                          Dh
-                        </TableCell>
-                        <TableCell className="hidden md:table-cell">
-                          0
-                        </TableCell>
-                        <TableCell className="hidden md:table-cell">
-                          {product.createdAt.toDate().toLocaleDateString()}
-                        </TableCell>
-                        <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button size="icon" variant="outline">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem
-                                onClick={() => {
-                                  setCurrentProduct(product);
-                                  setLastUploadedProduct(product);
-                                  router.push(
-                                    `/dashboard/products/${product.title.replaceAll(" ", "_")}`,
-                                  );
-                                }}
-                              >
-                                Edit
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => {
-                                  console.log("Dublicate", product);
-                                  setProducts([
-                                    ...products,
-                                    { ...product,title: product.title + " copy", id: uniqueId() },
-                                  ]);
-                                  addDoc(collection(db, "products"), {
-                                    ...product,
-                                    title: product.title + " copy",
-                                  });
-                                }}
-                              >
-                                Dublicate
-                              </DropdownMenuItem>
-
-                              <DropdownMenuItem
-                                onClick={() => {
-                                  console.log("Archive", product);
-                                  updateDoc(doc(db, "products", product.id), {
-                                    ...product,
-                                    status: "archived",
-                                  });
-                                  setProducts(
-                                    products.map((p) =>
-                                      p.id === product.id
-                                        ? { ...product, status: "archived" }
-                                        : p,
-                                    ),
-                                  );
-                                }}
-                              >
-                                Archive
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => {
-                                  console.log("Delete", product);
-                                  setProducts(
-                                    products.filter((p) => p.id !== product.id),
-                                  );
-                                  updateDoc(doc(db, "products", product.id), {
-                                    ...product,
-                                    status: "deleted",
-                                  });
-                                }}
-                              >
-                                Delete
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                </TableBody>
               </Table>
             </CardContent>
             <CardFooter>
@@ -350,3 +206,5 @@ export default function Page() {
     )
   );
 }
+
+
