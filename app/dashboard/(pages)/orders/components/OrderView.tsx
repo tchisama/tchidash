@@ -4,7 +4,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -21,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Copy, MoreVertical, Truck, X } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { useOrderStore } from "@/store/orders";
-import { orderStatusValues } from "@/constents/order";
+import { StateChanger } from "./StateChanger";
 
 function OrderView() {
   const { currentOrder, setCurrentOrder } = useOrderStore();
@@ -93,24 +92,7 @@ function OrderView() {
               <ul className="grid gap-2">
                 <li className="flex items-center justify-between">
                   <span className="text-muted-foreground">Order State</span>
-
-                  {/* Dropdown for Order Status */}
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button size="sm" variant={"outline"}>
-                        {currentOrder.orderStatus}
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuLabel>Order Status</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      {orderStatusValues.map((status) => (
-                        <DropdownMenuItem key={status}>
-                          {status}
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <StateChanger state={currentOrder.orderStatus} order={currentOrder} />
                 </li>
               </ul>
               <Separator className="my-4" />

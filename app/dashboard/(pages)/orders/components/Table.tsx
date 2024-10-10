@@ -1,5 +1,4 @@
 "use client";
-import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -29,6 +28,7 @@ import {
 } from "@/components/ui/pagination"
 import { collection, query, where } from "firebase/firestore";
 import { db } from "@/firebase";
+import { StateChanger } from "./StateChanger";
 
 
 
@@ -151,7 +151,11 @@ export function OrdersTable({pageSize, setPageSize}:{pageSize:number, setPageSiz
               </div>
             </TableCell>
             <TableCell className="">
-              <Badge>{order.orderStatus}</Badge>
+              <div className="w-fit" onClick={(e)=>{
+                e.stopPropagation();
+              }}>
+                <StateChanger state={order.orderStatus} order={order} />
+              </div>
             </TableCell>
             <TableCell className="">
               <div className="text-sm">
