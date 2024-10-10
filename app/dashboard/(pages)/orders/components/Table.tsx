@@ -37,6 +37,7 @@ export function OrdersTable({pageSize, setPageSize}:{pageSize:number, setPageSiz
   const { orders, setOrders, currentOrder, setCurrentOrder } = useOrderStore();
   const [currentPage, setCurrentPage] = React.useState(1);
   const [totalPages, setTotalPages] = React.useState(0);
+  const [totalCount, setTotalCount] = React.useState(0);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["orders", storeId, currentPage, pageSize],
@@ -53,8 +54,9 @@ export function OrdersTable({pageSize, setPageSize}:{pageSize:number, setPageSiz
       setCurrentPage(data.currentPage);
       setPageSize(data.pageSize);
       setTotalPages(data.totalPages)
+      setTotalCount(data.totalCount)
     } 
-  }, [data, setOrders, setCurrentPage, setPageSize, setTotalPages]);
+  }, [data, setOrders, setCurrentPage, setPageSize, setTotalPages,setTotalCount]);
 
 
 
@@ -181,7 +183,11 @@ export function OrdersTable({pageSize, setPageSize}:{pageSize:number, setPageSiz
 
 
 
-      <Pagination className=" flex justify-end">
+      <Pagination className=" flex items-end justify-between">
+        <div>
+          Showing {currentPage}-{totalPages} of {totalCount}
+        </div>
+      
       <PaginationContent className="bg-slate-50 mt-2 w-fit border rounded-xl">
         <PaginationItem>
           <PaginationPrevious href="#" onClick={handlePreviousPage}  />

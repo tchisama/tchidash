@@ -15,6 +15,7 @@ interface PaginationResult {
   currentPage: number;
   totalPages: number;
   pageSize: number;
+  totalCount: number;
 }
 
 export async function getPage(
@@ -63,11 +64,11 @@ export async function getPage(
     ...doc.data(),
     id: doc.id
   }));
-
   return {
     documents,
     currentPage: pageNumber,
     totalPages,
-    pageSize
+    pageSize,
+    totalCount
   };
 }
