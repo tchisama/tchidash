@@ -4,41 +4,98 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { db } from "@/firebase";
+import { getPage } from "@/lib/pagenation";
 import { cn } from "@/lib/utils";
 import { useOrderStore } from "@/store/orders";
 // import { cn } from "@/lib/utils"
 import { useStore } from "@/store/storeInfos";
 import { Order } from "@/types/order";
 import { useQuery } from "@tanstack/react-query";
-import { and, collection, getDocs, query, where } from "firebase/firestore";
 import Image from "next/image";
 import React, { useEffect } from "react";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
+
 
 export function OrdersTable() {
   const { storeId } = useStore();
   const { orders, setOrders, currentOrder, setCurrentOrder } = useOrderStore();
-  const { data } = useQuery({
-    queryKey: ["orders", storeId],
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const [totalPages, setTotalPages] = React.useState(0);
+  const [pageSize, setPageSize] = React.useState(3);
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["orders", storeId, currentPage, pageSize],
     queryFn: async () => {
-      const response = await getDocs(
-        query(collection(db, "orders"), and(where("storeId", "==", storeId))),
-      );
-      const data = response.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id,
-      }));
-      return data;
+      const response = await getPage("orders", currentPage, pageSize);
+      return response;
     },
     refetchOnWindowFocus:false,
   });
+
   useEffect(() => {
-    if (data) setOrders(data as Order[]);
-  }, [data, setOrders]);
+    if (data){
+      setOrders(data.documents as Order[]);
+      setCurrentPage(data.currentPage);
+      setPageSize(data.pageSize);
+      setTotalPages(data.totalPages)
+    } 
+  }, [data, setOrders, setCurrentPage, setPageSize, setTotalPages]);
+
+
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prevPage) => prevPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage((prevPage) => prevPage + 1);
+    }
+  };
+
+  const handlePageClick = (pageNumber:number) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const renderPageNumbers = () => {
+    const pages: JSX.Element[] = [];
+
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push(
+        <PaginationItem key={i}>
+          <PaginationLink
+            href="#"
+            onClick={() => handlePageClick(i)}
+            className={currentPage === i ? "active" : ""}
+          >
+            {i}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+
+    return pages;
+  };
+
+
+  if (isLoading) return <p>Loading...</p>;
+
+  if (error) return <p className="text-xs text-red-600">Error {error.message}</p>;
 
   return (
     <Table>
@@ -113,6 +170,26 @@ export function OrdersTable() {
           </TableRow>
         ))}
       </TableBody>
+      <TableFooter>
+
+
+
+      <Pagination >
+      <PaginationContent className="bg-slate-50 mt-2 w-fit border rounded-xl">
+        <PaginationItem>
+          <PaginationPrevious href="#" onClick={handlePreviousPage}  />
+        </PaginationItem>
+
+        {renderPageNumbers()}
+
+        {totalPages > 5 && <PaginationEllipsis />}
+
+        <PaginationItem>
+          <PaginationNext href="#" onClick={handleNextPage} />
+        </PaginationItem>
+      </PaginationContent>
+    </Pagination>
+      </TableFooter>
     </Table>
   );
 }

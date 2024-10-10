@@ -33,6 +33,5 @@ import { Timestamp } from "firebase/firestore";
     logoUrl?: string; // Optional logo for branding
     settings: StoreSettings; // Store-related settings
     productCount: number; // Total number of products
-    shipping: ShippingInfo;
 };
   

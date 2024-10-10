@@ -55,13 +55,15 @@ export default function CreateNewStore() {
       },
       ownerEmail: session?.user?.email || "",
       status: "pending_approval", // Default value
-      createdAt: Timestamp.fromDate(new Date()),
-      updatedAt: Timestamp.fromDate(new Date()),
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
       description: storeDescription,
       logoUrl: "", // This will be populated after uploading the logo
       settings: {
         currency: "MAD", // Default currency
         taxRate: 0, // Default tax rate
+        shippingCost: 40, // Default shipping cost
+        paymentMethod: "cash_on_delivery", // Default payment method
       },
       productCount: 0, // Default product count
     };
