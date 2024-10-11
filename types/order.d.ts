@@ -13,7 +13,10 @@ export type OrderStatus =
 export type ShippingStatus = "pending" | "shipped" | "delivered" | "returned";
 
 // Type for payment methods
-export type PaymentMethod = "cash_on_delivery";
+export type PaymentMethod = 
+  | "cash_on_delivery" // Cash on delivery method
+  | "stripe_card"      // Stripe card payment
+  | "stripe_wallet";   // Stripe wallet like Apple Pay, Google Pay, etc.
 
 // Type for currency
 export type Currency = "USD" | "MAD" | "EUR";
@@ -22,6 +25,8 @@ export type Currency = "USD" | "MAD" | "EUR";
 export interface ShippingAddress {
   address: string;
   city: string;
+  postalCode?: string;
+  country?: string;
 }
 
 // Type for customer information
@@ -62,6 +67,15 @@ export interface ShippingInfo {
   trackingNumber?: string;
   shippingStatus: ShippingStatus;
 }
+
+
+// Type for payment information
+export interface PaymentInfo {
+  method: PaymentMethod; // Payment method (cash on delivery, stripe card, etc.)
+  transactionId?: string; // Transaction ID for Stripe payments (not needed for cash on delivery)
+  status: "pending" | "paid" | "failed"; // Payment status
+}
+
 export interface Note {
   creator: string;
   creatorId: string;
@@ -80,6 +94,7 @@ export type Order = {
   totalPrice: number; // Final total price after discount and shipping
   currency: Currency;
   paymentMethod: PaymentMethod;
+  paymentInfo?: PaymentInfo;
   orderStatus: OrderStatus;
   createdAt: Timestamp;
   updatedAt?: Timestamp;
