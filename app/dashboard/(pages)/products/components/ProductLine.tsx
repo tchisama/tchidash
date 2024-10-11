@@ -130,12 +130,10 @@ const ProductLine = ({ product }: { product: Product }) => {
         <TableCell className="hidden md:table-cell"
         >
           <div>
-          {product.variants && product.variants.length > 0
-            ? Math.min(...product.variants.map((v) => v.inventoryQuantity)) +
-              " ... " +
-              Math.max(...product.variants.map((v) => v.inventoryQuantity))
-            : product.stockQuantity}{" "}
-          Items
+          {(product.variants && product.variants.length > 0) ?
+            "Have variants"
+            : product.hasInfiniteStock ? "Infinite Stock" : product.stockQuantity + " Items"
+          }{" "}
           </div>
         </TableCell>
         <TableCell className="hidden md:table-cell">
@@ -230,7 +228,7 @@ const ProductLine = ({ product }: { product: Product }) => {
                     </TableCell>
                     <TableCell>{variant.title || "Untitled Variant"}</TableCell>
                     <TableCell>{variant.price} Dh</TableCell>
-                    <TableCell>{variant.inventoryQuantity || 0}</TableCell>
+                    <TableCell>{variant.hasInfiniteStock ? "infinite" : variant.inventoryQuantity || 0}</TableCell>
                     <TableCell>{variant.totalSales || 0}</TableCell>
                   </TableRow>
                 ))}

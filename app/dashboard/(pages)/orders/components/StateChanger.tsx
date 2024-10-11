@@ -158,7 +158,7 @@ const updateStockOfProductsBasedOnStatus = async (
               if (variant.id === item.variantId) {
                 return {
                   ...variant,
-                  inventoryQuantity: variant.inventoryQuantity - item.quantity,
+                  inventoryQuantity:variant.hasInfiniteStock ? variant.inventoryQuantity : variant.inventoryQuantity - item.quantity,
                   totalSales: (variant?.totalSales ?? 0) + item.quantity
                 };
               } else {
@@ -172,7 +172,7 @@ const updateStockOfProductsBasedOnStatus = async (
         }else{
           if (!productData.hasInfiniteStock && productData.stockQuantity >= item.quantity) {
             await updateDoc(productRef, {
-              stockQuantity: productData.stockQuantity - item.quantity,
+              stockQuantity: productData.hasInfiniteStock ? productData.stockQuantity : productData.stockQuantity - item.quantity,
               totalSales: (productData?.totalSales ?? 0) + item.quantity
             });
           }
@@ -198,7 +198,7 @@ const updateStockOfProductsBasedOnStatus = async (
               if (variant.id === item.variantId) {
                 return {
                   ...variant,
-                  inventoryQuantity: variant.inventoryQuantity + item.quantity,
+                  inventoryQuantity: variant.hasInfiniteStock ? variant.inventoryQuantity : variant.inventoryQuantity - item.quantity,
                   totalSales: (variant?.totalSales ?? item.quantity) - item.quantity
                 };
               } else {
@@ -212,7 +212,7 @@ const updateStockOfProductsBasedOnStatus = async (
         }else{
           if (!productData.hasInfiniteStock) {
             await updateDoc(productRef, {
-              stockQuantity: productData.stockQuantity + item.quantity,
+              stockQuantity:  productData.hasInfiniteStock ? productData.stockQuantity : productData.stockQuantity - item.quantity,
               totalSales: (productData?.totalSales ?? item.quantity) - item.quantity
             });
           }

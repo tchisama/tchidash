@@ -39,7 +39,7 @@ function ChooseProductWithVariant({
     queryFn: () => {
       const q = query(
         collection(db, "products"),
-        and(where("storeId", "==", storeId), where("status", "!=", "deleted")),
+        and(where("storeId", "==", storeId), where("status", "==", "active")),
       );
       const response = getDocs(q).then((response) =>
         response.docs.map((doc) => ({ ...doc.data(), id: doc.id }) as Product),
@@ -84,7 +84,7 @@ function ChooseProductWithVariant({
       }) 
     } as Order)
     console.log(newOrder?.items)
-  },[selectedVariant,selectedProduct])
+  },[selectedVariant,selectedProduct,setNewOrder])
   return (
   <AlertDialog>
     <AlertDialogTrigger className='min-w-[300px] items-center text-left flex gap-2'>
