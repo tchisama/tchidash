@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import {  Check, CircleDotDashed, CircleOff, PackageCheck,  Truck, Undo } from "lucide-react";
+import {   CircleDotDashed,  PackageCheck,  PackageX,  Truck, Undo, UserCheck } from "lucide-react";
 import { Order } from "@/types/order";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/firebase";
@@ -28,30 +28,36 @@ export type OrderStatus =
 
 
 // import { orderStatusValues } from "@/constents/order";
-const orderStatusValues = [
+export const orderStatusValuesWithIcon = [
   {
     name: "pending",
-    icon: <CircleDotDashed className="h-4 w-4" />
+    icon: <CircleDotDashed className="h-4 w-4" />,
+    color: "#534b52",
   },
   {
     name: "processing",
-    icon: <PackageCheck className="h-4 w-4" />
+    icon: <PackageCheck className="h-4 w-4" />,
+    color: "#3d348b",
   },
   {
     name: "shipped",
-    icon: <Truck className="h-4 w-4" />
+    icon: <Truck className="h-4 w-4" />,
+    color: "#2667ff",
   },
   {
     name: "delivered",
-    icon: <Check className="h-4 w-4" />
+    icon: <UserCheck className="h-4 w-4" />,
+    color: "#43aa8b",
   },
   {
     name: "cancelled",
-    icon: <CircleOff className="h-4 w-4" />
+    icon: <PackageX className="h-4 w-4" />,
+    color: "#e63946",
   },
   {
     name: "returned",
-    icon: <Undo className="h-4 w-4" />
+    icon: <Undo className="h-4 w-4" />,
+    color: "#f8961e",
   },
 ] 
 
@@ -68,18 +74,32 @@ export function StateChanger({state:st,order}:{state:OrderStatus,order:Order}) {
       st && 
                   <DropdownMenu >
                     <DropdownMenuTrigger disabled={actionLoading} asChild>
-                      <Button size="sm" variant={"outline"} className="flex gap-2">
-                        {orderStatusValues.find((status) => status.name === state)?.icon}
+                      <Button
+                        style={
+                          {
+                            background: orderStatusValuesWithIcon.find((status) => status.name === state)?.color + "20",
+                            borderColor: orderStatusValuesWithIcon.find((status) => status.name === state)?.color + "30",
+                            color:"#000a"
+                          } 
+                        }
+                       size="sm" variant={"outline"} className="flex gap-2">
+                        {orderStatusValuesWithIcon.find((status) => status.name === state)?.icon}
                         {state}
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                       <DropdownMenuLabel>Order Status</DropdownMenuLabel>
                       <DropdownMenuSeparator />
-                      {orderStatusValues.map((status) => (
+                      {orderStatusValuesWithIcon.map((status) => (
                         <>
                         <DropdownMenuItem
                           key={status.name}
+                          style={{
+                            background: status.color + "30",
+                            borderColor: status.color + "40",
+                            color:"#000a",
+                          }}
+                          className=" mt-[2px] cursor-pointer border"
                           onClick={async () => {
                             setActionLoading(true)
                             setState(status.name as OrderStatus);
@@ -106,7 +126,7 @@ export function StateChanger({state:st,order}:{state:OrderStatus,order:Order}) {
                         </DropdownMenuItem>
                         {
                           status.name == "delivered" && (
-                            <DropdownMenuSeparator />
+                            <DropdownMenuSeparator className="w-full h-[2px]" />
                           )
                         }
                         </>

@@ -26,13 +26,13 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
-import { collection, query, where } from "firebase/firestore";
+import { and, collection,  query, QueryFilterConstraint, where } from "firebase/firestore";
 import { db } from "@/firebase";
 import { StateChanger } from "./StateChanger";
 
 
 
-export function OrdersTable({pageSize, setPageSize}:{pageSize:number, setPageSize:React.Dispatch<React.SetStateAction<number>>}) {
+export function OrdersTable({filter,pageSize, setPageSize}:{pageSize:number, setPageSize:React.Dispatch<React.SetStateAction<number>>,filter:{status:string[], search:string}}) {
   const { storeId } = useStore();
   const { orders, setOrders, currentOrder, setCurrentOrder } = useOrderStore();
   const [currentPage, setCurrentPage] = React.useState(1);
@@ -40,9 +40,30 @@ export function OrdersTable({pageSize, setPageSize}:{pageSize:number, setPageSiz
   const [totalCount, setTotalCount] = React.useState(0);
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["orders", storeId, currentPage, pageSize],
+    queryKey: ["orders", storeId, currentPage, pageSize,filter],
     queryFn: async () => {
-      const response = await getPage(query(collection(db, "orders"), where("storeId", "==", storeId)), currentPage??1, pageSize??10);
+      const wheres:QueryFilterConstraint[] = [];
+      wheres.push(where("storeId", "==", storeId));
+      wheres.push(where("orderStatus", "in", filter.status));
+      // if (filter.search) {
+      // const searchTermLower = filter.search.toLowerCase();
+      //   wheres.push(
+      //     or(
+      //       where("customer.name", ">=", searchTermLower),
+      //       where("customer.name", "<=", searchTermLower + "\uf8ff"),
+      //       where("customer.phoneNumber", ">=", searchTermLower),
+      //       where("customer.phoneNumber", "<=", searchTermLower + "\uf8ff")
+      //     )
+      //   );
+      // }
+
+      const queryBuilder = query(
+        collection(db, "orders"), 
+        and(
+          ...wheres
+        )
+      );
+      const response = await getPage(queryBuilder, currentPage, pageSize);
       return response;
     },
     refetchOnWindowFocus:false,
