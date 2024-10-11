@@ -178,6 +178,9 @@ export default function Page() {
                       Price
                     </TableHead>
                     <TableHead className="hidden md:table-cell">
+                      Stock
+                    </TableHead>
+                    <TableHead className="hidden md:table-cell">
                       Total Sales
                     </TableHead>
                     <TableHead className="hidden md:table-cell">

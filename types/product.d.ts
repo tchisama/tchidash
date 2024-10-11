@@ -23,6 +23,7 @@ export interface Variant {
   barcode?: string;
   image: string;
   variantValues: VariantValue[]; // Array of option and value pairs
+  totalSales?: number;
 }
 
 // Type for product option (general options like size, color)
@@ -73,4 +74,5 @@ export type Product = {
   price: number;
   bundle?: boolean;
   bundles?: ProductBundle[];
+  totalSales?: number;
 };

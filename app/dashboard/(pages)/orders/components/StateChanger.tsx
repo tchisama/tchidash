@@ -158,7 +158,8 @@ const updateStockOfProductsBasedOnStatus = async (
               if (variant.id === item.variantId) {
                 return {
                   ...variant,
-                  inventoryQuantity: variant.inventoryQuantity - item.quantity
+                  inventoryQuantity: variant.inventoryQuantity - item.quantity,
+                  totalSales: (variant?.totalSales ?? 0) + item.quantity
                 };
               } else {
                 return variant;
@@ -166,12 +167,13 @@ const updateStockOfProductsBasedOnStatus = async (
             })
 
             await updateDoc(productRef, {
-              variants: newUpdatedProductVariants
+              variants: newUpdatedProductVariants,
             });
         }else{
           if (!productData.hasInfiniteStock && productData.stockQuantity >= item.quantity) {
             await updateDoc(productRef, {
-              stockQuantity: productData.stockQuantity - item.quantity
+              stockQuantity: productData.stockQuantity - item.quantity,
+              totalSales: (productData?.totalSales ?? 0) + item.quantity
             });
           }
         }
@@ -196,7 +198,8 @@ const updateStockOfProductsBasedOnStatus = async (
               if (variant.id === item.variantId) {
                 return {
                   ...variant,
-                  inventoryQuantity: variant.inventoryQuantity + item.quantity
+                  inventoryQuantity: variant.inventoryQuantity + item.quantity,
+                  totalSales: (variant?.totalSales ?? item.quantity) - item.quantity
                 };
               } else {
                 return variant;
@@ -204,12 +207,13 @@ const updateStockOfProductsBasedOnStatus = async (
             })
 
             await updateDoc(productRef, {
-              variants: newUpdatedProductVariants
+              variants: newUpdatedProductVariants,
             });
         }else{
           if (!productData.hasInfiniteStock) {
             await updateDoc(productRef, {
-              stockQuantity: productData.stockQuantity + item.quantity
+              stockQuantity: productData.stockQuantity + item.quantity,
+              totalSales: (productData?.totalSales ?? item.quantity) - item.quantity
             });
           }
         }

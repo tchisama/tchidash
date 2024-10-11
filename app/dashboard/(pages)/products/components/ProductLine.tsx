@@ -72,6 +72,9 @@ const ProductLine = ({ product }: { product: Product }) => {
     });
     setProducts(products.filter((p) => p.id !== product.id));
   };
+  // const stock = (product.variants && product.variants.length > 0)
+  //   ? product.variants.reduce((acc, variant) => acc + variant.inventoryQuantity, 0)
+  //   : product.stockQuantity;
 
   return (
     <>
@@ -124,7 +127,20 @@ const ProductLine = ({ product }: { product: Product }) => {
             : product.price}{" "}
           Dh
         </TableCell>
-        <TableCell className="hidden md:table-cell">0</TableCell>
+        <TableCell className="hidden md:table-cell"
+        >
+          <div>
+          {product.variants && product.variants.length > 0
+            ? Math.min(...product.variants.map((v) => v.inventoryQuantity)) +
+              " ... " +
+              Math.max(...product.variants.map((v) => v.inventoryQuantity))
+            : product.stockQuantity}{" "}
+          Items
+          </div>
+        </TableCell>
+        <TableCell className="hidden md:table-cell">
+          {product?.totalSales ?? 0} Sales
+        </TableCell>
         <TableCell className="hidden md:table-cell">
           {product.createdAt.toDate().toLocaleDateString()}
         </TableCell>
@@ -183,6 +199,7 @@ const ProductLine = ({ product }: { product: Product }) => {
                   <TableHead>Variant Title</TableHead>
                   <TableHead>Price</TableHead>
                   <TableHead>Stock</TableHead>
+                  <TableHead>Total Sales</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -214,6 +231,7 @@ const ProductLine = ({ product }: { product: Product }) => {
                     <TableCell>{variant.title || "Untitled Variant"}</TableCell>
                     <TableCell>{variant.price} Dh</TableCell>
                     <TableCell>{variant.inventoryQuantity || 0}</TableCell>
+                    <TableCell>{variant.totalSales || 0}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
