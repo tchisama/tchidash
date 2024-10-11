@@ -1,11 +1,11 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
-	Table,
-	TableBody,
-	TableCell,
-	TableHead,
-	TableHeader,
-	TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import { useOrderStore } from "@/store/orders";
 import { Button } from "@/components/ui/button";
@@ -14,160 +14,230 @@ import { Input } from "@/components/ui/input";
 import ChooseProductWithVariant from "./ChooseProductWithVariant";
 import { getTotalPriceFromItem } from "@/lib/orders";
 import { PlusCircle, X } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { and, collection, getDocs, query, where } from "firebase/firestore";
+import { db } from "@/firebase";
+import { useStore } from "@/store/storeInfos";
+import { cn } from "@/lib/utils";
+import { Product } from "@/types/product";
 
 function ItemsTable() {
-	const { newOrder, setNewOrder } = useOrderStore();
+  const { newOrder, setNewOrder } = useOrderStore();
+  // new order item with the type of OrderItem
+  const addItem = () => {
+    const newItem: OrderItem = {
+      id: Date.now().toString(),
+      productId: "",
+      title: "",
+      quantity: 1,
+      price: 0,
+      totalPrice: 0,
+      imageUrl: "",
+    };
 
-	// new order item with the type of OrderItem
-	const addItem = () => {
-		const newItem: OrderItem = {
-			id: Date.now().toString(),
-			productId: "",
-			title: "",
-			quantity: 1,
-			price: 0,
-			totalPrice: 0,
-			imageUrl: "",
-		};
+    if (!newOrder) return;
 
-		if (!newOrder) return;
+    setNewOrder({
+      ...newOrder,
+      items: [...newOrder.items, newItem],
+    });
+  };
 
-		setNewOrder({
-			...newOrder,
-			items: [...newOrder.items, newItem],
-		});
-	};
-
-	return (
+  return (
     <div className="flex flex-col items-end">
-
-			<Button size={"sm"} onClick={addItem} variant={"outline"} className="ml-auto mb-2">
+      <Button
+        size={"sm"}
+        onClick={addItem}
+        variant={"outline"}
+        className="ml-auto mb-2"
+      >
         <PlusCircle className="h-3.5 w-3.5 mr-2" />
-				Add Item
-			</Button>
-		<div className="bg-slate-50 rounded-2xl w-full border">
-{
-  newOrder?.items.length === 0 ? (
-    <div className="flex justify-center items-center h-24">
-      <p className="text-slate-500">No items added</p>
+        Add Item
+      </Button>
+      <div className="bg-slate-50 rounded-2xl w-full border">
+        {newOrder?.items.length === 0 ? (
+          <div className="flex justify-center items-center h-24">
+            <p className="text-slate-500">No items added</p>
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[30%]">Product</TableHead>
+                <TableHead>Item Price</TableHead>
+                <TableHead>Quantity</TableHead>
+                <TableHead>Discount</TableHead>
+                <TableHead className="">Total Price</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+
+            <TableBody>
+              {newOrder?.items.map((item) => (
+                <ItemRow key={item.id} item={item} />
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </div>
     </div>
-  ) : (
-			<Table>
-				<TableHeader>
-					<TableRow>
-						<TableHead className="w-[30%]">Product</TableHead>
-						<TableHead>Item Price</TableHead>
-						<TableHead>Quantity</TableHead>
-						<TableHead>Discount</TableHead>
-						<TableHead className="">Total Price</TableHead>
-						<TableHead className="text-right">Actions</TableHead>
-					</TableRow>
-				</TableHeader>
-
-				<TableBody>
-					{newOrder?.items.map((item) => (
-						<TableRow key={item.id}>
-							{/* Product Info */}
-							<TableCell>
-								<ChooseProductWithVariant item={item} />
-							</TableCell>
-
-							{/* Item Price */}
-							<TableCell>
-								<div className="font-medium">{item.price} {newOrder.currency}</div>
-							</TableCell>
-
-							{/* Quantity */}
-							<TableCell>
-								<Input
-									className="w-32"
-									value={item.quantity}
-									onChange={(e) => {
-										const value = e.target.value;
-										setNewOrder({
-											...newOrder,
-											items: newOrder?.items.map((i) => {
-												if (i.id === item.id) {
-													return {
-														...i,
-														quantity: value, // Keep as string for onBlur evaluation
-													};
-												}
-												return i;
-											}) as OrderItem[],
-										});
-									}}
-									onBlur={(e) => {
-										try {
-											const evaluatedValue = eval(e.target.value); // Use eval to calculate the result
-											if (typeof evaluatedValue === "number") {
-												setNewOrder({
-													...newOrder,
-													items: newOrder?.items.map((i) => {
-														if (i.id === item.id) {
-															return {
-																...i,
-																quantity: evaluatedValue, // Set the quantity to the evaluated result
-															};
-														}
-														return i;
-													}),
-												});
-											} else {
-												console.error("Invalid expression"); // Handle cases where eval does not return a number
-											}
-										} catch (error) {
-											console.error("Error evaluating expression:", error); // Catch any errors from eval
-										}
-									}}
-								/>
-							</TableCell>
-
-							{/* Discount */}
-							<TableCell>
-								{
-									item.discount && 
-									item.discount.amount > 0 ?
-									<div className="font-medium">
-										{item.discount?.type === "percentage"
-											? `${item.discount.amount} %`
-											: `${item.discount?.amount} ${newOrder.currency}`}
-									</div>
-									:
-									<div className="font-medium">-</div>
-								}
-							</TableCell>
-
-							{/* Total Price */}
-							<TableCell className="text-right">
-								<div className="font-medium">
-                  {getTotalPriceFromItem(item)} {" "}
-                   {newOrder.currency}</div>
-							</TableCell>
-              <TableCell className="text-right">
-                <Button
-                  size={"icon"}
-                  variant={"outline"}
-                  onClick={() => {
-                    setNewOrder({
-                      ...newOrder,
-                      items: newOrder?.items.filter((i) => i.id !== item.id),
-                    });
-                  }}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </TableCell>
-
-						</TableRow>
-					))}
-				</TableBody>
-			</Table>
-      )
-    }
-		</div>
-		</div>
-	);
+  );
 }
+
+const ItemRow = ({ item }: { item: OrderItem }) => {
+  const { newOrder, setNewOrder } = useOrderStore();
+  const { storeId } = useStore();
+  const { data: products } = useQuery({
+    queryKey: ["products", storeId],
+    queryFn: () => {
+      const q = query(
+        collection(db, "products"),
+        and(where("storeId", "==", storeId), where("status", "==", "active"))
+      );
+      const response = getDocs(q).then((response) =>
+        response.docs.map((doc) => ({ ...doc.data(), id: doc.id } as Product))
+      );
+      return response;
+    },
+  });
+  const [stock, setStock] = useState(0);
+  useEffect(() => {
+    if (!products) return;
+    const product: Product | undefined = products.find(
+      (p) => p.id === item.productId
+    );
+    if (!product) return;
+    if (!product?.variants) return;
+    let stockNumber = 0;
+    if (item.variantId) {
+      const variant = item.variantId
+        ? product?.variants.find((v) => v.id === item.variantId)
+        : null;
+      if (variant?.hasInfiniteStock) {
+        stockNumber = 100000000000;
+      } else {
+        stockNumber = variant?.inventoryQuantity ?? 0;
+      }
+    } else {
+      if (product?.hasInfiniteStock) {
+        stockNumber = 100000000000;
+      } else {
+        stockNumber = product?.stockQuantity ?? 0;
+      }
+    }
+    newOrder?.items.forEach((i) => {
+      if (i.productId === item.productId && i.variantId === item.variantId && i.id !== item.id) {
+        stockNumber = stockNumber - i.quantity;
+      }
+    });
+	setStock(stockNumber);
+  }, [products, setStock,newOrder, item]);
+  return (
+    newOrder && (
+      <TableRow key={item.id}>
+        {/* Product Info */}
+        <TableCell>
+          <ChooseProductWithVariant item={item} />
+        </TableCell>
+
+        {/* Item Price */}
+        <TableCell>
+          <div className="font-medium">
+            {item.price} {newOrder.currency}
+          </div>
+        </TableCell>
+
+        {/* Quantity */}
+        <TableCell>
+          <Input
+            className={cn(
+              (stock < Number(item.quantity) && item.productId)
+                ? "border-red-200 text-destructive"
+                : "",
+              "w-32"
+            )}
+            value={item.quantity}
+            onChange={(e) => {
+              const value = e.target.value;
+              setNewOrder({
+                ...newOrder,
+                items: newOrder?.items.map((i) => {
+                  if (i.id === item.id) {
+                    return {
+                      ...i,
+                      quantity: value, // Keep as string for onBlur evaluation
+                    };
+                  }
+                  return i;
+                }) as OrderItem[],
+              });
+            }}
+            onBlur={(e) => {
+              try {
+                const evaluatedValue = eval(e.target.value); // Use eval to calculate the result
+                if (typeof evaluatedValue === "number") {
+                  setNewOrder({
+                    ...newOrder,
+                    items: newOrder?.items.map((i) => {
+                      if (i.id === item.id) {
+                        return {
+                          ...i,
+                          quantity: evaluatedValue, // Set the quantity to the evaluated result
+                        };
+                      }
+                      return i;
+                    }),
+                  });
+                } else {
+                  console.error("Invalid expression"); // Handle cases where eval does not return a number
+                }
+              } catch (error) {
+                console.error("Error evaluating expression:", error); // Catch any errors from eval
+              }
+            }}
+          />
+		  
+          {item.productId && stock < Number(item.quantity) && (
+            <span className="text-destructive">Out of Stock </span>
+          )}
+        </TableCell>
+
+        {/* Discount */}
+        <TableCell>
+          {item.discount && item.discount.amount > 0 ? (
+            <div className="font-medium">
+              {item.discount?.type === "percentage"
+                ? `${item.discount.amount} %`
+                : `${item.discount?.amount} ${newOrder.currency}`}
+            </div>
+          ) : (
+            <div className="font-medium">-</div>
+          )}
+        </TableCell>
+
+        {/* Total Price */}
+        <TableCell className="text-right">
+          <div className="font-medium">
+            {getTotalPriceFromItem(item)} {newOrder.currency}
+          </div>
+        </TableCell>
+        <TableCell className="text-right">
+          <Button
+            size={"icon"}
+            variant={"outline"}
+            onClick={() => {
+              setNewOrder({
+                ...newOrder,
+                items: newOrder?.items.filter((i) => i.id !== item.id),
+              });
+            }}
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </TableCell>
+      </TableRow>
+    )
+  );
+};
 
 export default ItemsTable;

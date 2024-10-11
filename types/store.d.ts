@@ -10,14 +10,26 @@ import { Timestamp } from "firebase/firestore";
     phoneNumber?: string;
   }
   
+  export type Currency =
+      {
+        name: string;
+        symbol: string;
+      }
   // Type for store settings (e.g., localization, payments)
   interface StoreSettings {
-    currency: "USD" | "MAD" | "EUR" ;
+    currency: Currency;
     taxRate: number; // Tax rate applied to products
     // shippingEnabled: boolean;
-    // paymentMethods: string[]; // e.g., ['paypal', 'credit_card']
+    paymentMethods: string[]; // e.g., ['paypal', 'credit_card']
     paymentMethod: "cash_on_delivery";
     shippingCost: number;
+    country: string;
+  }
+  
+  interface Discount {
+    above: number;
+    amount: number;
+    type: "percentage" | "fixed";
   }
   
   // Main Store type
@@ -33,5 +45,6 @@ import { Timestamp } from "firebase/firestore";
     logoUrl?: string; // Optional logo for branding
     settings: StoreSettings; // Store-related settings
     productCount: number; // Total number of products
+    discountOnOrdersAboveAmount?: Discount;
 };
   

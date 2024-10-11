@@ -26,3 +26,18 @@ export const useStore = create<StoreState>((set) => ({
   },
 }));
 
+
+  export const currencyOptions = [
+      {
+        name: "USD",
+        symbol: "$",
+      },
+      {
+        name: "EUR",
+        symbol: "€",
+      },
+      {
+        name: "MAD",
+        symbol: "dh",
+      }
+  ]

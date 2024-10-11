@@ -61,6 +61,11 @@ function ChooseProductWithVariant({
     }
   },[selectedProduct,setSelectedVariant])
   useEffect(() => {
+    if(products && products.length > 0){
+      setSelectedProduct(products[0])
+    }
+  },[products])
+  useEffect(() => {
     setNewOrder({
       ...newOrder,
       items: newOrder?.items.map((itm) => {

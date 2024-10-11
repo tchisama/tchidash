@@ -10,7 +10,7 @@ import Link from "next/link";
 import Image from "next/image";
 import Home from "@/public/images/svgs/icons/home.svg";
 import Cart from "@/public/images/svgs/icons/cart.svg";
-import Graph from "@/public/images/svgs/icons/graph.svg";
+// import Graph from "@/public/images/svgs/icons/graph.svg";
 import Settings from "@/public/images/svgs/icons/settings.svg";
 import Product from "@/public/images/svgs/icons/product.svg";
 import Mail from "@/public/images/svgs/icons/mail.svg";
@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 
 const iconsClass =
-  "h-6 w-6 group-hover:scale-[1.05] duration-200 hover:cursor-pointer";
+  "h-5 w-5 group-hover:scale-[1.05] duration-200 hover:cursor-pointer";
 type NavIconClass = { className?: string };
 export const navLinks = [
   {
@@ -48,13 +48,13 @@ export const navLinks = [
       />
     ),
   },
-  {
-    href: "/dashboard/analytics",
-    label: "Analytics",
-    icon: ({ className }: NavIconClass) => (
-      <Image src={Graph} alt="Graph" className={cn(iconsClass, className)} />
-    ),
-  },
+  // {
+  //   href: "/dashboard/analytics",
+  //   label: "Analytics",
+  //   icon: ({ className }: NavIconClass) => (
+  //     <Image src={Graph} alt="Graph" className={cn(iconsClass, className)} />
+  //   ),
+  // },
   {
     href: "/dashboard/contacts",
     label: "contacts",
@@ -112,9 +112,9 @@ function SideBar() {
                   <Link
                     href={link.href}
                     className={cn(
-                      "flex px-2 hover:bg-slate-50 pr-12 h-10  group duration-200 items-center border-slate-100 border gap-2 rounded-lg text-muted-foreground transition-colors hover:text-foreground",
+                      "flex px-2 hover:bg-slate-50 pr-12 h-10 hover:border group duration-200 items-center border-slate-100 border gap-2 rounded-lg text-muted-foreground transition-colors hover:text-foreground",
                       (link.href === "/dashboard" ? link.href===pathname : pathname.includes(link.href)) 
-                        ? "bg-primary/20 border border-primary/40 hover:bg-primary/30"
+                        ? "bg-primary/10 border border-primary/30 hover:bg-primary/20"
                         : "",
                     )}
                   >
