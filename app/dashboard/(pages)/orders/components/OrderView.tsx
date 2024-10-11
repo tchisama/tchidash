@@ -17,13 +17,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Copy, MoreVertical, Truck, X } from "lucide-react";
+import { Copy, DownloadIcon, MoreVertical, Phone, Trash2, Truck, X } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { useOrderStore } from "@/store/orders";
 import { StateChanger } from "./StateChanger";
 
 function OrderView() {
   const { currentOrder, setCurrentOrder } = useOrderStore();
+  
   return (
     currentOrder && (
       <div className="h-full ">
@@ -39,6 +40,7 @@ function OrderView() {
                   size="icon"
                   variant="outline"
                   className="h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
+                  onClick={() => navigator.clipboard.writeText(currentOrder?.id)}
                 >
                   <Copy className="h-3 w-3" />
                   <span className="sr-only">Copy Order ID</span>
@@ -68,10 +70,60 @@ function OrderView() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem>Edit</DropdownMenuItem>
-                  <DropdownMenuItem>Export</DropdownMenuItem>
+                  {/* <DropdownMenuItem>Edit</DropdownMenuItem>
+                  <DropdownMenuItem>Export</DropdownMenuItem> */}
+                  {/* <DropdownMenuItem>Print</DropdownMenuItem> */}
+                  <DropdownMenuItem
+                    onClick={() => {
+                      window.open(
+                        `https://wa.me/212${currentOrder?.customer?.phoneNumber}`,
+                      )
+                    }}
+                  >
+                    <Phone className="h-3.5 w-3.5 mr-2" /> Contact Whatsapp
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      window.open(
+                        `tel:+212${currentOrder?.customer?.phoneNumber}`,
+                      )
+                    }}
+                  >
+                    <Phone className="h-3.5 w-3.5 mr-2" />
+                    Call Customer
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>Trash</DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      navigator.clipboard.writeText(currentOrder?.id);
+                    }}
+                  >
+                    <Copy className="h-3.5 w-3.5 mr-2" />
+                    Copy Order ID
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      navigator.clipboard.writeText(
+                        currentOrder?.customer?.phoneNumber??"",
+                      );
+                    }}
+                  >
+                    <Copy className="h-3.5 w-3.5 mr-2" />
+                    Copy Customer Phone
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Copy className="h-3.5 w-3.5 mr-2" />
+                    Copy Order Tracking number
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>
+                    <DownloadIcon className="h-3.5 w-3.5 mr-2" />
+                    Export Order Excel
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>
+                    <Trash2 className="h-3.5 w-3.5 mr-2" />
+                    Trash</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
               <Button

@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { ArrowUpFromLine, CircleDotDashed, CircleOff, PackageCheck,  Truck, Undo } from "lucide-react";
+import {  Check, CircleDotDashed, CircleOff, PackageCheck,  Truck, Undo } from "lucide-react";
 import { Order } from "@/types/order";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/firebase";
@@ -39,11 +39,11 @@ const orderStatusValues = [
   },
   {
     name: "shipped",
-    icon: <ArrowUpFromLine className="h-4 w-4" />
+    icon: <Truck className="h-4 w-4" />
   },
   {
     name: "delivered",
-    icon: <Truck className="h-4 w-4" />
+    icon: <Check className="h-4 w-4" />
   },
   {
     name: "cancelled",
@@ -77,6 +77,7 @@ export function StateChanger({state:st,order}:{state:OrderStatus,order:Order}) {
                       <DropdownMenuLabel>Order Status</DropdownMenuLabel>
                       <DropdownMenuSeparator />
                       {orderStatusValues.map((status) => (
+                        <>
                         <DropdownMenuItem
                           key={status.name}
                           onClick={async () => {
@@ -103,6 +104,12 @@ export function StateChanger({state:st,order}:{state:OrderStatus,order:Order}) {
                           <span className="mr-2">{status.icon}</span>
                           {status.name}
                         </DropdownMenuItem>
+                        {
+                          status.name == "delivered" && (
+                            <DropdownMenuSeparator />
+                          )
+                        }
+                        </>
                       ))}
                     </DropdownMenuContent>
                   </DropdownMenu>
