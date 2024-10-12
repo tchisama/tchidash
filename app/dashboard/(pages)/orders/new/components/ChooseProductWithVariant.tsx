@@ -1,6 +1,6 @@
 "use client"
 import React, { useEffect } from 'react'
-import { useQuery } from '@tanstack/react-query';
+import {  useQuery } from '@tanstack/react-query';
 import { useStore } from '@/store/storeInfos';
 import { and, collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/firebase';
@@ -53,6 +53,7 @@ function ChooseProductWithVariant({
     setSelectedVariant(null)
   },[selectedProduct,setSelectedVariant])
 
+
   useEffect(() => {
     if(selectedProduct?.variants && selectedProduct.variants.length > 0){
       setSelectedVariant(
@@ -60,11 +61,6 @@ function ChooseProductWithVariant({
       )
     }
   },[selectedProduct,setSelectedVariant])
-  useEffect(() => {
-    if(products && products.length > 0){
-      setSelectedProduct(products[0])
-    }
-  },[products])
   useEffect(() => {
     setNewOrder({
       ...newOrder,

@@ -30,7 +30,7 @@ import { MoreHorizontal } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 export default function Page() {
   const {storeId} = useStore()
-  const {data:messages} = useQuery(
+  const {data:messages,isLoading,error} = useQuery(
     {
       queryKey: ["messages"],
       queryFn: async () => {
@@ -47,6 +47,12 @@ export default function Page() {
       }
     }
   )
+  if(error){
+    return <div className='text-red-500'>Error: {error.message}</div>
+  }
+  if(isLoading){
+    return <div>Loading...</div>
+  }
   return (
     <div>
       <div className="flex justify-end">

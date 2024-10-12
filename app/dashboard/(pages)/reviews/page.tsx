@@ -17,7 +17,7 @@ import { useQuery } from '@tanstack/react-query'
 import CreateReviewDialog from './components/CreateReviewDialog'
 
 export default function Page() {
-  const { data: reviews } = useQuery({
+  const { data: reviews, isLoading, error } = useQuery({
     queryKey: ["reviews"],
     queryFn: async () => {
       const q = query(collection(db, "reviews"));
@@ -29,6 +29,13 @@ export default function Page() {
       return data;
     }
   });
+
+  if (error) {
+    return <div className='text-red-500'>Error: {error.message}</div>;
+  }
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <>
