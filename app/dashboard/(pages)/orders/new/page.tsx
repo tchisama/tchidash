@@ -23,6 +23,7 @@ import { useRouter } from 'next/navigation'
 import { useStore } from '@/store/storeInfos'
 import { useSession } from 'next-auth/react'
 import { Customer } from '@/types/customer'
+import { toast } from '@/hooks/use-toast'
 
 
 // Default canvas for a new order
@@ -171,6 +172,11 @@ try {
     console.error("Error creating customer or order:", error);
     setError("An error occurred while creating the customer or order.");
   }
+    toast({
+      title: "Order created",
+      description: "Your order has been created successfully.",
+      duration: 3000,
+    })
   }
   return (
     order &&

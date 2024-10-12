@@ -33,6 +33,7 @@ import Link from "next/link";
 import ProductDangerZone from "./components/ProductDangerZone";
 import { isEqual} from "lodash";
 import { useNavbar } from "@/store/navbar";
+import { toast } from "@/hooks/use-toast";
 
 function Page({ params }: { params: { product: string } }) {
   const { products,setProducts,currentProduct, setCurrentProduct , lastUploadedProduct, setLastUploadedProduct } = useProducts();
@@ -85,6 +86,10 @@ function Page({ params }: { params: { product: string } }) {
       setLastUploadedProduct(currentProduct);
       setProducts(products.map((p) => (p.id === currentProduct.id ? currentProduct : p)));
       setActions([]);
+      toast({
+        title: "Product updated",
+        description: "Product has been updated successfully",
+      })
     } else {
       // Handle missing fields (e.g., show an error or notification)
       console.error("Missing required product fields");

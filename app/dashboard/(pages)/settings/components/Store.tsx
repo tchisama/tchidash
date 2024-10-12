@@ -144,7 +144,7 @@ const StoreDetailsCard = () => {
               Currency
             </Label>
             <Select
-              onValueChange={(value) => setCurrency(currencyOptions.find((c) => c.name === value)!)}
+              onValueChange={(value) => setCurrency(currencyOptions.find((c) => c.name === value)??{ name: "", symbol: "" })}
               value={currency.name}
             >
               <SelectTrigger className="w-full">

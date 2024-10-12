@@ -21,10 +21,17 @@ import { Copy, DownloadIcon, MoreVertical, Phone, Trash2, Truck, X } from "lucid
 import { Separator } from "@/components/ui/separator";
 import { useOrderStore } from "@/store/orders";
 import { StateChanger } from "./StateChanger";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card"
+import Image from "next/image";
+
 
 function OrderView() {
   const { currentOrder, setCurrentOrder } = useOrderStore();
-  
+
   return (
     currentOrder && (
       <div className="h-full ">
@@ -104,7 +111,7 @@ function OrderView() {
                   <DropdownMenuItem
                     onClick={() => {
                       navigator.clipboard.writeText(
-                        currentOrder?.customer?.phoneNumber??"",
+                        currentOrder?.customer?.phoneNumber ?? "",
                       );
                     }}
                   >
@@ -156,15 +163,15 @@ function OrderView() {
                     <dd>{currentOrder.customer.name}</dd>
                   </div>
                   {
-                  currentOrder.customer.email &&
-                  <div className="flex items-center justify-between">
-                    <dt className="text-muted-foreground">Email</dt>
-                    <dd>
-                      <a href="mailto:">
-                        {currentOrder.customer?.email ?? "no email"}
-                      </a>
-                    </dd>
-                  </div>
+                    currentOrder.customer.email &&
+                    <div className="flex items-center justify-between">
+                      <dt className="text-muted-foreground">Email</dt>
+                      <dd>
+                        <a href="mailto:">
+                          {currentOrder.customer?.email ?? "no email"}
+                        </a>
+                      </dd>
+                    </div>
                   }
                   <div className="flex items-center justify-between">
                     <dt className="text-muted-foreground">Phone</dt>
@@ -200,7 +207,25 @@ function OrderView() {
                       className="flex border-t pt-1 border-slate-100 items-center justify-between"
                     >
                       <span className="text-muted-foreground">
-                        {item.title} x{" "}
+                        <HoverCard>
+                          <HoverCardTrigger>
+                            {item.title}
+                          </HoverCardTrigger>
+                          <HoverCardContent>
+                            <div className="flex gap-4">
+                              <Image className="w-16 h-16 object-cover border rounded-md " src={item.imageUrl ??""} alt="" width={80} height={80} />
+                              <div>
+                                <div className="font-semibold">{item.title}</div>
+                                <div className="text-sm text-muted-foreground mt-1">
+                                  {item.price} dh x {item.quantity} = {item.totalPrice} dh
+                                </div>
+                              </div>
+                            </div>
+                          </HoverCardContent>
+                        </HoverCard>
+
+
+                        x{" "}
                         <span className="font-semibold">{item.quantity}</span>
                         <br />
                         {item.discount && (
@@ -219,7 +244,7 @@ function OrderView() {
                             {item.price * item.quantity -
                               (item.discount.type === "percentage"
                                 ? ((item.price * item.discount.amount) / 100) *
-                                  item.quantity
+                                item.quantity
                                 : item.discount.amount * item.quantity)}{" "}
                             Dh
                           </span>
@@ -239,11 +264,11 @@ function OrderView() {
                 </li>
                 {
                   currentOrder?.discountAmount ?
-                  <li className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Discount Amount</span>
-                    <span>- {currentOrder?.discountAmount} Dh</span>
-                  </li>
-                  : null
+                    <li className="flex items-center justify-between">
+                      <span className="text-muted-foreground">Discount Amount</span>
+                      <span>- {currentOrder?.discountAmount} Dh</span>
+                    </li>
+                    : null
                 }
                 <li className="flex items-center justify-between">
                   <span className="text-muted-foreground">Shipping</span>

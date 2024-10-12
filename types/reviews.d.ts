@@ -17,4 +17,5 @@ export interface Review {
   updatedAt?: Timestamp;
   productId?: string;
   variantId?: string;
+  publish: boolean;
 }

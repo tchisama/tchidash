@@ -53,6 +53,7 @@ export default function CreateReviewDialog() {
         reviewerEmail: email || null, // Only add email if provided
         rating,
         reviewText,
+        publish:true,
         images: uploadedImages,
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),

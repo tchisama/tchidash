@@ -1,6 +1,5 @@
 "use client";
 import Image from "next/image";
-import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {} from "@/components/ui/card";
 import {
@@ -11,7 +10,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
 import PhoneBar from "./PhoneBar";
 import SideBar from "./SideBar";
 import { signOut, useSession } from "next-auth/react";
@@ -23,6 +21,7 @@ import BreadcrumbCom from "./Breadcrumb";
 import { useNavbar } from "@/store/navbar";
 import { useRouter } from "next/navigation";
 import useClean from "@/hooks/useClean";
+import { DashboardCommand } from "./Command";
 
 export const description =
   "An orders dashboard with a sidebar navigation. The sidebar has icon navigation. The content area has a breadcrumb and search in the header. The main area has a list of recent orders with a filter and export button. The main area also has a detailed view of a single order with order details, shipping information, billing information, customer information, and payment information.";
@@ -53,14 +52,7 @@ export default function DashboardUiProvider({
                 </div>
               )
             }
-            <div className="relative min-w-[40%]  md:grow-0">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search..."
-                className="w-full rounded-lg bg-background min-w-[200px] pl-8 md:w-[200px] lg:w-[336px]"
-              />
-            </div>
+            <DashboardCommand />
           </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
