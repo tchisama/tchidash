@@ -60,10 +60,14 @@ export default function CreateNewStore() {
       description: storeDescription,
       logoUrl: "", // This will be populated after uploading the logo
       settings: {
-        currency: "MAD", // Default currency
+        currency: {
+          name: "MAD",
+          symbol: "dh",
+        },
         taxRate: 0, // Default tax rate
         shippingCost: 40, // Default shipping cost
-        paymentMethod: "cash_on_delivery", // Default payment method
+        paymentMethods: ["cash_on_delivery"], // Default payment method
+        country: "Morocco",
       },
       productCount: 0, // Default product count
     };

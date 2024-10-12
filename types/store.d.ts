@@ -21,7 +21,6 @@ import { Timestamp } from "firebase/firestore";
     taxRate: number; // Tax rate applied to products
     // shippingEnabled: boolean;
     paymentMethods: string[]; // e.g., ['paypal', 'credit_card']
-    paymentMethod: "cash_on_delivery";
     shippingCost: number;
     country: string;
   }
