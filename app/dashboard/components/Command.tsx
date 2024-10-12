@@ -27,7 +27,7 @@ const commandGroups = [
     group: "Home",
     commands: [
       {
-        icon: <Home className="mr-2 h-3 w-3" />,
+        icon: <Home style={{fontSize: 50}} className=" mr-2" />,
         title: "Home Page",
         url: "/dashboard",
       },
