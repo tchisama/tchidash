@@ -11,7 +11,6 @@ import ProductOptionsCard from "./components/ProductOptions";
 import ProductVariantsCard from "./components/ProductVariant";
 import ProductStatusCard from "./components/ProductStatus";
 import ProductImagesCard from "./components/ProductImage";
-import ProductDiscount from "./components/ProductDiscount";
 import { useEffect } from "react";
 import { useProducts } from "@/store/products";
 import {
