@@ -3,12 +3,10 @@ import { Timestamp } from "firebase/firestore";
 /**
  * Represents the possible statuses a customer can have.
  */
-export type CustomerStatus =  "active" | "inactive" | "suspended";
-  // ACTIVE = "active",
-  // INACTIVE = "inactive",
-  // SUSPENDED = "suspended",
-
-
+export type CustomerStatus = "active" | "inactive" | "suspended";
+// ACTIVE = "active",
+// INACTIVE = "inactive",
+// SUSPENDED = "suspended",
 
 /**
  * Represents a customer entity with best practices applied.
@@ -33,4 +31,5 @@ export interface Customer {
   purchaseCount?: number;
   dateOfBirth?: Date;
   totalAmountSpent?: number;
+  storeId: string;
 }
