@@ -23,6 +23,8 @@ interface StoreSettings {
   shippingFreeAboveCartAmount?: number;
   hasFreeShippingAboveAmount?: boolean;
   country: string;
+
+  dynamicVariantsImages?: boolean;
 }
 
 interface Discount {
@@ -45,5 +47,8 @@ export type Store = {
   settings: StoreSettings; // Store-related settings
   productCount: number; // Total number of products
   discountOnOrdersAboveAmount?: Discount;
+  apiKeys?: {
+    name: string;
+    key: string;
+  }[];
 };
-

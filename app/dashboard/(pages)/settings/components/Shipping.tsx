@@ -43,15 +43,16 @@ const ShippingCard = () => {
   useEffect(() => {
     if (!store) return;
     if (!store.settings) return;
-    setShippingCost(store.settings.shippingCost);
+    if (store.settings.shippingCost)
+      setShippingCost(store.settings.shippingCost);
     if (store.settings.shippingFreeAboveCartAmount) {
       setShippingFreeAboveCartAmount(
         store.settings.shippingFreeAboveCartAmount,
       );
     }
-    setHasFreeShippingAboveAmount(
-      store?.settings?.hasFreeShippingAboveAmount || false,
-    );
+    if (store.settings.hasFreeShippingAboveAmount) {
+      setHasFreeShippingAboveAmount(store.settings.hasFreeShippingAboveAmount);
+    }
   }, [store]);
 
   const handleSave = () => {

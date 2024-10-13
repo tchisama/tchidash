@@ -3,7 +3,7 @@
 const isProd = process.env.NODE_ENV === "production";
 
 const nextConfig = {
-  env:{
+  env: {
     NEXTAUTH_URL: isProd
       ? process.env.NEXTAUTH_URL_PRODUCTION
       : process.env.NEXTAUTH_URL_DEVELOPMENT,
@@ -14,7 +14,13 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-
+  webpack: (config) => {
+    config.externals = [...config.externals, { canvas: "canvas" }];
+    return config;
+  },
+  experimental: {
+    esmExternals: "loose",
+  },
   // add images
   images: {
     domains: ["localhost", "lh3.googleusercontent.com"],

@@ -95,6 +95,14 @@ export default function CreateOrder() {
 
   const [error, setError] = useState<string | undefined>("");
 
+  const totalPrice = () => {
+    if (!order) return 0;
+    return order.items.reduce(
+      (acc, item) => acc + getTotalPriceFromItem(item),
+      0,
+    );
+  };
+
   const handleSubmit = async () => {
     console.log(order);
     if (!order) return;
@@ -113,11 +121,8 @@ export default function CreateOrder() {
       return setError("Please enter the shipping city");
 
     if (!order.items.length) return setError("Please add at least one item");
-
-    const totalPrice = order.items.reduce(
-      (acc, item) => acc + getTotalPriceFromItem(item),
-      0,
-    );
+    const tp = totalPrice();
+    if (!tp) return setError("Please add at least one item");
 
     const shippingCost = () => {
       if (!store) return 0;
@@ -127,7 +132,7 @@ export default function CreateOrder() {
         store.settings.hasFreeShippingAboveAmount &&
         store.settings.shippingFreeAboveCartAmount
       ) {
-        if (totalPrice >= store?.settings?.shippingFreeAboveCartAmount) {
+        if (tp >= store?.settings?.shippingFreeAboveCartAmount) {
           cost = 0;
         }
       }
@@ -149,7 +154,7 @@ export default function CreateOrder() {
         };
       }),
       storeId: storeId,
-      totalPrice: totalPrice + shippingCost(),
+      totalPrice: tp + shippingCost(),
       subtotal: order.items.reduce(
         (acc, item) => acc + item.price * item.quantity,
         0,
@@ -254,6 +259,7 @@ export default function CreateOrder() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="firstName">First Name</Label>
+                {totalPrice()} herer is total price
                 <Input
                   id="firstName"
                   name="firstName"

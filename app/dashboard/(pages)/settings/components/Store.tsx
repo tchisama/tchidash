@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -17,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import UploadImageProvider from "@/components/UploadImageProvider";
 import { db } from "@/firebase";
@@ -56,6 +58,7 @@ const StoreDetailsCard = () => {
   const [storeDescription, setStoreDescription] = useState("");
   const [image, setImage] = useState("");
   const [saved, setSaved] = useState(false);
+  const [dainamicVariantImages, setDainamicVariantImages] = useState(false);
 
   const handleSave = () => {
     if (!storeId) return;
@@ -68,6 +71,7 @@ const StoreDetailsCard = () => {
       settings: {
         country,
         currency,
+        dynamicVariantsImages: dainamicVariantImages,
       },
       description: storeDescription,
     };
@@ -97,6 +101,11 @@ const StoreDetailsCard = () => {
     );
     if (!currencySelected) return;
     setCurrency(currencySelected);
+
+    if (store.settings?.dynamicVariantsImages) {
+      setDainamicVariantImages(store.settings.dynamicVariantsImages ?? false);
+    }
+
     setSaved(false);
   }, [store]);
 
@@ -220,6 +229,24 @@ const StoreDetailsCard = () => {
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+            <Separator className="my-4" />
+            <div>
+              <Label
+                htmlFor="dainamicVariantImages"
+                className="pb-3 font-medium flex items-center gap-2"
+              >
+                <Checkbox
+                  checked={dainamicVariantImages}
+                  id="dainamicVariantImages"
+                  onCheckedChange={(v: boolean) => setDainamicVariantImages(v)}
+                />
+                Dynamic Variant Images
+              </Label>
+              <p className="text-sm text-slate-500">
+                Enable this feature to genirate different images for each
+                product variant dynamically
+              </p>
             </div>
           </form>
         </CardContent>

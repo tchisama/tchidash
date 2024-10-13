@@ -31,14 +31,22 @@ import { useStore } from "@/store/storeInfos";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import ProductDangerZone from "./components/ProductDangerZone";
-import { isEqual} from "lodash";
+import { isEqual } from "lodash";
 import { useNavbar } from "@/store/navbar";
 import { toast } from "@/hooks/use-toast";
+import ProductDynamicVariantsImages from "./components/ProductDynamicVariantsImages";
 
 function Page({ params }: { params: { product: string } }) {
-  const { products,setProducts,currentProduct, setCurrentProduct , lastUploadedProduct, setLastUploadedProduct } = useProducts();
+  const {
+    products,
+    setProducts,
+    currentProduct,
+    setCurrentProduct,
+    lastUploadedProduct,
+    setLastUploadedProduct,
+  } = useProducts();
   const { storeId } = useStore();
-  const {setActions} = useNavbar();
+  const { setActions } = useNavbar();
   const productId = params.product;
 
   const { data, isLoading, error } = useQuery({
@@ -84,12 +92,14 @@ function Page({ params }: { params: { product: string } }) {
         updatedAt: Timestamp.now(),
       });
       setLastUploadedProduct(currentProduct);
-      setProducts(products.map((p) => (p.id === currentProduct.id ? currentProduct : p)));
+      setProducts(
+        products.map((p) => (p.id === currentProduct.id ? currentProduct : p)),
+      );
       setActions([]);
       toast({
         title: "Product updated",
         description: "Product has been updated successfully",
-      })
+      });
     } else {
       // Handle missing fields (e.g., show an error or notification)
       console.error("Missing required product fields");
@@ -102,8 +112,12 @@ function Page({ params }: { params: { product: string } }) {
     if (!lastUploadedProduct && currentProduct) {
       setLastUploadedProduct(currentProduct);
     }
-    window.history.pushState(null, "", `/dashboard/products/${currentProduct?.title.replaceAll(" ", "_")}`);
-  }, [lastUploadedProduct, currentProduct,setLastUploadedProduct]);
+    window.history.pushState(
+      null,
+      "",
+      `/dashboard/products/${currentProduct?.title.replaceAll(" ", "_")}`,
+    );
+  }, [lastUploadedProduct, currentProduct, setLastUploadedProduct]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -116,7 +130,7 @@ function Page({ params }: { params: { product: string } }) {
                 Save Product
               </Button>
             )}
-          </>
+          </>,
         ]);
       } else {
         // If scroll is less than 100px, clear actions
@@ -141,16 +155,15 @@ function Page({ params }: { params: { product: string } }) {
     const index = products.findIndex((p) => p.title == currentProduct?.title);
     if (index > 0) {
       setPreProduct(products[index - 1]);
-    }else{
+    } else {
       setPreProduct(products[products.length - 1]);
     }
     if (index < products.length - 1) {
       setNextProduct(products[index + 1]);
-    }else{
+    } else {
       setNextProduct(products[0]);
     }
   }, [products, currentProduct]);
-
 
   if (isLoading)
     return (
@@ -176,41 +189,38 @@ function Page({ params }: { params: { product: string } }) {
           {currentProduct?.status ?? "draft"}
         </Badge>
         <div className="hidden items-center gap-2 md:ml-auto md:flex">
-          {
-            !areProductsEqual &&
+          {!areProductsEqual && (
             <Button size="sm" onClick={saveProduct}>
               Save Product
             </Button>
-          }
+          )}
         </div>
-        {
-          products &&
-          products.length > 1 &&
-        <div className="flex gap-2 ">
-          <Button
-            size="sm"
-            variant={"outline"}
-            disabled={preProduct == null}
-            onClick={() => {
-              setCurrentProduct(preProduct);
-              setLastUploadedProduct(preProduct);
-            }}
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <Button
-            size="sm"
-            variant={"outline"}
-            disabled={nextProduct == null}
-            onClick={() => {
-              setCurrentProduct(nextProduct);
-              setLastUploadedProduct(nextProduct);
-            }}
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
-        }
+        {products && products.length > 1 && (
+          <div className="flex gap-2 ">
+            <Button
+              size="sm"
+              variant={"outline"}
+              disabled={preProduct == null}
+              onClick={() => {
+                setCurrentProduct(preProduct);
+                setLastUploadedProduct(preProduct);
+              }}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              size="sm"
+              variant={"outline"}
+              disabled={nextProduct == null}
+              onClick={() => {
+                setCurrentProduct(nextProduct);
+                setLastUploadedProduct(nextProduct);
+              }}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
       </div>
       <div className="grid gap-4 md:grid-cols-[1fr_250px] lg:grid-cols-3 lg:gap-8">
         <div className="grid auto-rows-max items-start gap-4 lg:col-span-2 lg:gap-8">
@@ -228,17 +238,16 @@ function Page({ params }: { params: { product: string } }) {
         <div className="grid auto-rows-max items-start gap-4 lg:gap-8">
           <ProductImagesCard />
           <ProductStatusCard />
-          <ProductDiscount />
+          <ProductDynamicVariantsImages />
           <ProductDangerZone />
         </div>
       </div>
       <div className="flex items-center justify-center gap-2 md:hidden">
-        {
-          !areProductsEqual &&
+        {!areProductsEqual && (
           <Button size="sm" onClick={saveProduct}>
             Save Product
           </Button>
-        }
+        )}
       </div>
     </div>
   );

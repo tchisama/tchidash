@@ -75,4 +75,5 @@ export type Product = {
   bundle?: boolean;
   bundles?: ProductBundle[];
   totalSales?: number;
+  dynamicVariantsImages?: boolean;
 };
