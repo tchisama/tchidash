@@ -1,13 +1,37 @@
 "use client";
+import { useProducts } from "@/store/products";
 import React, { useState, useEffect, useRef } from "react";
 import {
   Stage,
   Layer,
-  Rect,
   Image as KonvaImage,
 } from "react-konva";
 
 function StageComponent() {
+  const {currentProduct, setCurrentProduct} = useProducts();
+
+
+  const handleDragEnd = (o: string, v: string, x: number, y: number) => {
+    if (!currentProduct) return;
+    // Update the position of the dragged image in currentProduct
+    const updatedVariants = currentProduct?.dynamicVariantsOptionsImages?.map((ov, idx) => {
+      if ( ov.option === o) {
+        return {
+          ...ov,
+          x, // Update x position
+          y, // Update y position
+        };
+      }
+      return ov;
+    });
+
+    // Update the currentProduct with the new positions
+    setCurrentProduct({
+      ...currentProduct,
+      dynamicVariantsOptionsImages: updatedVariants,
+    });
+  };
+
   return (
     <Stage
       width={500}
@@ -15,19 +39,27 @@ function StageComponent() {
       className="w-[500px] bg-slate-100 h-[500px] border rounded-2xl overflow-hidden"
     >
       <Layer>
-        <Rect x={20} y={20} width={100} height={100} fill="red" draggable />
-        <URLImage
-          src="https://www.cactusia.ma/_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fcactusia-983c2.appspot.com%2Fo%2Fpots%252F1707510683964%3Falt%3Dmedia%26token%3Dbb288d03-287d-45f0-8b90-f9871f1a7567&w=256&q=75"
-          x={100}
-          y={100}
-        />
-        <Rect x={300} y={300} width={100} height={100} fill="blue" draggable />
+        {
+          currentProduct?.dynamicVariantsOptionsImages?.
+          filter((ov) => ov.selected)
+          .map((ov, index) => (
+            <URLImage
+              key={ov.option + ov.value}
+              src={ov.image}
+              x={ ov.x }
+              y={ ov.y }
+              onDragEnd={(x, y) => handleDragEnd(ov.option , ov.value, x, y)} 
+            />
+          ))
+        }
       </Layer>
     </Stage>
   );
 }
 
-const URLImage = ({ src, x, y }: { src: string; x: number; y: number }) => {
+const URLImage = ({ src, x, y , onDragEnd }: { src: string; x: number; y: number,
+  onDragEnd: (x: number, y: number) => void
+ }) => {
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   const imageNode = useRef(null);
 
@@ -55,6 +87,7 @@ const URLImage = ({ src, x, y }: { src: string; x: number; y: number }) => {
     imgHeight: number,
     maxWidth: number,
     maxHeight: number,
+
   ) => {
     const imgRatio = imgWidth / imgHeight;
     const containerRatio = maxWidth / maxHeight;
@@ -87,6 +120,11 @@ const URLImage = ({ src, x, y }: { src: string; x: number; y: number }) => {
         image={image}
         alt=""
         ref={imageNode}
+        onDragEnd={(e) => {
+          const newX = e.target.x();
+          const newY = e.target.y();
+          onDragEnd(newX, newY); // Call the drag end handler to update the x and y
+        }}
       />
     )
   );

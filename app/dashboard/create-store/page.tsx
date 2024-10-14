@@ -64,6 +64,8 @@ export default function CreateNewStore() {
           name: "MAD",
           symbol: "dh",
         },
+        hasFreeShippingAboveAmount: false,
+        shippingFreeAboveCartAmount: 200,
         taxRate: 0, // Default tax rate
         shippingCost: 40, // Default shipping cost
         paymentMethods: ["cash_on_delivery"], // Default payment method

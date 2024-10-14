@@ -37,16 +37,16 @@ function UploadImageProvider({ children, folder, name, callback }: Props) {
   };
 
   return (
-    <div>
+    <div className="">
       <input
         type="file"
         onChange={handleChange}
         className="hidden"
-        id="image"
+        id={"image" + name}
         accept="image/*"
         disabled={uploading}
       />
-      <label className="cursor-pointer" htmlFor="image">
+      <label className="cursor-pointer" htmlFor={"image" + name}>
         {uploading ? "Uploading..." : children}
       </label>
     </div>

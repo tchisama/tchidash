@@ -76,4 +76,12 @@ export type Product = {
   bundles?: ProductBundle[];
   totalSales?: number;
   dynamicVariantsImages?: boolean;
+  dynamicVariantsOptionsImages?: {
+    option: string; // e.g., "Size" or "Color"
+    value: string; // e.g., "Large" or "Red"
+    image: string;
+    selected: boolean;
+    x: number;
+    y: number;
+  }[];
 };
