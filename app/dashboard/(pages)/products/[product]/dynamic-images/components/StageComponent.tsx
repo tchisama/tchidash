@@ -63,28 +63,33 @@ function StageComponent() {
   );
 }
 
-const URLImage = ({ src, x, y , width, height , onDragEnd
-, selectedOption, setSelectedOption
- }: { src: string; x: number; y: number, width: number, height: number
-  onDragEnd: (x: number, y: number) => void
-  selectedOption: string | null,
-  setSelectedOption: (option: string | null) => void
- }) => {
+const URLImage = ({ src, x, y, width, height, onDragEnd, selectedOption, setSelectedOption }: { 
+  src: string; 
+  x: number; 
+  y: number; 
+  width: number; 
+  height: number;
+  onDragEnd: (x: number, y: number) => void;
+  selectedOption: string | null;
+  setSelectedOption: (option: string | null) => void;
+}) => {
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   const imageNode = useRef(null);
 
   useEffect(() => {
     const img = new window.Image();
     img.src = src;
-    img.addEventListener("load", handleLoad);
-
-    return () => {
-      img.removeEventListener("load", handleLoad);
+    img.onload = () => {
+      setImage(img);
+    };
+    img.onerror = (err) => {
+      console.error("Failed to load image: ", err);
     };
 
-    function handleLoad() {
-      setImage(img);
-    }
+    return () => {
+      img.onload = null;
+      img.onerror = null;
+    };
   }, [src]);
 
   const getContainDimensions = (
@@ -92,7 +97,6 @@ const URLImage = ({ src, x, y , width, height , onDragEnd
     imgHeight: number,
     maxWidth: number,
     maxHeight: number,
-
   ) => {
     const imgRatio = imgWidth / imgHeight;
     const containerRatio = maxWidth / maxHeight;
@@ -112,10 +116,9 @@ const URLImage = ({ src, x, y , width, height , onDragEnd
 
   return (
     image && (
-      <>
       <KonvaImage
         onClick={() => {
-            setSelectedOption(src);
+          setSelectedOption(src);
         }}
         stroke={selectedOption === src ? "#0003" : "#0001"}
         draggable
@@ -124,21 +127,21 @@ const URLImage = ({ src, x, y , width, height , onDragEnd
           image?.height as number,
           width * 10,
           height * 10,
-        )} // Here we apply the 'contain' logic
+        )}
         x={x}
         y={y}
         image={image}
-        alt=""
+        alt="Loaded Image"
         ref={imageNode}
         onDragEnd={(e) => {
           const newX = e.target.x();
           const newY = e.target.y();
-          onDragEnd(newX, newY); // Call the drag end handler to update the x and y
+          onDragEnd(newX, newY);
         }}
       />
-      </>
     )
   );
 };
+
 
 export default StageComponent;
