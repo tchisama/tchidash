@@ -18,9 +18,12 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import UploadImageProvider from "@/components/UploadImageProvider";
 import { v4 } from "uuid";
-import { Upload } from "lucide-react";
+import { ArrowDownToLine, ArrowUpToLine, Upload } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useDynamicVariantsImages } from "@/store/dynamicVariantsImages";
+import { set } from "lodash";
+import { Slider } from "@/components/ui/slider";
 
 function Page({ params }: { params: { product: string } }) {
   const { currentProduct, setCurrentProduct } = useProducts();
@@ -63,7 +66,9 @@ const handleSave = ()=>{
             image: "",
             selected: false,
             x: 0,
-            y: 0
+            y: 0,
+            scaleX: 30,
+            scaleY: 30,
           })
         })
       })
@@ -75,11 +80,7 @@ const handleSave = ()=>{
   }
 
 
-  const [selectedOptionsValues, setSelectedOptionsValues] = useState<{
-    option: string;
-    value: string;
-    image: string;
-  }[]>()
+  const {selectedOption} = useDynamicVariantsImages()
 
   return (
     currentProduct &&
@@ -96,7 +97,105 @@ const handleSave = ()=>{
             <Button className="w-fit" onClick={handleSave}>Save</Button>
           </CardHeader>
           <CardContent className="flex gap-4">
+            <div className="flex flex-col">
             <StageComponent />
+            <div className="flex gap-2 py-2">
+<Button
+  onClick={() => {
+    if (!currentProduct) return;
+    if (!selectedOption) return;
+    if(!currentProduct.dynamicVariantsOptionsImages) return
+    // Find the index of the selected image
+    const getIt = currentProduct.dynamicVariantsOptionsImages.find(
+      (o) => o.image === selectedOption
+    )
+
+    // Ensure the index is valid and not the first item
+
+    // Create a copy of the dynamicVariantsOptionsImages
+    const updatedImages = [...currentProduct.dynamicVariantsOptionsImages];
+
+   // remove the selected image from the array
+   const removeSelected = updatedImages.filter((o) => o.option !== getIt?.option);
+   const selected = updatedImages.filter((o) => o.option === getIt?.option);
+   // add it back in the correct position (last place)
+   
+
+    // Update the currentProduct with the new order
+    setCurrentProduct({
+      ...currentProduct,
+      dynamicVariantsOptionsImages: [
+        ...removeSelected,
+        ...selected
+      ],
+    });
+  }}
+  size={"icon"}
+  variant={"outline"}
+  className=""
+>
+  <ArrowUpToLine className="h-4 w-4" />
+</Button>
+
+
+              <Button
+               onClick={() => {
+                 if (!currentProduct) return;
+                 if (!selectedOption) return;
+                 if(!currentProduct.dynamicVariantsOptionsImages) return
+                 // Find the index of the selected image
+
+                 const getIt = currentProduct?.dynamicVariantsOptionsImages?.find((o) => o.image === selectedOption)
+                 if(!getIt) return
+                 // Ensure the index is valid and not the first item
+                 if (getIt?.option === currentProduct?.dynamicVariantsOptionsImages[0].option) return
+                 // Create a copy of the dynamicVariantsOptionsImages
+                 const updatedImages = [...currentProduct?.dynamicVariantsOptionsImages];
+                 // remove the selected image from the array
+                 const removeSelected = updatedImages.filter((o) => o.option !== getIt?.option);
+                 // add it back in the correct position (last place)
+                 const selected = updatedImages.filter((o) => o.option === getIt?.option);
+                 // Update the currentProduct with the new order
+
+                 setCurrentProduct({
+                   ...currentProduct,
+                   dynamicVariantsOptionsImages: [
+                     ...selected,
+                     ...removeSelected,
+                   ],
+
+                 })
+               }}
+               size={"icon"} variant={"outline"} className="">
+                <ArrowDownToLine className="h-4 w-4" />
+              </Button>
+              <Slider 
+                  min={2}
+                  max={60}
+                  value={[currentProduct?.dynamicVariantsOptionsImages?.find((o) => o.image === selectedOption)?.scaleX ?? 0] }
+                  onValueChange={(v) => {
+                    if (!currentProduct) return;
+                    if (!selectedOption) return;
+                    if(!currentProduct.dynamicVariantsOptionsImages) return
+                    const getIt = currentProduct?.dynamicVariantsOptionsImages?.find((o) => o.image === selectedOption)
+                    setCurrentProduct({
+                      ...currentProduct,
+                      dynamicVariantsOptionsImages: currentProduct?.dynamicVariantsOptionsImages?.map((o) => {
+                        if (getIt?.option == o.option) {
+                          return {
+                            ...o,
+                            scaleX: v[0],
+                            scaleY: v[0],
+                          };
+                        }
+                        return o;
+                      }),
+                    });
+                  }}
+                />
+
+            </div>
+            </div>
             <div>
               {currentProduct.options.map((option) => (
                 <div key={option.id} className="flex flex-col">
@@ -167,7 +266,7 @@ const handleSave = ()=>{
                                     // If entry doesn't exist, add a new one
                                     updatedDynamicOptions = [
                                       ...dynamicOptions,
-                                      { option: option.name, value: v, image: url, selected: false, x: 0, y: 0 },
+                                      { option: option.name, value: v, image: url, selected: false, x: 0, y: 0 ,scaleX: 1, scaleY: 1},
                                     ];
                                   }
 

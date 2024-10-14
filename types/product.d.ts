@@ -83,5 +83,7 @@ export type Product = {
     selected: boolean;
     x: number;
     y: number;
+    scaleX: number;
+    scaleY: number;
   }[];
 };

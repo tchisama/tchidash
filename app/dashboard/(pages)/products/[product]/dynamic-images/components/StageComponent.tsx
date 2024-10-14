@@ -1,15 +1,20 @@
 "use client";
+import { Button } from "@/components/ui/button";
+import { useDynamicVariantsImages } from "@/store/dynamicVariantsImages";
 import { useProducts } from "@/store/products";
+import { set } from "lodash";
 import React, { useState, useEffect, useRef } from "react";
 import {
   Stage,
   Layer,
   Image as KonvaImage,
+  Text,
 } from "react-konva";
 
 function StageComponent() {
   const {currentProduct, setCurrentProduct} = useProducts();
 
+  const {selectedOption, setSelectedOption} = useDynamicVariantsImages();
 
   const handleDragEnd = (o: string, v: string, x: number, y: number) => {
     if (!currentProduct) return;
@@ -48,7 +53,11 @@ function StageComponent() {
               src={ov.image}
               x={ ov.x }
               y={ ov.y }
+              width={ov.scaleX}
+              height={ov.scaleY}
               onDragEnd={(x, y) => handleDragEnd(ov.option , ov.value, x, y)} 
+              selectedOption={selectedOption}
+              setSelectedOption={setSelectedOption}
             />
           ))
         }
@@ -57,8 +66,12 @@ function StageComponent() {
   );
 }
 
-const URLImage = ({ src, x, y , onDragEnd }: { src: string; x: number; y: number,
+const URLImage = ({ src, x, y , width, height , onDragEnd
+, selectedOption, setSelectedOption
+ }: { src: string; x: number; y: number, width: number, height: number
   onDragEnd: (x: number, y: number) => void
+  selectedOption: string | null,
+  setSelectedOption: (option: string | null) => void
  }) => {
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   const imageNode = useRef(null);
@@ -68,17 +81,12 @@ const URLImage = ({ src, x, y , onDragEnd }: { src: string; x: number; y: number
     img.src = src;
     img.addEventListener("load", handleLoad);
 
-    // Cleanup on unmount
     return () => {
       img.removeEventListener("load", handleLoad);
     };
 
     function handleLoad() {
       setImage(img);
-      // If you need to manually update the layer:
-      // if (imageNode.current) {
-      //   imageNode.current.getLayer().batchDraw();
-      // }
     }
   }, [src]);
 
@@ -107,13 +115,18 @@ const URLImage = ({ src, x, y , onDragEnd }: { src: string; x: number; y: number
 
   return (
     image && (
+      <>
       <KonvaImage
+        onClick={() => {
+            setSelectedOption(src);
+        }}
+        stroke={selectedOption === src ? "#0003" : "#0001"}
         draggable
         {...getContainDimensions(
           image?.width as number,
           image?.height as number,
-          300,
-          300,
+          width * 10,
+          height * 10,
         )} // Here we apply the 'contain' logic
         x={x}
         y={y}
@@ -126,6 +139,7 @@ const URLImage = ({ src, x, y , onDragEnd }: { src: string; x: number; y: number
           onDragEnd(newX, newY); // Call the drag end handler to update the x and y
         }}
       />
+      </>
     )
   );
 };
