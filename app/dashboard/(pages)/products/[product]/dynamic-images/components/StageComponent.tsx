@@ -1,14 +1,11 @@
 "use client";
-import { Button } from "@/components/ui/button";
 import { useDynamicVariantsImages } from "@/store/dynamicVariantsImages";
 import { useProducts } from "@/store/products";
-import { set } from "lodash";
 import React, { useState, useEffect, useRef } from "react";
 import {
   Stage,
   Layer,
   Image as KonvaImage,
-  Text,
 } from "react-konva";
 
 function StageComponent() {
@@ -19,7 +16,7 @@ function StageComponent() {
   const handleDragEnd = (o: string, v: string, x: number, y: number) => {
     if (!currentProduct) return;
     // Update the position of the dragged image in currentProduct
-    const updatedVariants = currentProduct?.dynamicVariantsOptionsImages?.map((ov, idx) => {
+    const updatedVariants = currentProduct?.dynamicVariantsOptionsImages?.map((ov) => {
       if ( ov.option === o) {
         return {
           ...ov,
@@ -47,7 +44,7 @@ function StageComponent() {
         {
           currentProduct?.dynamicVariantsOptionsImages?.
           filter((ov) => ov.selected)
-          .map((ov, index) => (
+          .map((ov) => (
             <URLImage
               key={ov.option + ov.value}
               src={ov.image}

@@ -14,7 +14,7 @@ import { and, collection, doc, getDocs, query, updateDoc, where } from "firebase
 import { useStore } from "@/store/storeInfos";
 import { db } from "@/firebase";
 import { Product } from "@/types/product";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Image from "next/image";
 import UploadImageProvider from "@/components/UploadImageProvider";
 import { v4 } from "uuid";
@@ -22,7 +22,6 @@ import { ArrowDownToLine, ArrowUpToLine, Upload } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useDynamicVariantsImages } from "@/store/dynamicVariantsImages";
-import { set } from "lodash";
 import { Slider } from "@/components/ui/slider";
 
 function Page({ params }: { params: { product: string } }) {
