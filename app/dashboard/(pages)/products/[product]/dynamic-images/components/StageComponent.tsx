@@ -5,7 +5,6 @@ import {
   Layer,
   Rect,
   Image as KonvaImage,
-  Transformer,
 } from "react-konva";
 
 function StageComponent() {
@@ -29,7 +28,7 @@ function StageComponent() {
 }
 
 const URLImage = ({ src, x, y }: { src: string; x: number; y: number }) => {
-  const [image, setImage] = useState<CanvasImageSource | null>(null);
+  const [image, setImage] = useState<HTMLImageElement | null>(null);
   const imageNode = useRef(null);
 
   useEffect(() => {
@@ -78,8 +77,8 @@ const URLImage = ({ src, x, y }: { src: string; x: number; y: number }) => {
       <KonvaImage
         draggable
         {...getContainDimensions(
-          image.width as number,
-          image.height as number,
+          image?.width as number,
+          image?.height as number,
           300,
           300,
         )} // Here we apply the 'contain' logic
