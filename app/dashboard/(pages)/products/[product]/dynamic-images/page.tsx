@@ -1,73 +1,55 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
-import { Stage, Layer, Rect, Image } from "react-konva";
 
-function page() {
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import StageComponent from "./components/StageComponent";
+import { useProducts } from "@/store/products";
+
+function Page() {
+  const { setCurrentProduct, currentProduct } = useProducts();
+  const q;
   return (
-    <div>
-      <Stage
-        width={500}
-        height={500}
-        className="bg-white w-[500px] h-[500px] border rounded-2xl overflow-hidden"
-      >
-        <Layer>
-          <Rect x={20} y={20} width={100} height={100} fill="red" draggable />
-          <Rect x={150} y={150} width={100} height={100} fill="green" />
-          <URLImage
-            src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/640px-Google_2015_logo.svg.png"
-            x={100}
-            y={100}
-          />
-          <Rect
-            x={300}
-            y={300}
-            width={100}
-            height={100}
-            fill="blue"
-            draggable
-          />
-        </Layer>
-      </Stage>
-    </div>
+    currentProduct &&
+    currentProduct.options &&
+    currentProduct.options.length > 0 && (
+      <div>
+        <Card className="">
+          <CardHeader>
+            <CardTitle>Dynamic Variants Images Generator</CardTitle>
+            <CardDescription>
+              Create dynamic variants images for your products by selecting the
+              variants and the images you want to use.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex gap-4">
+            <StageComponent />
+            <div>
+              {currentProduct.options.map((option) => (
+                <div key={option.id} className="flex flex-col">
+                  <div className="text-lg font-semibold">{option.name}</div>
+                  <div className="flex space-x-4">
+                    {option.values.map((v) => {
+                      return (
+                        <div key={v} className="flex items-center space-x-2">
+                          <input type="checkbox" className="form-checkbox" />
+                          <span>{v}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
   );
 }
 
-const URLImage = ({ src, x, y }: { src: string; x: number; y: number }) => {
-  const [image, setImage] = useState<CanvasImageSource | null>(null);
-  const imageNode = useRef(null);
-
-  useEffect(() => {
-    const img = new window.Image();
-    img.src = src;
-    img.addEventListener("load", handleLoad);
-
-    // Cleanup on unmount
-    return () => {
-      img.removeEventListener("load", handleLoad);
-    };
-
-    function handleLoad() {
-      setImage(img);
-      // If you need to manually update the layer:
-      // if (imageNode.current) {
-      //   imageNode.current.getLayer().batchDraw();
-      // }
-    }
-  }, [src]); // Trigger effect whenever `src` changes
-
-  return (
-    image && (
-      <Image
-        draggable
-        width={400}
-        x={x}
-        y={y}
-        image={image}
-        alt=""
-        ref={imageNode}
-      />
-    )
-  );
-};
-
-export default page;
+export default Page;
