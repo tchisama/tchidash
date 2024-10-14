@@ -11,8 +11,8 @@ import StageComponent from "./components/StageComponent";
 import { useProducts } from "@/store/products";
 
 function Page() {
-  const { setCurrentProduct, currentProduct } = useProducts();
-  const q;
+  const { currentProduct } = useProducts();
+  // const q
   return (
     currentProduct &&
     currentProduct.options &&
