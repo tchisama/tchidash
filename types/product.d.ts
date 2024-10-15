@@ -45,10 +45,6 @@ export interface Discount {
 export interface ProductBundle {
   id: string;
   title: string;
-  products: Array<{ productId: string; quantity: number }>; // List of products and their quantities in the bundle
-  price: number;
-  discount?: Discount; // Optional discount for the bundle
-  imageUrl?: string;
 }
 
 // Main Product type
@@ -72,8 +68,13 @@ export type Product = {
   stockQuantity: number; // Total stock of all variants
   hasInfiniteStock?: boolean; // If true, stock management is ignored
   price: number;
+  // can be saled
+  canBeSaled: boolean;
+
+  // bundle specific fields
   bundle?: boolean;
   bundles?: ProductBundle[];
+
   totalSales?: number;
   dynamicVariantsImages?: boolean;
   dynamicVariantsOptionsImages?: {

@@ -39,6 +39,19 @@ const ProductDetailsCard = () => {
               value={currentProduct.title}
             />
           </div>
+          <div className="flex items-center gap-2">
+            <Checkbox
+              checked={currentProduct.canBeSaled}
+              onCheckedChange={(value) =>
+                setCurrentProduct({
+                  ...currentProduct,
+                  canBeSaled: value,
+                } as Product)
+              }
+              id="canBeSaled"
+            />
+            <Label htmlFor="canBeSaled">This product can be saled</Label>
+          </div>
           <div className="grid gap-3">
             <Label htmlFor="description">Description</Label>
             <Textarea
@@ -67,7 +80,9 @@ const ProductDetailsCard = () => {
                   }
                   value={currentProduct.price}
                 />
-                  <Label htmlFor="price" className="">Inventory Quantity</Label>
+                <Label htmlFor="price" className="">
+                  Inventory Quantity
+                </Label>
                 <Input
                   id="inventoryQuantity"
                   type="number"
@@ -82,23 +97,19 @@ const ProductDetailsCard = () => {
                   value={currentProduct.stockQuantity}
                 />
                 <div className="flex gap-2 items-center">
-                <Checkbox
-                  id="hasInfiniteStock"
-                  checked={currentProduct?.hasInfiniteStock}
-                  onCheckedChange={
-                    (value) =>
+                  <Checkbox
+                    id="hasInfiniteStock"
+                    checked={currentProduct?.hasInfiniteStock}
+                    onCheckedChange={(value) =>
                       setCurrentProduct({
                         ...currentProduct,
                         hasInfiniteStock: value,
                       } as Product)
-                  }
-                ></Checkbox>
-                <Label
-                  htmlFor="hasInfiniteStock"
-                  className="ml-2"
-                >
-                  has Infinite Stock ?
-                </Label>
+                    }
+                  ></Checkbox>
+                  <Label htmlFor="hasInfiniteStock" className="ml-2">
+                    has Infinite Stock ?
+                  </Label>
                 </div>
               </>
             )}

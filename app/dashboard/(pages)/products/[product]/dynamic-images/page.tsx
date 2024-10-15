@@ -242,11 +242,11 @@ function Page({ params }: { params: { product: string } }) {
                   />
                 </div>
               </div>
-              <div>
+              <div className="flex-1  overflow-x-auto max-w-[1000px]">
                 {currentProduct.options.map((option) => (
-                  <div key={option.id} className="flex flex-col">
+                  <div key={option.id} className="flex  flex-col">
                     <div className="text-lg font-semibold">{option.name}</div>
-                    <div className="flex space-x-4">
+                    <div className="flex space-x-4  overflow-x-auto">
                       {option.values.map((v, i) => {
                         return (
                           <div
@@ -367,7 +367,7 @@ function Page({ params }: { params: { product: string } }) {
                                 height={100}
                               />
                             </div>
-                            <span>{v}</span>
+                            <span className="text-xs">{v}</span>
                           </div>
                         );
                       })}
@@ -376,7 +376,7 @@ function Page({ params }: { params: { product: string } }) {
                 ))}
               </div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 max-w-[1300px] overflow-x-scroll">
               {currentProduct.variants?.map((variant) => (
                 <div className="bg-slate-50 border rounded-xl" key={variant.id}>
                   <OneVariant currentProductVariant={variant} />

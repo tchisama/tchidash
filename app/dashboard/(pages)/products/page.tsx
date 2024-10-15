@@ -43,15 +43,11 @@ import { useQuery } from "@tanstack/react-query";
 import { db } from "@/firebase";
 import { Product } from "@/types/product";
 import { useStore } from "@/store/storeInfos";
-import {ProductLine} from "./components/ProductLine";
+import { ProductLine } from "./components/ProductLine";
 // Sample product data
 
 export default function Page() {
-  const {
-    setCurrentProduct,
-    products = [],
-    setProducts,
-  } = useProducts();
+  const { setCurrentProduct, products = [], setProducts } = useProducts();
   const { storeId } = useStore();
   const { data, error, isLoading } = useQuery({
     queryKey: ["products", storeId],
@@ -105,6 +101,7 @@ export default function Page() {
       storeId,
       stockQuantity: 0,
       hasDiscount: false,
+      canBeSaled: true,
     };
     addDoc(collection(db, "products"), newProduct).then((docRef) => {
       setCurrentProduct({ ...newProduct, id: docRef.id } as Product);
@@ -191,10 +188,12 @@ export default function Page() {
                     </TableHead>
                   </TableRow>
                 </TableHeader>
-<TableBody>
-  {products && products.map((product) => <ProductLine key={product.id} product={product} />)}
-</TableBody>
-
+                <TableBody>
+                  {products &&
+                    products.map((product) => (
+                      <ProductLine key={product.id} product={product} />
+                    ))}
+                </TableBody>
               </Table>
             </CardContent>
             <CardFooter>
@@ -209,5 +208,3 @@ export default function Page() {
     )
   );
 }
-
-

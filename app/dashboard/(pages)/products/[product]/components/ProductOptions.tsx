@@ -115,23 +115,6 @@ const OptionRow = ({
             <Input
               value={option.values.join(",")}
               className="w-full"
-              onBlur={(e) => {
-                const newOptions = [
-                  ...(currentProduct.options as {
-                    name: string;
-                    values: string[];
-                  }[]),
-                ];
-                // Apply trim only on blur (when the user stops typing or leaves the input field)
-                newOptions[index].values = e.target.value
-                  .split(",")
-                  .map((val) => val.trim());
-                setCurrentProduct({
-                  ...currentProduct,
-                  options: newOptions,
-                } as Product);
-                setEditing(false);
-              }}
               onChange={(e) => {
                 const newOptions = [
                   ...(currentProduct.options as {

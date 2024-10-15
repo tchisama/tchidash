@@ -259,7 +259,6 @@ export default function CreateOrder() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="firstName">First Name</Label>
-                {totalPrice()} herer is total price
                 <Input
                   id="firstName"
                   name="firstName"

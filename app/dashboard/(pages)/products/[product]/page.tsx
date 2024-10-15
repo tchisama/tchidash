@@ -34,6 +34,7 @@ import { isEqual } from "lodash";
 import { useNavbar } from "@/store/navbar";
 import { toast } from "@/hooks/use-toast";
 import ProductDynamicVariantsImages from "./components/ProductDynamicVariantsImages";
+import ProductDiscount from "./components/ProductDiscount";
 
 function Page({ params }: { params: { product: string } }) {
   const {
@@ -118,33 +119,33 @@ function Page({ params }: { params: { product: string } }) {
     );
   }, [lastUploadedProduct, currentProduct, setLastUploadedProduct]);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      // Check if scroll position is greater than 100px
-      if (window.scrollY > 80) {
-        setActions([
-          <>
-            {!areProductsEqual && (
-              <Button size="sm" onClick={saveProduct}>
-                Save Product
-              </Button>
-            )}
-          </>,
-        ]);
-      } else {
-        // If scroll is less than 100px, clear actions
-        setActions([]);
-      }
-    };
-
-    // Attach scroll event listener
-    window.addEventListener("scroll", handleScroll);
-
-    // Clean up the event listener on component unmount
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [areProductsEqual, currentProduct]);
+  //useEffect(() => {
+  //  const handleScroll = () => {
+  //    // Check if scroll position is greater than 100px
+  //    if (window.scrollY > 80) {
+  //      setActions([
+  //        <>
+  //          {!areProductsEqual && (
+  //            <Button size="sm" onClick={saveProduct}>
+  //              Save Product
+  //            </Button>
+  //          )}
+  //        </>,
+  //      ]);
+  //    } else {
+  //      // If scroll is less than 100px, clear actions
+  //      setActions([]);
+  //    }
+  //  };
+  //
+  //  // Attach scroll event listener
+  //  window.addEventListener("scroll", handleScroll);
+  //
+  //  // Clean up the event listener on component unmount
+  //  return () => {
+  //    window.removeEventListener("scroll", handleScroll);
+  //  };
+  //}, [areProductsEqual, currentProduct]);
 
   const [preProduct, setPreProduct] = React.useState<Product | null>(null);
   const [nextProduct, setNextProduct] = React.useState<Product | null>(null);
@@ -237,8 +238,12 @@ function Page({ params }: { params: { product: string } }) {
         <div className="grid auto-rows-max items-start gap-4 lg:gap-8">
           <ProductImagesCard />
           <ProductStatusCard />
+          <ProductDiscount />
           <ProductDynamicVariantsImages />
+          {/*
+             *
           <ProductDangerZone />
+             * */}
         </div>
       </div>
       <div className="flex items-center justify-center gap-2 md:hidden">
