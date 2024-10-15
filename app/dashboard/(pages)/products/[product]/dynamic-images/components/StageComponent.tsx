@@ -1,73 +1,74 @@
-"use client";
 import { useDynamicVariantsImages } from "@/store/dynamicVariantsImages";
 import { useProducts } from "@/store/products";
 import React, { useState, useEffect, useRef } from "react";
-import {
-  Stage,
-  Layer,
-  Image as KonvaImage,
-} from "react-konva";
+import { Stage, Layer, Image as KonvaImage } from "react-konva";
 
 function StageComponent() {
-  const {currentProduct, setCurrentProduct} = useProducts();
-
-  const {selectedOption, setSelectedOption} = useDynamicVariantsImages();
+  const { currentProduct, setCurrentProduct } = useProducts();
+  const { selectedOption, setSelectedOption } = useDynamicVariantsImages();
+  const stageRef = useRef(null);
 
   const handleDragEnd = (o: string, v: string, x: number, y: number) => {
     if (!currentProduct) return;
-    // Update the position of the dragged image in currentProduct
-    const updatedVariants = currentProduct?.dynamicVariantsOptionsImages?.map((ov) => {
-      if ( ov.option === o) {
-        return {
-          ...ov,
-          x, // Update x position
-          y, // Update y position
-        };
-      }
-      return ov;
-    });
-
-    // Update the currentProduct with the new positions
+    const updatedVariants = currentProduct?.dynamicVariantsOptionsImages?.map(
+      (ov) => {
+        if (ov.option === o) {
+          return { ...ov, x, y };
+        }
+        return ov;
+      },
+    );
     setCurrentProduct({
       ...currentProduct,
       dynamicVariantsOptionsImages: updatedVariants,
     });
   };
 
+
   return (
-    <Stage
-      width={500}
-      height={500}
-      className="w-[500px] bg-slate-100 h-[500px] border rounded-2xl overflow-hidden"
-    >
-      <Layer>
-        {
-          currentProduct?.dynamicVariantsOptionsImages?.
-          filter((ov) => ov.selected)
-          .map((ov) => (
-            <URLImage
-              key={ov.option + ov.value}
-              src={ov.image}
-              x={ ov.x }
-              y={ ov.y }
-              width={ov.scaleX}
-              height={ov.scaleY}
-              onDragEnd={(x, y) => handleDragEnd(ov.option , ov.value, x, y)} 
-              selectedOption={selectedOption}
-              setSelectedOption={setSelectedOption}
-            />
-          ))
-        }
-      </Layer>
-    </Stage>
+    <div>
+      <Stage
+        width={500}
+        height={500}
+        className="w-[500px] bg-slate-100 h-[500px] border rounded-2xl overflow-hidden"
+        ref={stageRef}
+      >
+        <Layer>
+          {currentProduct?.dynamicVariantsOptionsImages
+            ?.filter((ov) => ov.selected)
+            .map((ov) => (
+              <URLImage
+                key={ov.option + ov.value}
+                src={ov.image}
+                x={ov.x}
+                y={ov.y}
+                width={ov.scaleX}
+                height={ov.scaleY}
+                onDragEnd={(x, y) => handleDragEnd(ov.option, ov.value, x, y)}
+                selectedOption={selectedOption}
+                setSelectedOption={setSelectedOption}
+              />
+            ))}
+        </Layer>
+      </Stage>
+    </div>
   );
 }
 
-const URLImage = ({ src, x, y, width, height, onDragEnd, selectedOption, setSelectedOption }: { 
-  src: string; 
-  x: number; 
-  y: number; 
-  width: number; 
+const URLImage = ({
+  src,
+  x,
+  y,
+  width,
+  height,
+  onDragEnd,
+  selectedOption,
+  setSelectedOption,
+}: {
+  src: string;
+  x: number;
+  y: number;
+  width: number;
   height: number;
   onDragEnd: (x: number, y: number) => void;
   selectedOption: string | null;
@@ -77,42 +78,33 @@ const URLImage = ({ src, x, y, width, height, onDragEnd, selectedOption, setSele
   const imageNode = useRef(null);
 
   useEffect(() => {
-    const img = new window.Image();
-    img.src = src;
-    img.onload = () => {
-      setImage(img);
-    };
-    img.onerror = (err) => {
-      console.error("Failed to load image: ", err);
+    const fetchImageThroughProxy = async () => {
+      try {
+        const response = await fetch("/api/proxy-image", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ image: src }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch image through proxy");
+        }
+
+        const blob = await response.blob();
+        const img = new window.Image();
+        img.src = URL.createObjectURL(blob);
+        img.onload = () => {
+          setImage(img);
+        };
+      } catch (err) {
+        console.error("Failed to fetch image: ", err);
+      }
     };
 
-    return () => {
-      img.onload = null;
-      img.onerror = null;
-    };
+    fetchImageThroughProxy();
   }, [src]);
-
-  const getContainDimensions = (
-    imgWidth: number,
-    imgHeight: number,
-    maxWidth: number,
-    maxHeight: number,
-  ) => {
-    const imgRatio = imgWidth / imgHeight;
-    const containerRatio = maxWidth / maxHeight;
-
-    if (imgRatio > containerRatio) {
-      return {
-        width: maxWidth,
-        height: maxWidth / imgRatio,
-      };
-    } else {
-      return {
-        width: maxHeight * imgRatio,
-        height: maxHeight,
-      };
-    }
-  };
 
   return (
     image && (
@@ -143,5 +135,25 @@ const URLImage = ({ src, x, y, width, height, onDragEnd, selectedOption, setSele
   );
 };
 
+export const getContainDimensions = (
+  imgWidth: number,
+  imgHeight: number,
+  maxWidth: number,
+  maxHeight: number,
+) => {
+  const imgRatio = imgWidth / imgHeight;
+  const containerRatio = maxWidth / maxHeight;
+  if (imgRatio > containerRatio) {
+    return {
+      width: maxWidth,
+      height: maxWidth / imgRatio,
+    };
+  } else {
+    return {
+      width: maxHeight * imgRatio,
+      height: maxHeight,
+    };
+  }
+};
 
 export default StageComponent;
