@@ -85,11 +85,11 @@ const ProductVariantsCard = ({}: { saveProduct: () => void }) => {
       });
     }
   };
-  useEffect(() => {
-    if (currentProduct) {
-      setProductVariants(currentProduct.variants || []);
-    }
-  }, [currentProduct]);
+  //useEffect(() => {
+  //  if (currentProduct) {
+  //    setProductVariants(currentProduct.variants || []);
+  //  }
+  //}, [currentProduct]);
   const [editMode, setEditMode] = useState(false);
 
   return (
