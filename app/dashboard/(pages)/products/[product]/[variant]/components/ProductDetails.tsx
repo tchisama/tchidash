@@ -1,3 +1,4 @@
+"use client";
 import {
   Card,
   CardContent,
@@ -9,6 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useProducts } from "@/store/products";
 import { Variant } from "@/types/product";
 
 const ProductDetailsCard = ({
@@ -20,6 +22,7 @@ const ProductDetailsCard = ({
     setVariantProduct: (variant: Variant) => void;
   };
 }) => {
+  const { currentProduct } = useProducts();
   return variantState.variantProduct ? (
     <Card>
       <CardHeader>
@@ -58,67 +61,63 @@ const ProductDetailsCard = ({
               }
               value={variantState.variantProduct.description}
             />
-            <div className="space-y-2">
-              <div>
-                <Label className="mb-2" htmlFor="price">
-                  Price
-                </Label>
-                <Input
-                  id="price"
-                  type="number"
-                  className="w-full "
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    variantState.setVariantProduct({
-                      ...variantState.variantProduct,
-                      price: parseFloat(e.target.value) ?? 0,
-                    } as Variant)
-                  }
-                  value={variantState.variantProduct.price}
-                />
-              </div>
-              <div>
-                <Label className="mb-2" htmlFor="price">
-                  Stock
-                </Label>
-                <Input
-                  id="stock"
-                  type="number"
-                  className="w-full "
-                  disabled={variantState?.variantProduct?.hasInfiniteStock}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    variantState.setVariantProduct({
-                      ...variantState.variantProduct,
-                      inventoryQuantity: parseInt(e.target.value) ?? 0,
-                    } as Variant)
-                  }
-                  value={variantState.variantProduct.inventoryQuantity}
-                />
-              </div>
-
-                  
-                <div className="flex gap-2 items-center">
-                <Checkbox
-                  id="hasInfiniteStock"
-                  checked={
-                    variantState?.variantProduct
-                    ?.hasInfiniteStock}
-                  onCheckedChange={
-                    (value) =>
+            {currentProduct && !currentProduct.variantsAreOneProduct && (
+              <div className="space-y-2">
+                <div>
+                  <Label className="mb-2" htmlFor="price">
+                    Price
+                  </Label>
+                  <Input
+                    id="price"
+                    type="number"
+                    className="w-full "
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       variantState.setVariantProduct({
                         ...variantState.variantProduct,
-                        hasInfiniteStock: value
+                        price: parseFloat(e.target.value) ?? 0,
                       } as Variant)
-                  }
-                ></Checkbox>
-                <Label
-                  htmlFor="hasInfiniteStock"
-                  className="ml-2"
-                >
-                  has Infinite Stock ?
-                </Label>
+                    }
+                    value={variantState.variantProduct.price}
+                  />
                 </div>
-            </div>
+                <div>
+                  <Label className="mb-2" htmlFor="price">
+                    Stock
+                  </Label>
+                  <Input
+                    id="stock"
+                    type="number"
+                    className="w-full "
+                    disabled={variantState?.variantProduct?.hasInfiniteStock}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      variantState.setVariantProduct({
+                        ...variantState.variantProduct,
+                        inventoryQuantity: parseInt(e.target.value) ?? 0,
+                      } as Variant)
+                    }
+                    value={variantState.variantProduct.inventoryQuantity}
+                  />
+                </div>
+
+                <div className="flex gap-2 items-center">
+                  <Checkbox
+                    id="hasInfiniteStock"
+                    checked={variantState?.variantProduct?.hasInfiniteStock}
+                    onCheckedChange={(value) =>
+                      variantState.setVariantProduct({
+                        ...variantState.variantProduct,
+                        hasInfiniteStock: value,
+                      } as Variant)
+                    }
+                  ></Checkbox>
+                  <Label htmlFor="hasInfiniteStock" className="ml-2">
+                    has Infinite Stock ?
+                  </Label>
+                </div>
+              </div>
+            )}
           </div>
+
           <div></div>
         </div>
       </CardContent>

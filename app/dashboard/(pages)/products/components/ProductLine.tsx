@@ -1,6 +1,6 @@
 "use client";
 
-import React, {  useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { MoreHorizontal } from "lucide-react";
@@ -22,12 +22,7 @@ import {
 } from "@/components/ui/table";
 import Photo from "@/public/images/svgs/icons/photo.svg";
 import Link from "next/link";
-import {
-  addDoc,
-  collection,
-  updateDoc,
-  doc,
-} from "firebase/firestore";
+import { addDoc, collection, updateDoc, doc } from "firebase/firestore";
 import { useProducts } from "@/store/products";
 import { db } from "@/firebase";
 import { Product } from "@/types/product";
@@ -120,20 +115,24 @@ const ProductLine = ({ product }: { product: Product }) => {
           <Badge variant="outline">{product.status}</Badge>
         </TableCell>
         <TableCell className="hidden md:table-cell">
-          {product.variants && product.variants.length > 0
+          {product.variants &&
+          product.variants.length > 0 &&
+          product.variantsAreOneProduct === false
             ? Math.min(...product.variants.map((v) => v.price)) +
               " - " +
               Math.max(...product.variants.map((v) => v.price))
             : product.price}{" "}
           Dh
         </TableCell>
-        <TableCell className="hidden md:table-cell"
-        >
+        <TableCell className="hidden md:table-cell">
           <div>
-          {(product.variants && product.variants.length > 0) ?
-            "Have variants"
-            : product.hasInfiniteStock ? "Infinite Stock" : product.stockQuantity + " Items"
-          }{" "}
+            {product.variants &&
+            product.variants.length > 0 &&
+            product.variantsAreOneProduct === false
+              ? "Have variants"
+              : product.hasInfiniteStock
+                ? "Infinite Stock"
+                : product.stockQuantity + " Items"}{" "}
           </div>
         </TableCell>
         <TableCell className="hidden md:table-cell">
@@ -170,70 +169,74 @@ const ProductLine = ({ product }: { product: Product }) => {
               <DropdownMenuItem onClick={deleteProduct}>
                 Delete
               </DropdownMenuItem>
-              {
-                product.variants && product.variants.length > 0 &&
-              <DropdownMenuItem
-                onClick={() => {
-                  toggleVariants();
-                }}
-              >
-                {showVariants ? "Hide Variants" : "Show Variants"}
-              </DropdownMenuItem>
-              }
+              {product.variants && product.variants.length > 0 && (
+                <DropdownMenuItem
+                  onClick={() => {
+                    toggleVariants();
+                  }}
+                >
+                  {showVariants ? "Hide Variants" : "Show Variants"}
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </TableCell>
       </TableRow>
 
       {showVariants && product.variants && product.variants?.length > 0 && (
-        <TableRow >
+        <TableRow>
           <TableCell colSpan={8}>
             <div className="bg-slate-50 ml-4 border w-fit rounded-xl">
               <h1 className="text-xl font-semibold p-3">Variants</h1>
-            <Table className="w-fit min-w-[600px]">
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Image</TableHead>
-                  <TableHead>Variant Title</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead>Stock</TableHead>
-                  <TableHead>Total Sales</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {
-                  product?.variants &&
-                product?.variants.map((variant, index) => (
-                  <TableRow key={index}>
-                    <TableCell>
-                      {variant.image ? (
-                        <Image
-                          src={variant.image}
-                          alt={variant.title || "Variant Image"}
-                          width={60}
-                          height={60}
-                          className="w-12 aspect-square object-contain border rounded-md p-[2px]"
-                        />
-                      ) : (
-                        <div className="w-12 aspect-square rounded-xl border bg-slate-50 flex justify-center items-center">
-                          <Image
-                            src={Photo}
-                            alt="No image available"
-                            width={30}
-                            height={30}
-                            className="w-6 h-6 opacity-50"
-                          />
-                        </div>
-                      )}
-                    </TableCell>
-                    <TableCell>{variant.title || "Untitled Variant"}</TableCell>
-                    <TableCell>{variant.price} Dh</TableCell>
-                    <TableCell>{variant.hasInfiniteStock ? "infinite" : variant.inventoryQuantity || 0}</TableCell>
-                    <TableCell>{variant.totalSales || 0}</TableCell>
+              <Table className="w-fit min-w-[600px]">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Image</TableHead>
+                    <TableHead>Variant Title</TableHead>
+                    <TableHead>Price</TableHead>
+                    <TableHead>Stock</TableHead>
+                    <TableHead>Total Sales</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {product?.variants &&
+                    product?.variants.map((variant, index) => (
+                      <TableRow key={index}>
+                        <TableCell>
+                          {variant.image ? (
+                            <Image
+                              src={variant.image}
+                              alt={variant.title || "Variant Image"}
+                              width={60}
+                              height={60}
+                              className="w-12 aspect-square object-contain border rounded-md p-[2px]"
+                            />
+                          ) : (
+                            <div className="w-12 aspect-square rounded-xl border bg-slate-50 flex justify-center items-center">
+                              <Image
+                                src={Photo}
+                                alt="No image available"
+                                width={30}
+                                height={30}
+                                className="w-6 h-6 opacity-50"
+                              />
+                            </div>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {variant.title || "Untitled Variant"}
+                        </TableCell>
+                        <TableCell>{variant.price} Dh</TableCell>
+                        <TableCell>
+                          {variant.hasInfiniteStock
+                            ? "infinite"
+                            : variant.inventoryQuantity || 0}
+                        </TableCell>
+                        <TableCell>{variant.totalSales || 0}</TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
             </div>
           </TableCell>
         </TableRow>
@@ -241,4 +244,5 @@ const ProductLine = ({ product }: { product: Product }) => {
     </>
   );
 };
-export {ProductLine}
+export { ProductLine };
+

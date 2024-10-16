@@ -33,7 +33,6 @@ import { useNavbar } from "@/store/navbar";
 import { toast } from "@/hooks/use-toast";
 import ProductDynamicVariantsImages from "./components/ProductDynamicVariantsImages";
 import ProductDiscount from "./components/ProductDiscount";
-import ProductBundel from "./components/ProductBundle";
 
 function Page({ params }: { params: { product: string } }) {
   const {
@@ -236,7 +235,9 @@ function Page({ params }: { params: { product: string } }) {
                 )}
             </>
           )}
+          {/*
           <ProductBundel />
+           */}
         </div>
         <div className="grid auto-rows-max items-start gap-4 lg:gap-8">
           {currentProduct &&

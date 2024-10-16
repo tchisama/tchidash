@@ -205,7 +205,7 @@ export function OrdersTable({
                           height={50}
                           src={item.imageUrl ?? ""}
                           alt="Avatar Tailwind CSS Component"
-                          className="w-10 rounded-xl border-[3px] aspect-square  shadow-lg object-cover"
+                          className="w-10 rounded-xl bg-slate-100 border-[2px] aspect-square  shadow-lg object-cover"
                         />
                       </div>
                     );

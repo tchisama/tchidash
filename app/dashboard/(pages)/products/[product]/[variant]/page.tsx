@@ -10,14 +10,57 @@ import Link from "next/link";
 import { useProducts } from "@/store/products";
 import { Product, Variant } from "@/types/product";
 import { db } from "@/firebase";
-import { doc, updateDoc } from "firebase/firestore";
+import {
+  and,
+  collection,
+  doc,
+  getDocs,
+  query,
+  updateDoc,
+  where,
+} from "firebase/firestore";
 import ProductVariantsCard from "./components/ProductVariants";
+import { useQuery } from "@tanstack/react-query";
+import { useStore } from "@/store/storeInfos";
 
 function Page({ params }: { params: { product: string; variant: string } }) {
   const { currentProduct, setCurrentProduct } = useProducts();
   const router = useRouter();
   const productId = params.product;
   const variantId = params.variant;
+  const { storeId } = useStore();
+
+  const {
+    data: product,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: [productId],
+    queryFn: async () => {
+      const q = query(
+        collection(db, "products"),
+        and(
+          where("storeId", "==", storeId),
+          where("title", "==", productId.replaceAll("_", " ")),
+        ),
+      );
+      if (productId == "new") return null;
+      const response = await getDocs(q);
+      console.log(response.docs[0].data());
+      if (response.docs.length === 0) return null;
+      const productData = {
+        ...(response.docs[0].data() as Product),
+        id: response.docs[0].id,
+      };
+      return productData;
+    },
+  });
+
+  useEffect(() => {
+    if (product) {
+      setCurrentProduct(product);
+    }
+  }, [product, setCurrentProduct, productId, storeId]);
 
   const saveVariant = () => {
     if (variantProduct == null) return;
@@ -28,8 +71,7 @@ function Page({ params }: { params: { product: string; variant: string } }) {
       ) as Variant[],
     } as Product;
     setCurrentProduct(newProduct);
-    updateDoc(doc(db, "products", newProduct.id), newProduct).then(() => {
-    });
+    updateDoc(doc(db, "products", newProduct.id), newProduct).then(() => {});
   };
   const [variantProduct, setVariantProduct] = React.useState<Variant | null>(
     null,
@@ -52,6 +94,9 @@ function Page({ params }: { params: { product: string; variant: string } }) {
     }
   }, [currentProduct, variantId, setVariantProduct]);
 
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+
   return productId ? (
     <div className="mx-auto grid max-w-[90rem]  flex-1 auto-rows-max gap-4">
       <div className="flex items-center gap-4">
@@ -72,7 +117,7 @@ function Page({ params }: { params: { product: string; variant: string } }) {
             Discard
           </Button>
           <Button size="sm" onClick={saveVariant}>
-            Save 
+            Save
           </Button>
         </div>
       </div>

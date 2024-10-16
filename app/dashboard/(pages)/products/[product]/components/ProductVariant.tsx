@@ -85,11 +85,12 @@ const ProductVariantsCard = ({}: { saveProduct: () => void }) => {
       });
     }
   };
-  //useEffect(() => {
-  //  if (currentProduct) {
-  //    setProductVariants(currentProduct.variants || []);
-  //  }
-  //}, [currentProduct]);
+  useEffect(() => {
+    if (currentProduct) {
+      setProductVariants(currentProduct.variants as Variant[]);
+    }
+  }, [currentProduct]);
+
   const [editMode, setEditMode] = useState(false);
 
   return (
@@ -126,10 +127,22 @@ const ProductVariantsCard = ({}: { saveProduct: () => void }) => {
               <TableHead>Select</TableHead>
               <TableHead>Image</TableHead>
               <TableHead>Title</TableHead>
-              <TableHead>Price</TableHead>
-              <TableHead>Stock</TableHead>
+              <TableHead
+                className={
+                  currentProduct?.variantsAreOneProduct ? "hidden" : ""
+                }
+              >
+                Price
+              </TableHead>
+              <TableHead
+                className={
+                  currentProduct?.variantsAreOneProduct ? "hidden" : ""
+                }
+              >
+                Stock
+              </TableHead>
               <TableHead>SKU</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -169,7 +182,11 @@ const ProductVariantsCard = ({}: { saveProduct: () => void }) => {
                   />
                 </TableCell>
                 <TableCell>{variant.title}</TableCell>
-                <TableCell>
+                <TableCell
+                  className={
+                    currentProduct?.variantsAreOneProduct ? "hidden" : ""
+                  }
+                >
                   {editMode ? (
                     <Input
                       type="text"
@@ -204,7 +221,11 @@ const ProductVariantsCard = ({}: { saveProduct: () => void }) => {
                     </div>
                   )}
                 </TableCell>
-                <TableCell>
+                <TableCell
+                  className={
+                    currentProduct?.variantsAreOneProduct ? "hidden" : ""
+                  }
+                >
                   {variant?.hasInfiniteStock ? (
                     <div>Infinite</div>
                   ) : editMode ? (

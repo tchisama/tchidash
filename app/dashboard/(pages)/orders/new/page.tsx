@@ -154,7 +154,7 @@ export default function CreateOrder() {
         };
       }),
       storeId: storeId,
-      totalPrice: tp + shippingCost(),
+      totalPrice: tp + (shippingCost() ?? 0),
       subtotal: order.items.reduce(
         (acc, item) => acc + item.price * item.quantity,
         0,

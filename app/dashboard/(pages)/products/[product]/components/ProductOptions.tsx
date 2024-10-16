@@ -22,7 +22,7 @@ import { MoreVertical } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { useProducts } from "@/store/products";
 import { Input } from "@/components/ui/input";
-import { Product, Variant } from "@/types/product";
+import { Product } from "@/types/product";
 import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 
@@ -42,12 +42,21 @@ const ProductOptionsCard = () => {
                 setCurrentProduct({
                   ...currentProduct,
                   variantsAreOneProduct: value,
-                  variants: [],
                 } as Product)
               }
+              id="variantarejustoneproduct"
             />
-            <Label htmlFor="options">Variants are just one Product</Label>
+            <Label htmlFor="variantarejustoneproduct">
+              Asign stock and price to the product only
+            </Label>
           </div>
+          {currentProduct?.variantsAreOneProduct && (
+            <p className="mb-2 text-slate-500 text-sm">
+              {" "}
+              by checking this option, the stock now is signed to the product
+              and not to the variant as well as the price
+            </p>
+          )}
 
           <div className="flex items-center justify-between">
             <Label htmlFor="options">Options List</Label>
@@ -196,7 +205,6 @@ const OptionRow = ({
                   setCurrentProduct({
                     ...currentProduct,
                     options: newOptions,
-                    variants: [] as Variant[],
                   } as Product);
                 }}
               >

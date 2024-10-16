@@ -92,10 +92,10 @@ const ItemRow = ({ item }: { item: OrderItem }) => {
     queryFn: () => {
       const q = query(
         collection(db, "products"),
-        and(where("storeId", "==", storeId), where("status", "==", "active"))
+        and(where("storeId", "==", storeId), where("status", "==", "active")),
       );
       const response = getDocs(q).then((response) =>
-        response.docs.map((doc) => ({ ...doc.data(), id: doc.id } as Product))
+        response.docs.map((doc) => ({ ...doc.data(), id: doc.id }) as Product),
       );
       return response;
     },
@@ -104,7 +104,7 @@ const ItemRow = ({ item }: { item: OrderItem }) => {
   useEffect(() => {
     if (!products) return;
     const product: Product | undefined = products.find(
-      (p) => p.id === item.productId
+      (p) => p.id === item.productId,
     );
     if (!product) return;
     if (!product?.variants) return;
@@ -126,12 +126,27 @@ const ItemRow = ({ item }: { item: OrderItem }) => {
       }
     }
     newOrder?.items.forEach((i) => {
-      if (i.productId === item.productId && i.variantId === item.variantId && i.id !== item.id) {
+      if (
+        i.productId === item.productId &&
+        i.variantId === item.variantId &&
+        i.id !== item.id
+      ) {
         stockNumber = stockNumber - i.quantity;
       }
     });
-	setStock(stockNumber);
-  }, [products, setStock,newOrder, item]);
+    setStock(stockNumber);
+  }, [products, setStock, newOrder, item]);
+
+  const price = () => {
+    const product = products?.find((p) => p.id === item.productId);
+    if (!product) return 0;
+    if (product.variantsAreOneProduct) {
+      return product.price;
+    } else {
+      return item.price;
+    }
+  };
+
   return (
     newOrder && (
       <TableRow key={item.id}>
@@ -143,7 +158,7 @@ const ItemRow = ({ item }: { item: OrderItem }) => {
         {/* Item Price */}
         <TableCell>
           <div className="font-medium">
-            {item.price} {newOrder.currency}
+            {price()} {newOrder.currency}
           </div>
         </TableCell>
 
@@ -151,10 +166,10 @@ const ItemRow = ({ item }: { item: OrderItem }) => {
         <TableCell>
           <Input
             className={cn(
-              (stock < Number(item.quantity) && item.productId)
+              stock < Number(item.quantity) && item.productId
                 ? "border-red-200 text-destructive"
                 : "",
-              "w-32"
+              "w-32",
             )}
             value={item.quantity}
             onChange={(e) => {
@@ -196,7 +211,7 @@ const ItemRow = ({ item }: { item: OrderItem }) => {
               }
             }}
           />
-		  
+
           {item.productId && stock < Number(item.quantity) && (
             <span className="text-destructive">Out of Stock </span>
           )}

@@ -57,6 +57,24 @@ function ChooseProductWithVariant({ item }: { item: OrderItem }) {
       setSelectedVariant(selectedProduct.variants[0].id);
     }
   }, [selectedProduct, setSelectedVariant]);
+
+  const price = () => {
+    if (selectedProduct) {
+      if (selectedProduct.variantsAreOneProduct) {
+        return selectedProduct.price;
+      } else {
+        if (selectedVariant) {
+          return selectedProduct.variants?.find(
+            (variant) => variant.id === selectedVariant,
+          )?.price;
+        } else {
+          return selectedProduct.price;
+        }
+      }
+    }
+    return 0;
+  };
+
   useEffect(() => {
     setNewOrder({
       ...newOrder,
@@ -66,11 +84,7 @@ function ChooseProductWithVariant({ item }: { item: OrderItem }) {
             ...itm,
             productId: selectedProduct?.id,
             variantId: selectedVariant,
-            price: selectedVariant
-              ? selectedProduct?.variants?.find(
-                  (variant) => variant.id === selectedVariant,
-                )?.price || 0
-              : selectedProduct?.price || 0,
+            price: price(),
             discount: selectedProduct?.hasDiscount
               ? selectedProduct?.discount
               : null,
@@ -214,4 +228,3 @@ const SelectProductVariant = ({
 };
 
 export default ChooseProductWithVariant;
-
