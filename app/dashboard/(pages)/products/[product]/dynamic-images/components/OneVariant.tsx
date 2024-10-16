@@ -3,8 +3,9 @@ import { useProducts } from "@/store/products";
 import React, { useState, useEffect, useRef } from "react";
 import { Stage, Layer, Image as KonvaImage } from "react-konva";
 import { getStorage, ref, uploadString } from "firebase/storage"; // Firebase imports
-import { Button } from "@/components/ui/button";
 import { Variant } from "@/types/product";
+import { useDynamicVariantsImages } from "@/store/dynamicVariantsImages";
+import { Loader } from "lucide-react";
 
 // Initialize Firebase Storage
 const storage = getStorage();
@@ -15,11 +16,14 @@ function OneVariant({
   currentProductVariant: Variant;
 }) {
   const stageRef = useRef(null);
-  const { currentProduct, setCurrentProduct } = useProducts();
+  const { currentProduct } = useProducts();
+  const { addSaveFunction } = useDynamicVariantsImages();
+  const [loading, setLoading] = useState(false);
 
   // Function to upload the stage image to Firebase
   const uploadStageImage = () => {
-    if (!stageRef.current) return;
+    setLoading(true);
+    if (!stageRef.current) return setLoading(false);
 
     const stage = stageRef.current;
     const dataURL = (
@@ -29,45 +33,47 @@ function OneVariant({
     ).toDataURL(); // Get the data URL of the stage (base64 image)
 
     // Firebase storage reference
-    const iamgeId = `dynamicVariantsOptionsImages/stage-image-${new Date().getTime()}.png`;
+    if (!currentProduct) return;
+    const iamgeId = `dynamicVariantsOptionsImages/stage-image-${currentProductVariant.id + currentProduct.title}.png`;
     const storageRef = ref(storage, iamgeId);
 
     // Upload the image as a base64 string to Firebase
     uploadString(storageRef, dataURL, "data_url")
       .then(() => {
-        if (!currentProduct) return;
-        if (!currentProduct.variants) return;
-        setCurrentProduct({
-          ...currentProduct,
-          variants: currentProduct.variants.map((v) => {
-            if (v.id === currentProductVariant.id) {
-              return {
-                ...v,
-                image: `https://firebasestorage.googleapis.com/v0/b/tchidash-fd7aa.appspot.com/o/${iamgeId
-                  .replace(/\//g, "%2F")
-                  .replace(/\./g, "%2E")
-                  .replace(/\?/g, "%3F")
-                  .replace(
-                    /=/g,
-                    "%3D",
-                  )}?alt=media&token=7a7fea2e-50bb-44b1-a887-b8411a96e862`,
-              };
-            }
-            return v;
-          }),
-        });
+        setLoading(false);
       })
       .catch((error) => {
         console.error("Error uploading image: ", error);
+        setLoading(false);
       });
+    return iamgeId;
   };
 
-  const quality = 0.5;
+  useEffect(() => {
+    setTimeout(() => {
+      addSaveFunction({
+        [currentProductVariant.id]: uploadStageImage as () => string,
+      });
+    }, 4000);
+  }, []);
+
+  const quality = 0.3;
 
   return (
-    <div>
+    <div className="relative">
       {/* Hidden Stage for Background Image Generation */}
-      <div className="relative">
+      {loading && (
+        <div className="absolute flex justify-center items-center top-0 left-0 w-full h-full bg-white ">
+          <Loader className="animate-spin" />
+        </div>
+      )}
+      <div
+        style={{
+          opacity: loading ? 0.5 : 1,
+          pointerEvents: loading ? "none" : "all",
+        }}
+        className="relative"
+      >
         <Stage width={500 * quality} height={500 * quality} ref={stageRef}>
           <Layer>
             {currentProduct?.dynamicVariantsOptionsImages
@@ -95,9 +101,6 @@ function OneVariant({
               ))}
           </Layer>
         </Stage>
-        <Button onClick={uploadStageImage} variant="outline">
-          Upload Image
-        </Button>
       </div>
 
       {/* Add an upload button below the stage */}

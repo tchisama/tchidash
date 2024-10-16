@@ -26,7 +26,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
-const ProductVariantsCard = ({  }: { saveProduct: () => void }) => {
+const ProductVariantsCard = ({}: { saveProduct: () => void }) => {
   const { currentProduct, setCurrentProduct } = useProducts();
   const [productVariants, setProductVariants] = useState<Variant[]>([]);
   const [selectedVariants, setSelectedVariants] = useState<string[]>([]);
@@ -158,7 +158,10 @@ const ProductVariantsCard = ({  }: { saveProduct: () => void }) => {
                 </TableCell>
                 <TableCell>
                   <Image
-                    src={variant.image ?? ""}
+                    src={
+                      //variant.image ? `${variant.image}?${Math.random()}` : ""
+                      variant.image ?? ""
+                    }
                     alt={""}
                     width={60}
                     height={60}
@@ -202,11 +205,9 @@ const ProductVariantsCard = ({  }: { saveProduct: () => void }) => {
                   )}
                 </TableCell>
                 <TableCell>
-                  {
-                    variant?.hasInfiniteStock ? (
-                      <div>Infinite</div>
-                    ):
-                  (editMode ? (
+                  {variant?.hasInfiniteStock ? (
+                    <div>Infinite</div>
+                  ) : editMode ? (
                     <Input
                       defaultValue={variant.inventoryQuantity}
                       value={variant.inventoryQuantity}
@@ -239,7 +240,7 @@ const ProductVariantsCard = ({  }: { saveProduct: () => void }) => {
                     <div>
                       <b>{variant.inventoryQuantity}</b> in stock
                     </div>
-                  ))}
+                  )}
                 </TableCell>
                 <TableCell>{variant.sku}</TableCell>
                 <TableCell className="flex justify-end">

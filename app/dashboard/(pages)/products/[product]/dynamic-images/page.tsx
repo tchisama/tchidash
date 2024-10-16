@@ -36,6 +36,13 @@ import OneVariant from "./components/OneVariant";
 function Page({ params }: { params: { product: string } }) {
   const { currentProduct, setCurrentProduct } = useProducts();
   const { storeId } = useStore();
+
+  const { savefunctions } = useDynamicVariantsImages();
+
+  useEffect(() => {
+    console.log(savefunctions);
+  }, [savefunctions]);
+
   const { data: product } = useQuery({
     queryKey: ["product", params.product],
     queryFn: () => {
@@ -66,9 +73,11 @@ function Page({ params }: { params: { product: string } }) {
     //updateDoc(doc(db, "products", currentProduct.id), currentProduct)
   }, [currentProduct]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!currentProduct) return;
+
     if (!currentProduct?.dynamicVariantsOptionsImages) {
+      // Create the dynamic variant options images
       const allOptions: Product["dynamicVariantsOptionsImages"] = [];
       currentProduct?.options?.forEach((option) => {
         option.values.forEach((v) => {
@@ -89,7 +98,70 @@ function Page({ params }: { params: { product: string } }) {
         dynamicVariantsOptionsImages: allOptions,
       });
     }
-    updateDoc(doc(db, "products", currentProduct.id), currentProduct);
+    const ids: Array<{ [key: string]: string }> = [];
+
+    // Use for...of loop for async operations with Object.keys()
+    for (const key of Object.keys(savefunctions)) {
+      await new Promise((resolve) => {
+        setTimeout(async () => {
+          const id = savefunctions[key]();
+          ids.push({ [key]: id });
+          resolve(true); // Resolves the promise after savefunction is called
+        }, 100); // Delay each function call by i * 1000ms
+      });
+    }
+
+    // Update the product with the new dynamic variant options images
+    setCurrentProduct({
+      ...currentProduct,
+      variants: currentProduct.variants?.map((v) => ({
+        ...v,
+        image:
+          `https://firebasestorage.googleapis.com/v0/b/tchidash-fd7aa.appspot.com/o/${ids
+            .find((i) => i[v.id])
+            ?.[v.id].replace(
+              /\//g,
+              "%2F",
+            )}?alt=media&token=7a7fea2e-50bb-44b1-a887-b8411a96e862` || "", // Ensure image update from ids
+      })),
+    });
+
+    //if (!currentProduct) return;
+    //if (!currentProduct.variants) return;
+    //setCurrentProduct({
+    //  ...currentProduct,
+    //  variants: currentProduct.variants.map((v) => {
+    //    if (v.id === currentProductVariant.id) {
+    //      return {
+    //        ...v,
+    //        image: `https://firebasestorage.googleapis.com/v0/b/tchidash-fd7aa.appspot.com/o/${iamgeId
+    //          .replace(/\//g, "%2F")
+    //          .replace(/\./g, "%2E")
+    //          .replace(/\?/g, "%3F")
+    //          .replace(
+    //            /=/g,
+    //            "%3D",
+    //          )}?alt=media&token=7a7fea2e-50bb-44b1-a887-b8411a96e862`,
+    //      };
+    //    }
+    //    return v;
+    //  }),
+    //});
+
+    updateDoc(doc(db, "products", currentProduct.id), {
+      ...currentProduct,
+      variants: currentProduct.variants?.map((v) => ({
+        ...v,
+        image:
+          `https://firebasestorage.googleapis.com/v0/b/tchidash-fd7aa.appspot.com/o/${ids
+            .find((i) => i[v.id])
+            ?.[v.id].replace(
+              /\//g,
+              "%2F",
+            )}?alt=media&token=${Math.random().toString().replace(".", "")}` ||
+          "",
+      })),
+    });
   };
 
   const { selectedOption } = useDynamicVariantsImages();
@@ -376,7 +448,7 @@ function Page({ params }: { params: { product: string } }) {
                 ))}
               </div>
             </div>
-            <div className="flex gap-2 max-w-[1300px] overflow-x-scroll">
+            <div className=" gap-2 flex max-w-[1300px] overflow-x-scroll">
               {currentProduct.variants?.map((variant) => (
                 <div className="bg-slate-50 border rounded-xl" key={variant.id}>
                   <OneVariant currentProductVariant={variant} />

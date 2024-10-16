@@ -25,16 +25,15 @@ import {
 } from "firebase/firestore";
 import { db } from "@/firebase";
 import { Product } from "@/types/product";
-//import { useQuery } from "@tanstack/react-query";
 import { useStore } from "@/store/storeInfos";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import ProductDangerZone from "./components/ProductDangerZone";
 import { isEqual } from "lodash";
 import { useNavbar } from "@/store/navbar";
 import { toast } from "@/hooks/use-toast";
 import ProductDynamicVariantsImages from "./components/ProductDynamicVariantsImages";
 import ProductDiscount from "./components/ProductDiscount";
+import ProductBundel from "./components/ProductBundle";
 
 function Page({ params }: { params: { product: string } }) {
   const {
@@ -227,16 +226,22 @@ function Page({ params }: { params: { product: string } }) {
           <ProductDetailsCard />
 
           <ProductCategoryCard />
-
-          <ProductOptionsCard />
-          {currentProduct &&
-            currentProduct?.options &&
-            currentProduct.options.length > 0 && (
-              <ProductVariantsCard saveProduct={saveProduct} />
-            )}
+          {!currentProduct?.hasBundle && (
+            <>
+              <ProductOptionsCard />
+              {currentProduct &&
+                currentProduct?.options &&
+                currentProduct.options.length > 0 && (
+                  <ProductVariantsCard saveProduct={saveProduct} />
+                )}
+            </>
+          )}
+          <ProductBundel />
         </div>
         <div className="grid auto-rows-max items-start gap-4 lg:gap-8">
-          <ProductImagesCard />
+          {currentProduct &&
+            currentProduct?.options &&
+            currentProduct.options.length == 0 && <ProductImagesCard />}
           <ProductStatusCard />
           <ProductDiscount />
           <ProductDynamicVariantsImages />

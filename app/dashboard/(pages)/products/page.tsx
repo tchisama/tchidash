@@ -101,7 +101,9 @@ export default function Page() {
       storeId,
       stockQuantity: 0,
       hasDiscount: false,
+      hasBundle: false,
       canBeSaled: true,
+      variantsAreOneProduct: false,
     };
     addDoc(collection(db, "products"), newProduct).then((docRef) => {
       setCurrentProduct({ ...newProduct, id: docRef.id } as Product);

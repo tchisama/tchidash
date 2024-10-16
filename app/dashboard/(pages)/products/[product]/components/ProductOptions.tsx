@@ -24,6 +24,7 @@ import { useProducts } from "@/store/products";
 import { Input } from "@/components/ui/input";
 import { Product, Variant } from "@/types/product";
 import { useState } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const ProductOptionsCard = () => {
   const { currentProduct, setCurrentProduct } = useProducts();
@@ -34,6 +35,20 @@ const ProductOptionsCard = () => {
       </CardHeader>
       <CardContent>
         <div className="grid gap-3">
+          <div className="flex gap-2">
+            <Checkbox
+              checked={currentProduct?.variantsAreOneProduct}
+              onCheckedChange={(value) =>
+                setCurrentProduct({
+                  ...currentProduct,
+                  variantsAreOneProduct: value,
+                  variants: [],
+                } as Product)
+              }
+            />
+            <Label htmlFor="options">Variants are just one Product</Label>
+          </div>
+
           <div className="flex items-center justify-between">
             <Label htmlFor="options">Options List</Label>
             <Button
@@ -52,6 +67,7 @@ const ProductOptionsCard = () => {
               Add Option
             </Button>
           </div>
+
           {currentProduct?.options && currentProduct?.options?.length > 0 && (
             <Table>
               <TableHeader>

@@ -67,12 +67,15 @@ export type Product = {
   hasDiscount: boolean;
   stockQuantity: number; // Total stock of all variants
   hasInfiniteStock?: boolean; // If true, stock management is ignored
+
+  variantsAreOneProduct: boolean;
+
   price: number;
   // can be saled
   canBeSaled: boolean;
 
   // bundle specific fields
-  bundle?: boolean;
+  hasBundle: boolean;
   bundles?: ProductBundle[];
 
   totalSales?: number;

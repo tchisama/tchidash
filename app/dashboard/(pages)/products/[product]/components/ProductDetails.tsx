@@ -65,7 +65,8 @@ const ProductDetailsCard = () => {
               }
               value={currentProduct.description}
             />
-            {currentProduct.options && currentProduct.options.length == 0 && (
+            {((currentProduct.options && currentProduct.options.length == 0) ||
+              currentProduct.variantsAreOneProduct == true) && (
               <>
                 <Label htmlFor="price">Price</Label>
                 <Input
