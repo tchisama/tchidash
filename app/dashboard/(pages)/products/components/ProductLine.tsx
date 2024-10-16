@@ -193,8 +193,16 @@ const ProductLine = ({ product }: { product: Product }) => {
                   <TableRow>
                     <TableHead>Image</TableHead>
                     <TableHead>Variant Title</TableHead>
-                    <TableHead>Price</TableHead>
-                    <TableHead>Stock</TableHead>
+                    <TableHead
+                      className={product.variantsAreOneProduct ? "hidden" : ""}
+                    >
+                      Price
+                    </TableHead>
+                    <TableHead
+                      className={product.variantsAreOneProduct ? "hidden" : ""}
+                    >
+                      Stock
+                    </TableHead>
                     <TableHead>Total Sales</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -226,8 +234,12 @@ const ProductLine = ({ product }: { product: Product }) => {
                         <TableCell>
                           {variant.title || "Untitled Variant"}
                         </TableCell>
-                        <TableCell>{variant.price} Dh</TableCell>
-                        <TableCell>
+                        <TableCell
+                      className={product.variantsAreOneProduct ? "hidden" : ""}
+                          >{variant.price} Dh</TableCell>
+                        <TableCell
+                      className={product.variantsAreOneProduct ? "hidden" : ""}
+                          >
                           {variant.hasInfiniteStock
                             ? "infinite"
                             : variant.inventoryQuantity || 0}

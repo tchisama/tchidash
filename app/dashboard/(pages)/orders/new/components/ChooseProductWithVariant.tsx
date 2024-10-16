@@ -176,8 +176,8 @@ const SelectProduct = ({
       value={selectedProduct?.id}
       defaultValue={selectedProduct?.id}
     >
-      <SelectTrigger className="flex-1">
-        <SelectValue placeholder="Theme" />
+      <SelectTrigger className="flex-1 h-16">
+        <SelectValue placeholder="Product" />
       </SelectTrigger>
       <SelectContent>
         {products?.map((product: Product) => (
@@ -186,7 +186,22 @@ const SelectProduct = ({
             value={product.id}
             onClick={() => setSelectedProduct(product)}
           >
-            {product.title}
+            <div className="flex gap-2 items-center">
+              <Image
+                src={
+                  (product.images &&
+                  product.images.length > 0 &&
+                  product.images[0]
+                    ? product.images[0]
+                    : product.variants?.find((v) => v.image)?.image) || ""
+                }
+                alt=""
+                width={30}
+                height={30}
+                className="w-[40px] border bg-slate-100 h-[40px] object-cover rounded-lg"
+              />
+              {product.title}
+            </div>
           </SelectItem>
         ))}
       </SelectContent>
@@ -209,8 +224,8 @@ const SelectProductVariant = ({
       value={selectedVariant ?? ""}
       defaultValue={selectedVariant ?? ""}
     >
-      <SelectTrigger className="flex-1">
-        <SelectValue placeholder="Theme" />
+      <SelectTrigger className="flex-1 h-16">
+        <SelectValue placeholder="Variant" />
       </SelectTrigger>
       <SelectContent>
         {variants?.map((variant: Variant) => (
@@ -219,7 +234,16 @@ const SelectProductVariant = ({
             value={variant.id}
             onClick={() => setSelectedVariant(variant.id)}
           >
-            {variant.title}
+            <div className="flex gap-2 items-center">
+              <Image
+                src={variant.image || ""}
+                alt=""
+                width={30}
+                height={30}
+                className="w-[40px] border bg-slate-100 h-[40px] object-cover rounded-lg"
+              />
+              {variant.title}
+            </div>
           </SelectItem>
         ))}
       </SelectContent>
