@@ -3,7 +3,7 @@ import { StoreDetailsCard } from "./components/Store";
 
 export default function Page() {
   return (
-    <div>
+    <div className="flex flex-col gap-4">
       <StoreDetailsCard />
       <ShippingCard />
     </div>

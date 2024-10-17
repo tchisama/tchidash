@@ -22,22 +22,19 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from "@/components/ui/popover";
 import { orderStatusValuesWithIcon } from "./components/StateChanger";
 import { Label } from "@/components/ui/label";
 
 export default function Page() {
   const { currentOrder } = useOrderStore();
   const [pageSize, setPageSize] = useState(25);
-  const [
-    filter,
-    setFilter
-  ] = useState({
+  const [filter, setFilter] = useState({
     status: [
       "pending",
       "processing",
@@ -59,97 +56,90 @@ export default function Page() {
       <div className="grid auto-rows-max items-start gap-4  lg:col-span-2">
         {/* <Analytic /> */}
         <div className="">
-
-        <div className="ml-auto mb-2 flex items-center gap-2">
-
+          <div className="ml-auto mb-2 flex items-center gap-2">
             <div className="">
               <Popover>
                 <PopoverTrigger asChild>
-                    <Button className="" variant={"outline"}>
-                      <Filter className="h-4 w-4 mr-2" />
-                      Filter
-                    </Button>
+                  <Button className="" variant={"outline"}>
+                    <Filter className="h-4 w-4 mr-2" />
+                    Filter
+                  </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-[150px] flex p-2 gap-1 flex-col">
                   <div className="p-1 px-2">
-                  <Label>Order Status</Label>
+                    <Label>Order Status</Label>
                   </div>
-                  {
-                    orderStatusValuesWithIcon.map((status) => (
-                      <Button
-                        key={status.name}
-                        onClick={() => {
-                          setFilter({
-                            ...filter,
-                            status: filter.status.includes(status.name)
-                              ? filter.status.filter((s) => s !== status.name)
-                              : [...filter.status, status.name],
-                          });
-                        }}
-                        style={{
-                          background: status.color + "20",
-                          borderColor: status.color + "30",
-                          color: "#000a",
-                        }}
-                        size="sm"
-                        className="w-full gap-2 justify-start text-left shadow-none border font-normal"
-                      >
-                        {status.icon} {status.name}
-                        {
-                          filter.status.includes(status.name) && (
-                            <Check className="ml-auto h-4 w-4" />
-                          )
-                        }
-                      </Button>
-                    ))
-                  }
+                  {orderStatusValuesWithIcon.map((status) => (
+                    <Button
+                      key={status.name}
+                      onClick={() => {
+                        setFilter({
+                          ...filter,
+                          status: filter.status.includes(status.name)
+                            ? filter.status.filter((s) => s !== status.name)
+                            : [...filter.status, status.name],
+                        });
+                      }}
+                      style={{
+                        background: status.color + "20",
+                        borderColor: status.color + "30",
+                        color: "#000a",
+                      }}
+                      size="sm"
+                      className="w-full gap-2 justify-start text-left shadow-none border font-normal"
+                    >
+                      {status.icon} {status.name}
+                      {filter.status.includes(status.name) && (
+                        <Check className="ml-auto h-4 w-4" />
+                      )}
+                    </Button>
+                  ))}
                 </PopoverContent>
               </Popover>
             </div>
 
-                {/* <Input
-                  onBlur={(e) => setFilter({ ...filter, search: e.target.value })}
-                  onChange={(e) => setSearch(e.target.value)}
-                  value={search}
-                  placeholder="Search"
-                  className="w-[220px] bg-background"
-                /> */}
-
-          <div className="flex ml-auto flex-col gap-2 min-w-[100px]">
-            <div className="flex gap-2 w-[220px]">
-              <Select
-                onValueChange={(value) => setPageSize(Number(value))}
-                defaultValue={pageSize.toString()}
-              >
-                <SelectTrigger className="bg-white">
-                  <SelectValue placeholder="Theme" />
-                </SelectTrigger>
-                <SelectContent className="mt-2 max-w-xs bg-white">
-                  <SelectItem value="25">25</SelectItem>
-                  <SelectItem value="50">50</SelectItem>
-                  <SelectItem value="100">100</SelectItem>
-                </SelectContent>
-              </Select>
-              <Link className="" href="/dashboard/orders/new">
-                <Button variant="outline" className=" gap-1 w-[130px] text-sm">
-                  <PlusCircle className="h-3.5 w-3.5" />
-                  <span className="sr-only sm:not-sr-only">New Order</span>
-                </Button>
-              </Link>
+            <div className="flex ml-auto flex-col gap-2 min-w-[100px]">
+              <div className="flex gap-2 w-[220px]">
+                <Select
+                  onValueChange={(value) => setPageSize(Number(value))}
+                  defaultValue={pageSize.toString()}
+                >
+                  <SelectTrigger className="bg-white">
+                    <SelectValue placeholder="Theme" />
+                  </SelectTrigger>
+                  <SelectContent className="mt-2 max-w-xs bg-white">
+                    <SelectItem value="25">25</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                    <SelectItem value="100">100</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Link className="" href="/dashboard/orders/new">
+                  <Button
+                    variant="outline"
+                    className=" gap-1 w-[130px] text-sm"
+                  >
+                    <PlusCircle className="h-3.5 w-3.5" />
+                    <span className="sr-only sm:not-sr-only">New Order</span>
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
+          <Card x-chunk="dashboard-05-chunk-3">
+            <CardHeader className="px-7">
+              <CardTitle>Orders</CardTitle>
+              <CardDescription>Recent orders from your store.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <OrdersTable
+                filter={filter}
+                pageSize={pageSize}
+                setPageSize={setPageSize}
+              />
+            </CardContent>
+          </Card>
         </div>
-        <Card x-chunk="dashboard-05-chunk-3">
-          <CardHeader className="px-7">
-            <CardTitle>Orders</CardTitle>
-            <CardDescription>Recent orders from your store.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <OrdersTable filter={filter}  pageSize={pageSize} setPageSize={setPageSize} />
-          </CardContent>
-        </Card>
       </div>
-        </div>
 
       <OrderView />
     </main>

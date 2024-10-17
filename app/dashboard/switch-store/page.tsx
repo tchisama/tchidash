@@ -1,119 +1,197 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Loader2, PlusCircle, Store } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { and, collection,  getDocs, query,  where } from "firebase/firestore"
-import { db } from "@/firebase"
-import { signOut, useSession } from "next-auth/react"
-import { redirect, useRouter } from "next/navigation"
-import Link from "next/link"
-import { useStore } from "@/store/storeInfos"
-import useClean from "@/hooks/useClean"
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Loader2, PlusCircle, Store } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { and, collection, getDocs, query, where } from "firebase/firestore";
+import { db } from "@/firebase";
+import { signOut, useSession } from "next-auth/react";
+import { redirect, useRouter } from "next/navigation";
+import Link from "next/link";
+import { useStore } from "@/store/storeInfos";
+import useClean from "@/hooks/useClean";
 
 interface Store {
-  id: string
-  name: string
-  description: string
+  id: string;
+  name: string;
+  description: string;
 }
 
-
 export default function StoreSwitchCard() {
-  const [selectedStore, setSelectedStore] = useState<string>("")
-  const [stores,setStores] = useState<Store[]>([])
-  const {cleanAll} = useClean()
-  const {setStoreId} = useStore();
-  const [loading,setLoading] = useState(false)
+  const [selectedStore, setSelectedStore] = useState<string>("");
+  const [stores, setStores] = useState<Store[]>([]);
+  const [workOnStores, setWorkOnStores] = useState<Store[]>([]);
+  const { cleanAll } = useClean();
+  const { setStoreId } = useStore();
+  const [loading, setLoading] = useState(false);
   const { data: session } = useSession({
     required: true,
     onUnauthenticated() {
-      redirect('/signin')
-    }
-  })
+      redirect("/signin");
+    },
+  });
 
   useEffect(() => {
-    if(!session) return
-    if(! session?.user?.email) return
+    if (!session) return;
+    if (!session?.user?.email) return;
     const fetchStores = async () => {
       try {
-        const q = query(collection(db, "stores"), and(where("ownerEmail", "==", session?.user?.email)))
-        const querySnapshot = await getDocs(q)
-        const stores = querySnapshot.docs.map((doc) => ({...doc.data(), id: doc.id} as Store))
+        const q = query(
+          collection(db, "stores"),
+          and(where("ownerEmail", "==", session?.user?.email)),
+        );
+        const querySnapshot = await getDocs(q);
+        const stores = querySnapshot.docs.map(
+          (doc) => ({ ...doc.data(), id: doc.id }) as Store,
+        );
         cleanAll();
-        setStores(stores)
-      } catch (error) {
-        console.error("Error fetching stores:", error)
-      }
-    }
+        setStores(stores);
 
-    fetchStores()
-  }, [session, cleanAll])
+        const q2 = query(
+          collection(db, "stores"),
+          and(where("employeesEmails", "array-contains", session?.user?.email)),
+        );
+        const querySnapshot2 = await getDocs(q2);
+        const workOnStores = querySnapshot2.docs.map(
+          (doc) => ({ ...doc.data(), id: doc.id }) as Store,
+        );
+        setWorkOnStores(workOnStores);
+      } catch (error) {
+        console.error("Error fetching stores:", error);
+      }
+    };
+
+    fetchStores();
+  }, [session, cleanAll]);
+
   const router = useRouter();
 
   const handleContinue = () => {
-    setLoading(true)
-    console.log(`Continuing to dashboard for store: ${selectedStore}`)
+    setLoading(true);
+    console.log(`Continuing to dashboard for store: ${selectedStore}`);
     // Add your logic here to navigate to the dashboard or perform any other action
-    setStoreId(selectedStore)
+    setStoreId(selectedStore);
     router.push("/dashboard");
-  }
+  };
 
   return (
     <div className="flex justify-center items-center w-full h-screen bg-muted">
-    <Card className="w-full  max-w-lg mx-auto">
-      <CardHeader className="flex flex-row justify-between items-start">
-        <CardTitle className="text-2xl font-bold">Switch Store</CardTitle>
-        <Link href={"/dashboard/create-store"} >
-          <Button variant={"outline"} className="w-full">
-              <PlusCircle className="h-4 w-4 mr-2" />Create Store
-          </Button>
-        </Link>
-      </CardHeader>
-      <CardContent>
-        <RadioGroup value={selectedStore} onValueChange={setSelectedStore}>
-          {
-            stores &&
-          stores.map((store: Store) => (
-            <div onClick={() => setSelectedStore(store.id)} key={store.id} className={cn("duration-200 flex cursor-pointer py-4 items-center bg-slate-50 border p-2 space-x-2 mb-1 rounded-xl pl-4", 
-              selectedStore === store.id ? "border-primary bg-primary/10" : "border"
-             )}>
-              <RadioGroupItem value={store.id} id={store.id} />
-              <Label htmlFor={store.id} className="flex items-center cursor-pointer">
-                <Store strokeWidth={1.3} className="h-7 w-7 mr-2 text-muted-foreground" />
-                <div>
-                  <div className="font-medium">{store.name}</div>
-                  <div className="text-sm text-muted-foreground">{store.description}</div>
-                </div>
-              </Label>
-            </div>
-          ))}
-        </RadioGroup>
-      </CardContent>
-      <CardFooter className="flex gap-2 flex-col">
-        {
-          stores.length > 0 && (
-            <Button disabled={!selectedStore} onClick={handleContinue} className="w-full py-6 flex gap-4">
-              Continue to Dashboard
-              {
-                loading &&
-                <Loader2 className="animate-spin ml-2" />
-              }
+      <Card className="w-full  max-w-lg mx-auto">
+        <CardHeader className="flex flex-row justify-between items-start">
+          <CardTitle className="text-2xl font-bold">Switch Store</CardTitle>
+          <Link href={"/dashboard/create-store"}>
+            <Button variant={"outline"} className="w-full">
+              <PlusCircle className="h-4 w-4 mr-2" />
+              Create Store
             </Button>
-          )
-        }
-        <p className="mt-4">signed in as {session?.user?.name}, 
-          <Link href={"/api/auth/signin"}
-            onClick={()=>signOut()}
-            className="text-primary hover:underline">
-            {" "} sign out
           </Link>
-        </p>
-      </CardFooter>
-    </Card>
+        </CardHeader>
+        <CardContent>
+          <RadioGroup value={selectedStore} onValueChange={setSelectedStore}>
+            <div className="text-sm text-muted-foreground">Your Stores</div>
+            {stores &&
+              stores.map((store: Store) => (
+                <div
+                  onClick={() => setSelectedStore(store.id)}
+                  key={store.id}
+                  className={cn(
+                    "duration-200 flex cursor-pointer py-4 items-center bg-slate-50 border p-2 space-x-2 mb-1 rounded-xl pl-4",
+                    selectedStore === store.id
+                      ? "border-primary bg-primary/10"
+                      : "border",
+                  )}
+                >
+                  <RadioGroupItem value={store.id} id={store.id} />
+                  <Label
+                    htmlFor={store.id}
+                    className="flex items-center cursor-pointer"
+                  >
+                    <Store
+                      strokeWidth={1.3}
+                      className="h-7 w-7 mr-2 text-muted-foreground"
+                    />
+                    <div>
+                      <div className="font-medium">{store.name}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {store.description}
+                      </div>
+                    </div>
+                  </Label>
+                </div>
+              ))}
+            <div className="text-sm text-muted-foreground">
+              Stores you work on
+            </div>
+            {workOnStores.length > 0 && (
+              <>
+                {workOnStores.map((store: Store) => (
+                  <div
+                    onClick={() => setSelectedStore(store.id)}
+                    key={store.id}
+                    className={cn(
+                      "duration-200 flex cursor-pointer py-4 items-center bg-slate-50 border p-2 space-x-2 mb-1 rounded-xl pl-4",
+                      selectedStore === store.id
+                        ? "border-primary bg-primary/10"
+                        : "border",
+                    )}
+                  >
+                    <RadioGroupItem value={store.id} id={store.id} />
+                    <Label
+                      htmlFor={store.id}
+                      className="flex items-center cursor-pointer"
+                    >
+                      <Store
+                        strokeWidth={1.3}
+                        className="h-7 w-7 mr-2 text-muted-foreground"
+                      />
+                      <div>
+                        <div className="font-medium">{store.name}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {store.description}
+                        </div>
+                      </div>
+                    </Label>
+                  </div>
+                ))}
+              </>
+            )}
+          </RadioGroup>
+        </CardContent>
+        <CardFooter className="flex gap-2 flex-col">
+          {stores.length > 0 && (
+            <Button
+              disabled={!selectedStore}
+              onClick={handleContinue}
+              className="w-full py-6 flex gap-4"
+            >
+              Continue to Dashboard
+              {loading && <Loader2 className="animate-spin ml-2" />}
+            </Button>
+          )}
+          <p className="mt-4">
+            signed in as {session?.user?.name},
+            <Link
+              href={"/api/auth/signin"}
+              onClick={() => signOut()}
+              className="text-primary hover:underline"
+            >
+              {" "}
+              sign out
+            </Link>
+          </p>
+        </CardFooter>
+      </Card>
     </div>
-  )
+  );
 }
+

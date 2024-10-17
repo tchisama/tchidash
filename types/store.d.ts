@@ -51,4 +51,15 @@ export type Store = {
     name: string;
     key: string;
   }[];
+  employeesEmails?: string[];
+  employees?: Employee[];
+};
+
+export type Employee = {
+  id: string;
+  name: string;
+  email: string;
+  access: {
+    [key: string]: boolean;
+  };
 };
