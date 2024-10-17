@@ -17,7 +17,7 @@ function Protected({ children }: { children: React.ReactNode }) {
       redirect("/signin");
     },
   });
-  const { storeId, loadStoreId } = useStore();
+  const { storeId, loadStoreId, setStore } = useStore();
   const [dontHaveAccess, setDontHaveAccess] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
 
@@ -31,6 +31,12 @@ function Protected({ children }: { children: React.ReactNode }) {
     },
     refetchOnWindowFocus: false,
   });
+  useEffect(() => {
+    if (store) {
+      setStore(store);
+    }
+  }, [store, setStore]);
+
   useEffect(() => {
     setLoading(true);
     if (!store) return;

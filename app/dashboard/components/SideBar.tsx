@@ -124,14 +124,14 @@ function SideBar() {
   );
   useEffect(() => {
     if (!data) return;
-    if (!data.employees) return;
     if (!session) return;
     if (!session.user) return;
     if (!session.user.email) return;
-    if (data.ownerEmail === session?.user?.email) {
+    if (data.ownerEmail == session?.user?.email) {
       setEmployee("admin");
       return;
     }
+    if (!data.employees) return;
     setEmployee(
       data.employees.find(
         (employee) => employee.email === session?.user?.email,
@@ -165,13 +165,13 @@ function SideBar() {
                     <Link
                       href={link.href}
                       className={cn(
-                        "flex px-2 hover:bg-slate-50 pr-12 h-10 hover:border group duration-200 items-center border-slate-100 border gap-2 rounded-lg text-muted-foreground transition-colors hover:text-foreground",
+                        "flex px-2 hover:bg-slate-50 pr-12 h-10 hover:border group duration-200 items-center border-slate-100 border gap-2 rounded-lg text-slate-700 transition-colors hover:text-foreground",
                         (
                           link.href === "/dashboard"
                             ? link.href === pathname
                             : pathname.includes(link.href)
                         )
-                          ? "bg-primary/10 border border-primary/30 hover:bg-primary/20"
+                          ? "bg-white   font-bold "
                           : "",
                       )}
                     >

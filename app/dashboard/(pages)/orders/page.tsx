@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/popover";
 import { orderStatusValuesWithIcon } from "./components/StateChanger";
 import { Label } from "@/components/ui/label";
+import Analytic from "./components/analytic";
 
 export default function Page() {
   const { currentOrder } = useOrderStore();
@@ -55,6 +56,7 @@ export default function Page() {
     >
       <div className="grid auto-rows-max items-start gap-4  lg:col-span-2">
         {/* <Analytic /> */}
+        <Analytic />
         <div className="">
           <div className="ml-auto mb-2 flex items-center gap-2">
             <div className="">

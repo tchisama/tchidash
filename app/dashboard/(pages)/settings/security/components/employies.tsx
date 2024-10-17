@@ -4,7 +4,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -14,7 +13,6 @@ import { useStore } from "@/store/storeInfos";
 import { Employee, Store } from "@/types/store";
 import { useQuery } from "@tanstack/react-query";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { CheckCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
   Popover,
@@ -77,7 +75,7 @@ const Emplyies = () => {
     },
     refetchOnWindowFocus: false,
   });
-  const [saved, setSaved] = useState(false);
+  const [, setSaved] = useState(false);
   const [newEmployee, setNewEmployee] = useState<Employee>({
     name: "",
     id: "",
