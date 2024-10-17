@@ -24,6 +24,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { v4 } from "uuid";
+import { useSession } from "next-auth/react";
 
 const accesses = [
   {
@@ -62,6 +63,7 @@ const accesses = [
 
 const Emplyies = () => {
   const { storeId } = useStore();
+  const { data: session } = useSession();
   const { data: store } = useQuery({
     queryKey: ["store", storeId],
     queryFn: async () => {
@@ -121,104 +123,158 @@ const Emplyies = () => {
   }, [setSaved, store]);
 
   return (
-    <Card x-chunk="dashboard-04-chunk-1">
-      <CardHeader>
-        <CardTitle>Emploies</CardTitle>
-        <CardDescription>
-          Manage your store&apos;s security settings here.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="p-4 flex flex-col items-start gap-2 border bg-slate-100 rounded-xl">
-          <Input
-            value={newEmployee.name}
-            placeholder="Name"
-            className="bg-white"
-            onChange={(e) =>
-              setNewEmployee({ ...newEmployee, name: e.target.value })
-            }
-          />
-          <Input
-            value={newEmployee.email}
-            placeholder="Email"
-            className="bg-white"
-            onChange={(e) =>
-              setNewEmployee({ ...newEmployee, email: e.target.value })
-            }
-          />
-          <Popover>
-            <PopoverTrigger>
-              <div className="w-[400px] flex justify-start">
-                <Button variant="outline" className="space-y-1 space-x-1">
-                  {Object.keys(newEmployee.access).filter(
-                    (key) => newEmployee.access[key],
-                  ).length > 0
-                    ? Object.keys(newEmployee.access)
-                        .filter((key) => newEmployee.access[key])
-                        .map((a) => (
-                          <Badge variant={"outline"} key={a}>
-                            {a}
-                          </Badge>
-                        ))
-                    : "Select Access"}
-                </Button>
-              </div>
-            </PopoverTrigger>
-            <PopoverContent className="p-1 flex flex-col">
-              {accesses.map((access) => (
-                <Button
-                  onClick={() => {
-                    setNewEmployee({
-                      ...newEmployee,
-                      access: {
-                        ...newEmployee.access,
-                        [access.key]: !newEmployee.access[access.key],
-                      },
-                    });
-                  }}
-                  variant="ghost"
-                  key={access.key}
-                  className="w-full flex justify-between"
+    store &&
+    session &&
+    session.user &&
+    store.ownerEmail === session.user.email && (
+      <Card x-chunk="dashboard-04-chunk-1">
+        <CardHeader>
+          <CardTitle>Emploies</CardTitle>
+          <CardDescription>
+            Manage your store&apos;s security settings here.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="p-4 flex flex-col items-start gap-2 border bg-slate-100 rounded-xl">
+            <Input
+              value={newEmployee.name}
+              placeholder="Name"
+              className="bg-white"
+              onChange={(e) =>
+                setNewEmployee({ ...newEmployee, name: e.target.value })
+              }
+            />
+            <Input
+              value={newEmployee.email}
+              placeholder="Email"
+              className="bg-white"
+              onChange={(e) =>
+                setNewEmployee({ ...newEmployee, email: e.target.value })
+              }
+            />
+            <Popover>
+              <PopoverTrigger>
+                <div className="w-[400px] flex justify-start">
+                  <Button variant="outline" className="space-y-1 space-x-1">
+                    {Object.keys(newEmployee.access).filter(
+                      (key) => newEmployee.access[key],
+                    ).length > 0
+                      ? Object.keys(newEmployee.access)
+                          .filter((key) => newEmployee.access[key])
+                          .map((a) => (
+                            <Badge variant={"outline"} key={a}>
+                              {a}
+                            </Badge>
+                          ))
+                      : "Select Access"}
+                  </Button>
+                </div>
+              </PopoverTrigger>
+              <PopoverContent className="p-1 flex flex-col">
+                {accesses.map((access) => (
+                  <Button
+                    onClick={() => {
+                      setNewEmployee({
+                        ...newEmployee,
+                        access: {
+                          ...newEmployee.access,
+                          [access.key]: !newEmployee.access[access.key],
+                        },
+                      });
+                    }}
+                    variant="ghost"
+                    key={access.key}
+                    className="w-full flex justify-between"
+                  >
+                    {access.name}{" "}
+                    <div>{newEmployee.access[access.key] && "✔️"} </div>
+                  </Button>
+                ))}
+              </PopoverContent>
+            </Popover>
+            <Button
+              onClick={() => {
+                handleSave();
+              }}
+            >
+              Add Employee
+            </Button>
+          </div>
+          <Separator className="mb-2 mt-4" />
+          <div className="p-2  mt-2">
+            {store?.employees &&
+              store?.employees.map((employee) => (
+                <div
+                  key={employee.id}
+                  className="flex px-4 items-center p-2 border rounded-xl justify-between"
                 >
-                  {access.name}{" "}
-                  <div>{newEmployee.access[access.key] && "✔️"} </div>
-                </Button>
+                  <div>
+                    <p>{employee.name}</p>
+                    <p>{employee.email}</p>
+                  </div>
+                  <UpdateAccesses employee={employee} store={store} />
+                </div>
               ))}
-            </PopoverContent>
-          </Popover>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  );
+};
+
+const UpdateAccesses = ({
+  employee,
+  store,
+}: {
+  employee: Employee;
+  store: Store;
+}) => {
+  const { storeId } = useStore();
+  const [newEmployee, setNewEmployee] = useState<Employee>({
+    name: "",
+    id: "",
+    email: "",
+    access: {},
+  });
+  useEffect(() => {
+    setNewEmployee(employee);
+  }, [employee]);
+  return (
+    <Popover>
+      <PopoverTrigger>
+        <Button variant="outline">Access</Button>
+      </PopoverTrigger>
+      <PopoverContent className="p-1 flex flex-col">
+        {accesses.map((access) => (
           <Button
             onClick={() => {
-              handleSave();
+              const updatedEmployee = {
+                ...newEmployee,
+                access: {
+                  ...newEmployee.access,
+                  [access.key]: !newEmployee.access[access.key],
+                },
+              };
+
+              setNewEmployee(updatedEmployee);
+              if (!storeId) return;
+              if (!store) return;
+              if (!store.employees) return;
+              updateDoc(doc(db, "stores", storeId), {
+                employees: store.employees.map((e) =>
+                  e.id === employee.id ? updatedEmployee : e,
+                ),
+              });
             }}
+            variant="ghost"
+            key={access.key}
+            className="w-full flex justify-between"
           >
-            Add Employee
+            {access.name} <div>{newEmployee.access[access.key] && "✔️"} </div>
           </Button>
-        </div>
-        <Separator />
-        <div className="p-2 mt-2">
-          {store?.employees &&
-            store?.employees.map((employee) => (
-              <div
-                key={employee.id}
-                className="flex items-center justify-between"
-              >
-                <div>
-                  <p>{employee.email}</p>
-                </div>
-                <Button variant="outline" className="text-sm">
-                  Remove
-                </Button>
-              </div>
-            ))}
-        </div>
-      </CardContent>
-      <CardFooter className="border-t px-6 py-4">
-        <Button onClick={handleSave}>
-          {!saved ? "Save" : "Saved"}
-          {saved && <CheckCircle className="ml-2 h-4 w-4" />}
-        </Button>
-      </CardFooter>
-    </Card>
+        ))}
+      </PopoverContent>
+    </Popover>
   );
 };
 

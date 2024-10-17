@@ -38,6 +38,14 @@ function Protected({ children }: { children: React.ReactNode }) {
     if (session?.user == undefined) return;
     if (session?.user.email == undefined) return;
 
+    if (
+      pathname === "/dashboard/create-store" ||
+      pathname === "/dashboard/switch-store"
+    ) {
+      setLoading(false);
+      return setDontHaveAccess(false);
+    }
+
     let employee: Employee | null | "admin" = null;
     const email = session?.user.email;
     employee =
@@ -59,9 +67,12 @@ function Protected({ children }: { children: React.ReactNode }) {
     } else {
       //redirect("/dashboard/switch-store");
       setDontHaveAccess(false);
+      if (Object.keys(employee.access).filter((key) => key).length === 0) {
+        return redirect("/dashboard/switch-store");
+      }
       return redirect("/dashboard/" + Object.keys(employee.access)[0]);
     }
-  }, [store, session, redirect, pathname, setDontHaveAccess, setLoading]);
+  }, [store, session, pathname, setDontHaveAccess, setLoading]);
 
   useEffect(() => {
     loadStoreId();
