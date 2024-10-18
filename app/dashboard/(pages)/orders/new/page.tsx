@@ -11,17 +11,14 @@ import axios from "axios";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 import { Order } from "@/types/order";
-import { doc, getDoc, Timestamp } from "firebase/firestore";
+import { Timestamp } from "firebase/firestore";
 import { useOrderStore } from "@/store/orders";
 import ItemsTable from "./components/ItemsTable";
 import { getTotalPriceFromItem } from "@/lib/orders";
-import { db } from "@/firebase";
 import { useRouter } from "next/navigation";
 import { useStore } from "@/store/storeInfos";
 import { useSession } from "next-auth/react";
 import { toast } from "@/hooks/use-toast";
-import { useQuery } from "@tanstack/react-query";
-import { Store } from "@/types/store";
 
 // Default canvas for a new order
 const defaultOrder: Order = {
