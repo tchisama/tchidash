@@ -60,24 +60,11 @@ const defaultOrder: Order = {
 
 export default function CreateOrder() {
   const { newOrder: order, setNewOrder: setOrder } = useOrderStore();
-  const { storeId } = useStore();
+  const { storeId, store } = useStore();
   const { data: session } = useSession();
   useEffect(() => {
     setOrder(defaultOrder);
   }, [setOrder]);
-  const { data: store } = useQuery({
-    queryKey: ["store", storeId],
-    queryFn: async () => {
-      if (!storeId) return null;
-      const store: Store = await getDoc(doc(db, "stores", storeId)).then(
-        (doc) => {
-          return { ...doc.data(), id: doc.id } as Store;
-        },
-      );
-      return store;
-    },
-    refetchOnWindowFocus: false,
-  });
 
   const router = useRouter();
 
@@ -89,6 +76,22 @@ export default function CreateOrder() {
       (acc, item) => acc + getTotalPriceFromItem(item),
       0,
     );
+  };
+
+  const tp = totalPrice();
+  const shippingCost = () => {
+    if (!store) return 0;
+    if (!store.settings) return 0;
+    let cost = store.settings.shippingCost;
+    if (
+      store.settings.hasFreeShippingAboveAmount &&
+      store.settings.shippingFreeAboveCartAmount
+    ) {
+      if (tp >= store?.settings?.shippingFreeAboveCartAmount) {
+        cost = 0;
+      }
+    }
+    return cost;
   };
 
   const handleSubmit = async () => {
@@ -109,23 +112,7 @@ export default function CreateOrder() {
       return setError("Please enter the shipping city");
 
     if (!order.items.length) return setError("Please add at least one item");
-    const tp = totalPrice();
     if (!tp) return setError("Please add at least one item");
-
-    const shippingCost = () => {
-      if (!store) return 0;
-      if (!store.settings) return 0;
-      let cost = store.settings.shippingCost;
-      if (
-        store.settings.hasFreeShippingAboveAmount &&
-        store.settings.shippingFreeAboveCartAmount
-      ) {
-        if (tp >= store?.settings?.shippingFreeAboveCartAmount) {
-          cost = 0;
-        }
-      }
-      return cost;
-    };
 
     const orderForUpdate: Order = {
       ...order,
@@ -183,7 +170,7 @@ export default function CreateOrder() {
             <h2 className="text-lg font-bold">Customer Information</h2>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="firstName">First Name</Label>
+                <Label htmlFor="firstName">First Name </Label>
                 <Input
                   id="firstName"
                   name="firstName"

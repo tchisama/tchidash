@@ -3,7 +3,15 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { MoreHorizontal } from "lucide-react";
+import {
+  Archive,
+  Copy,
+  Edit,
+  Eye,
+  EyeOff,
+  MoreHorizontal,
+  Trash2,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -141,7 +149,7 @@ const ProductLine = ({ product }: { product: Product }) => {
         <TableCell className="hidden md:table-cell">
           {product.createdAt.toDate().toLocaleDateString()}
         </TableCell>
-        <TableCell>
+        <TableCell className="flex justify-end items-center h-full mt-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button size="icon" variant="outline">
@@ -158,15 +166,19 @@ const ProductLine = ({ product }: { product: Product }) => {
                   );
                 }}
               >
+                <Edit className="h-4 w-4 mr-2" />
                 Edit
               </DropdownMenuItem>
               <DropdownMenuItem onClick={duplicateProduct}>
+                <Copy className="h-4 w-4 mr-2" />
                 Duplicate
               </DropdownMenuItem>
               <DropdownMenuItem onClick={archiveProduct}>
+                <Archive className="h-4 w-4 mr-2" />
                 Archive
               </DropdownMenuItem>
               <DropdownMenuItem onClick={deleteProduct}>
+                <Trash2 className="h-4 w-4 mr-2" />
                 Delete
               </DropdownMenuItem>
               {product.variants && product.variants.length > 0 && (
@@ -175,6 +187,11 @@ const ProductLine = ({ product }: { product: Product }) => {
                     toggleVariants();
                   }}
                 >
+                  {showVariants ? (
+                    <EyeOff className="h-4 w-4 mr-2" />
+                  ) : (
+                    <Eye className="h-4 w-4 mr-2" />
+                  )}
                   {showVariants ? "Hide Variants" : "Show Variants"}
                 </DropdownMenuItem>
               )}
@@ -235,11 +252,17 @@ const ProductLine = ({ product }: { product: Product }) => {
                           {variant.title || "Untitled Variant"}
                         </TableCell>
                         <TableCell
-                      className={product.variantsAreOneProduct ? "hidden" : ""}
-                          >{variant.price} Dh</TableCell>
+                          className={
+                            product.variantsAreOneProduct ? "hidden" : ""
+                          }
+                        >
+                          {variant.price} Dh
+                        </TableCell>
                         <TableCell
-                      className={product.variantsAreOneProduct ? "hidden" : ""}
-                          >
+                          className={
+                            product.variantsAreOneProduct ? "hidden" : ""
+                          }
+                        >
                           {variant.hasInfiniteStock
                             ? "infinite"
                             : variant.inventoryQuantity || 0}
@@ -257,4 +280,3 @@ const ProductLine = ({ product }: { product: Product }) => {
   );
 };
 export { ProductLine };
-

@@ -22,6 +22,7 @@ import {
   DownloadIcon,
   MoreVertical,
   Phone,
+  QrCodeIcon,
   Trash2,
   Truck,
   X,
@@ -35,9 +36,32 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import Image from "next/image";
+import CustomerShield from "./CustomerShield";
+import { db } from "@/firebase";
+import { deleteDoc, doc } from "firebase/firestore";
+import QRCode from "react-qr-code";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 function OrderView() {
   const { currentOrder, setCurrentOrder } = useOrderStore();
+
+  const deleteOrder = async (orderId: string) => {
+    if (!currentOrder) return;
+    if (
+      ["cancelled", "returned", "pending"].includes(currentOrder.orderStatus)
+    ) {
+      deleteDoc(doc(db, "orders", orderId));
+      deleteDoc(doc(db, "sales", orderId));
+      setCurrentOrder("");
+      return;
+    } else {
+      alert("You can't delete an order that is not cancelled or returned");
+    }
+  };
 
   return (
     currentOrder && (
@@ -136,7 +160,11 @@ function OrderView() {
                     Export Order Excel
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      deleteOrder(currentOrder.id);
+                    }}
+                  >
                     <Trash2 className="h-3.5 w-3.5 mr-2" />
                     Trash
                   </DropdownMenuItem>
@@ -155,20 +183,44 @@ function OrderView() {
               </Button>
             </div>
           </CardHeader>
-          <CardContent className="p-6 text-sm">
+          <CardContent className="p-4 text-sm">
             <div className="grid gap-2">
               <ul className="grid gap-2">
                 <li className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Order State</span>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="flex gap-2"
+                      >
+                        <QrCodeIcon className="h-5 w-5 " />
+                        QR Code
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent align="end">
+                      <div className="text-primary">
+                        <QRCode value={currentOrder.id} fgColor="#9661f0" />
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+
                   <StateChanger
                     state={currentOrder.orderStatus}
                     order={currentOrder}
                   />
                 </li>
               </ul>
-              <Separator className="my-4" />
+
+              <Separator className="my-2" />
               <div className="grid gap-3">
-                <div className="font-semibold">Customer Information</div>
+                <div className="flex justify-between">
+                  <div className="font-semibold">Customer Information</div>
+                  <CustomerShield
+                    number={currentOrder.customer.phoneNumber ?? ""}
+                    orderId={currentOrder.id}
+                  />
+                </div>
                 <dl className="grid gap-3">
                   <div className="flex items-center justify-between">
                     <dt className="text-muted-foreground">Customer</dt>
@@ -289,7 +341,7 @@ function OrderView() {
                 ) : null}
                 <li className="flex items-center justify-between">
                   <span className="text-muted-foreground">Shipping</span>
-                  <span>+ {currentOrder.shippingInfo.cost} Dh</span>
+                  <span>+ {currentOrder.shippingInfo.cost || 0} Dh</span>
                 </li>
                 <li className="flex items-center justify-between font-semibold">
                   <span className="text-muted-foreground">Total</span>

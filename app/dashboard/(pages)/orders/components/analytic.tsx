@@ -156,42 +156,42 @@ function Analytic() {
   if (errorThisMonth) return <div>Error{errorThisMonth.message}</div>;
 
   return (
-    store &&
-    thisWeekProfit &&
-    lastWeekProfit && (
+    store && (
       <div
         className={cn(
           "grid gap-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4",
           currentOrder && "lg:grid-cols-3",
         )}
       >
-        <Card x-chunk="dashboard-05-chunk-1">
-          <CardHeader className="pb-2">
-            <CardDescription>This Week</CardDescription>
-            <CardTitle
-              className={cn(
-                "text-4xl flex items-end",
-                thisWeekProfit > lastWeekProfit && "text-primary",
-              )}
-            >
-              {thisWeekProfit} {store.settings.currency.symbol}
-              {thisWeekProfit > lastWeekProfit && (
-                <ArrowUpRightIcon className="w-8 h-8" />
-              )}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-xs text-muted-foreground">
-              {thisWeekProgress}% from last week
-            </div>
-          </CardContent>
-          <CardFooter>
-            <Progress
-              value={Math.min(thisWeekProgress, 100)}
-              aria-label="increase"
-            />
-          </CardFooter>
-        </Card>
+        {thisWeekProfit && lastWeekProfit ? (
+          <Card x-chunk="dashboard-05-chunk-1">
+            <CardHeader className="pb-2">
+              <CardDescription>This Week</CardDescription>
+              <CardTitle
+                className={cn(
+                  "text-4xl flex items-end",
+                  thisWeekProfit > lastWeekProfit && "text-primary",
+                )}
+              >
+                {thisWeekProfit} {store.settings.currency.symbol}
+                {thisWeekProfit > lastWeekProfit && (
+                  <ArrowUpRightIcon className="w-8 h-8" />
+                )}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-xs text-muted-foreground">
+                {thisWeekProgress}% from last week
+              </div>
+            </CardContent>
+            <CardFooter>
+              <Progress
+                value={Math.min(thisWeekProgress, 100)}
+                aria-label="increase"
+              />
+            </CardFooter>
+          </Card>
+        ) : null}
         {thisMonthProfit && lastMonthProfit ? (
           <Card x-chunk="dashboard-05-chunk-2">
             <CardHeader className="pb-2">

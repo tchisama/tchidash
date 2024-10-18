@@ -18,7 +18,7 @@ import {
   UserCheck,
 } from "lucide-react";
 import { Order } from "@/types/order";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/firebase";
 import { useOrderStore } from "@/store/orders";
 import { Product } from "@/types/product";
@@ -138,6 +138,7 @@ export function StateChanger({
                     status.name as OrderStatus,
                     order.orderStatus,
                     order.items,
+                    order,
                   );
                   setOrders(
                     orders.map((o) =>
@@ -170,8 +171,20 @@ const updateStockOfProductsBasedOnStatus = async (
   status: OrderStatus,
   oldStatus: OrderStatus,
   products: Order["items"],
+  order: Order,
 ) => {
   // Check if the order status is transitioning to "shipped" or "delivered"
+  //
+  //
+  //
+
+  setDoc(doc(db, "sales", order.id), {
+    phoneNumber: order.customer.phoneNumber,
+    totalPrice: order.totalPrice,
+    status,
+    storeId: order.storeId,
+  });
+
   if (
     (oldStatus === "pending" ||
       oldStatus === "cancelled" ||

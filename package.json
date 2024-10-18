@@ -48,6 +48,7 @@
     "react-day-picker": "^8.10.1",
     "react-dom": "^18",
     "react-konva": "^18.2.10",
+    "react-qr-code": "^2.0.15",
     "recharts": "^2.12.7",
     "tailwind-merge": "^2.5.3",
     "tailwindcss-animate": "^1.0.7",

@@ -204,9 +204,7 @@ function SideBar() {
                   href={link.href}
                   className={cn(
                     "flex w-full px-2 pr-4 h-10  group duration-200 items-center border-slate-100 border gap-2 rounded-lg text-muted-foreground transition-colors hover:text-foreground",
-                    pathname === link.href
-                      ? "bg-slate-100 border border-slate-200"
-                      : "text-muted-foreground",
+                    pathname === link.href ? "bg-white   font-bold " : "",
                   )}
                 >
                   {link.icon({})}
