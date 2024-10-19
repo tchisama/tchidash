@@ -81,10 +81,6 @@ function Page({ params }: { params: { product: string; variant: string } }) {
     saveVariant();
   }, [variantProduct]);
 
-  const discard = () => {
-    setCurrentProduct(null);
-    router.push("/dashboard/products");
-  };
   useEffect(() => {
     if (currentProduct) {
       if (!currentProduct.variants) return;
