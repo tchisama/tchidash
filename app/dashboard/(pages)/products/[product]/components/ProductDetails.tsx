@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -11,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useProducts } from "@/store/products";
 import { Product } from "@/types/product";
+import { Copy } from "lucide-react";
 
 const ProductDetailsCard = () => {
   const { setCurrentProduct, currentProduct } = useProducts();
@@ -19,7 +21,18 @@ const ProductDetailsCard = () => {
       <CardHeader>
         <CardTitle>Product Details</CardTitle>
         <CardDescription>
-          Lipsum dolor sit amet, consectetur adipiscing elit
+          Product Id : {currentProduct.id}
+          <Button
+            onClick={() =>
+              navigator.clipboard.writeText(
+                currentProduct.id + " " + currentProduct.title || "",
+              )
+            }
+            variant={"ghost"}
+            className="p-1 w-6 h-6"
+          >
+            <Copy className="w-3 h-3" />
+          </Button>
         </CardDescription>
       </CardHeader>
       <CardContent>

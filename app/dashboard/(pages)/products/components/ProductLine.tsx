@@ -35,11 +35,13 @@ import { useProducts } from "@/store/products";
 import { db } from "@/firebase";
 import { Product } from "@/types/product";
 import { uniqueId } from "lodash";
+import { useStore } from "@/store/storeInfos";
 
 const ProductLine = ({ product }: { product: Product }) => {
   const [showVariants, setShowVariants] = useState(false);
   const { setCurrentProduct, setLastUploadedProduct, setProducts, products } =
     useProducts();
+  const { store } = useStore();
   const router = useRouter();
 
   const toggleVariants = () => {
@@ -130,7 +132,7 @@ const ProductLine = ({ product }: { product: Product }) => {
               " - " +
               Math.max(...product.variants.map((v) => v.price))
             : product.price}{" "}
-          Dh
+          {store?.settings.currency.symbol}
         </TableCell>
         <TableCell className="hidden md:table-cell">
           <div>

@@ -10,7 +10,7 @@ import Link from "next/link";
 import Image from "next/image";
 import Home from "@/public/images/svgs/icons/home.svg";
 import Cart from "@/public/images/svgs/icons/cart.svg";
-// import Graph from "@/public/images/svgs/icons/graph.svg";
+import Graph from "@/public/images/svgs/icons/graph.svg";
 import Settings from "@/public/images/svgs/icons/settings.svg";
 import Product from "@/public/images/svgs/icons/product.svg";
 import Mail from "@/public/images/svgs/icons/mail.svg";
@@ -55,13 +55,13 @@ export const navLinks = [
       />
     ),
   },
-  // {
-  //   href: "/dashboard/analytics",
-  //   label: "Analytics",
-  //   icon: ({ className }: NavIconClass) => (
-  //     <Image src={Graph} alt="Graph" className={cn(iconsClass, className)} />
-  //   ),
-  // },
+  {
+    href: "/dashboard/analytics",
+    label: "Analytics",
+    icon: ({ className }: NavIconClass) => (
+      <Image src={Graph} alt="Graph" className={cn(iconsClass, className)} />
+    ),
+  },
   {
     href: "/dashboard/contacts",
     label: "contacts",

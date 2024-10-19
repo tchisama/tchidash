@@ -1,6 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -21,10 +27,11 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useProducts } from "@/store/products";
 import { Option, Product, Variant, VariantValue } from "@/types/product";
-import { MoreVertical, RefreshCw } from "lucide-react";
+import { Check, Copy, Edit, MoreVertical, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import UploadImageProvider from "@/components/UploadImageProvider";
 
 const ProductVariantsCard = ({}: { saveProduct: () => void }) => {
   const { currentProduct, setCurrentProduct } = useProducts();
@@ -103,7 +110,15 @@ const ProductVariantsCard = ({}: { saveProduct: () => void }) => {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={generateAction}
+                onClick={() => {
+                  if (
+                    window.confirm(
+                      "Are you sure you want to generate variants?",
+                    )
+                  ) {
+                    generateAction();
+                  }
+                }}
                 className="flex items-center gap-2"
               >
                 <RefreshCw className="h-3 w-3" />
@@ -114,11 +129,36 @@ const ProductVariantsCard = ({}: { saveProduct: () => void }) => {
                 size="sm"
                 onClick={() => setEditMode((p) => !p)}
               >
-                {editMode ? "done" : "Edit"}
+                {editMode ? (
+                  <>
+                    <Check className="w-4 h-4 mr-2" /> Save
+                  </>
+                ) : (
+                  <>
+                    <Edit className="w-4 h-4 mr-2" /> Edit
+                  </>
+                )}
               </Button>
             </div>
           </div>
         </CardTitle>
+        <CardDescription>
+          Copy the list Of ids of all the variants of this product
+          <Button
+            variant="ghost"
+            size="icon"
+            className="p-1 w-6 h-6"
+            onClick={() => {
+              navigator.clipboard.writeText(
+                currentProduct?.variants
+                  ?.map((v) => v.id + " " + v.title)
+                  .join(" \n ") ?? "",
+              );
+            }}
+          >
+            <Copy className="w-3 h-3" />
+          </Button>
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Table>
@@ -170,16 +210,45 @@ const ProductVariantsCard = ({}: { saveProduct: () => void }) => {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Image
-                    src={
-                      //variant.image ? `${variant.image}?${Math.random()}` : ""
-                      variant.image ?? ""
-                    }
-                    alt={""}
-                    width={60}
-                    height={60}
-                    className="rounded-md w-14 object-contain h-14 p-1 bg-slate-50 border"
-                  />
+                  {editMode ? (
+                    <UploadImageProvider
+                      folder="products"
+                      name={variant.id}
+                      callback={(url) => {
+                        setProductVariants((prev) =>
+                          prev.map((v) =>
+                            // if the id is the same as the variant id or if its selected
+                            v.id === variant.id ||
+                            selectedVariants.includes(v.id)
+                              ? { ...v, image: url }
+                              : v,
+                          ),
+                        );
+                      }}
+                    >
+                      <Image
+                        src={
+                          //variant.image ? `${variant.image}?${Math.random()}` : ""
+                          variant.image ?? ""
+                        }
+                        alt={""}
+                        width={60}
+                        height={60}
+                        className="rounded-md w-14 object-contain h-14 p-1 bg-slate-50 border"
+                      />
+                    </UploadImageProvider>
+                  ) : (
+                    <Image
+                      src={
+                        //variant.image ? `${variant.image}?${Math.random()}` : ""
+                        variant.image ?? ""
+                      }
+                      alt={""}
+                      width={60}
+                      height={60}
+                      className="rounded-md w-14 object-contain h-14 p-1 bg-slate-50 border"
+                    />
+                  )}
                 </TableCell>
                 <TableCell>{variant.title}</TableCell>
                 <TableCell

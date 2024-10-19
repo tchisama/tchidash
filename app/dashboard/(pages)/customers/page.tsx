@@ -34,7 +34,7 @@ import { Copy, Eye, MoreHorizontal, Phone } from "lucide-react";
 import { useStore } from "@/store/storeInfos";
 
 export default function CustomerPage() {
-  const { storeId } = useStore();
+  const { storeId, store } = useStore();
   // Fetch customers using react-query
   const {
     data: customers,
@@ -102,7 +102,10 @@ export default function CustomerPage() {
                     {customer.createdAt.toDate().toLocaleString()}
                   </TableCell>
                   <TableCell>{customer.purchaseCount} </TableCell>
-                  <TableCell>{customer.totalAmountSpent}</TableCell>
+                  <TableCell>
+                    {customer.totalAmountSpent}{" "}
+                    {store?.settings.currency.symbol}
+                  </TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

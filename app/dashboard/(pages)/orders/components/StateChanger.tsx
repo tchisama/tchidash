@@ -183,6 +183,7 @@ const updateStockOfProductsBasedOnStatus = async (
     totalPrice: order.totalPrice,
     status,
     storeId: order.storeId,
+    createdAt: order.createdAt,
   });
 
   if (

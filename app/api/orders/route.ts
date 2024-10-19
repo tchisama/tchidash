@@ -9,6 +9,7 @@ import {
   updateDoc,
   doc,
   increment,
+  setDoc,
 } from "firebase/firestore";
 import { db } from "@/firebase"; // Adjust this import based on your Firebase setup
 import { Order } from "@/types/order";
@@ -127,7 +128,15 @@ export async function POST(request: NextRequest) {
   order.discountAmount = discountAmount;
 
   const createdOrder = await addDoc(collection(db, "orders"), order).then(
-    (response) => response.id,
+    (response) => {
+      setDoc(doc(db, "sales", response.id), {
+        phoneNumber: order.customer.phoneNumber,
+        totalPrice: order.totalPrice,
+        status: order.orderStatus,
+        storeId: order.storeId,
+        createdAt: order.createdAt,
+      });
+    },
   );
 
   const newCustomer: Customer = {
@@ -156,6 +165,7 @@ export async function POST(request: NextRequest) {
     const customerQuery = query(
       collection(db, "customers"),
       where("phoneNumber", "==", newCustomer.phoneNumber),
+      where("storeId", "==", storeId),
     );
     const customerSnapshot = await getDocs(customerQuery);
 
@@ -168,7 +178,7 @@ export async function POST(request: NextRequest) {
       console.log("New customer created with ID:", customerDocRef.id);
     } else {
       // increment customer purchase count
-      updateDoc(doc(db, "customers", customerSnapshot.docs[0].id), {
+      await updateDoc(doc(db, "customers", customerSnapshot.docs[0].id), {
         purchaseCount: increment(1),
         totalAmountSpent: increment(order.totalPrice),
       });
@@ -188,4 +198,3 @@ export async function POST(request: NextRequest) {
     createdOrder,
   });
 }
-

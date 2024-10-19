@@ -57,6 +57,7 @@ function Page({ params }: { params: { product: string; variant: string } }) {
   });
 
   useEffect(() => {
+    if (currentProduct) return;
     if (product) {
       setCurrentProduct(product);
     }
@@ -77,7 +78,7 @@ function Page({ params }: { params: { product: string; variant: string } }) {
     null,
   );
   useEffect(() => {
-    console.log(variantProduct);
+    saveVariant();
   }, [variantProduct]);
 
   const discard = () => {
@@ -112,14 +113,6 @@ function Page({ params }: { params: { product: string; variant: string } }) {
         <Badge variant="outline" className="ml-auto sm:ml-0">
           {currentProduct?.status ?? "draft"}
         </Badge>
-        <div className="hidden items-center gap-2 md:ml-auto md:flex">
-          <Button onClick={discard} variant="outline" size="sm">
-            Discard
-          </Button>
-          <Button size="sm" onClick={saveVariant}>
-            Save
-          </Button>
-        </div>
       </div>
       <div className="grid gap-4 md:grid-cols-[1fr_250px] lg:grid-cols-2 lg:gap-8">
         <ProductVariantsCard sku={variantId} />

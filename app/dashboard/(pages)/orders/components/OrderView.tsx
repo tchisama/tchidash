@@ -198,9 +198,12 @@ function OrderView() {
                         QR Code
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent align="end">
+                    <PopoverContent align="start">
                       <div className="text-primary">
-                        <QRCode value={currentOrder.id} fgColor="#9661f0" />
+                        <QRCode
+                          value={"Order:" + currentOrder.id}
+                          fgColor="#444"
+                        />
                       </div>
                     </PopoverContent>
                   </Popover>

@@ -168,16 +168,14 @@ export default function StoreSwitchCard() {
           </RadioGroup>
         </CardContent>
         <CardFooter className="flex gap-2 flex-col">
-          {stores.length > 0 && (
-            <Button
-              disabled={!selectedStore}
-              onClick={handleContinue}
-              className="w-full py-6 flex gap-4"
-            >
-              Continue to Dashboard
-              {loading && <Loader2 className="animate-spin ml-2" />}
-            </Button>
-          )}
+          <Button
+            disabled={!selectedStore}
+            onClick={handleContinue}
+            className="w-full py-6 flex gap-4"
+          >
+            Continue to Dashboard
+            {loading && <Loader2 className="animate-spin ml-2" />}
+          </Button>
           <p className="mt-4">
             signed in as {session?.user?.name},
             <Link
@@ -194,4 +192,3 @@ export default function StoreSwitchCard() {
     </div>
   );
 }
-

@@ -22,7 +22,7 @@ import { useStore } from "@/store/storeInfos";
 import { Store } from "@/types/store";
 import { useQuery } from "@tanstack/react-query";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { CheckCircle, X } from "lucide-react";
+import { CheckCircle, Copy, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { v4 } from "uuid";
@@ -77,6 +77,22 @@ const SecuritySettings = () => {
         </CardDescription>
       </CardHeader>
       <CardContent>
+        <div className="flex justify-between mb-4">
+          <Label htmlFor="password">Store Id</Label>
+          <div>
+            {store?.id}{" "}
+            <Button
+              className="ml-2"
+              variant={"outline"}
+              size="icon"
+              onClick={() => {
+                navigator.clipboard.writeText(store?.id ?? "");
+              }}
+            >
+              <Copy className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
         <div className="flex gap-2 justify-between">
           <Label htmlFor="password">Api Keys</Label>
 
@@ -84,9 +100,9 @@ const SecuritySettings = () => {
             onClick={() => {
               const key = v4();
               if (!apiKeys) {
-                setApiKeys([key]);
+                setApiKeys([{ name: "", key }]);
               } else {
-                setApiKeys([...apiKeys, key]);
+                setApiKeys([...apiKeys, { name: "", key }]);
               }
             }}
           >
@@ -104,8 +120,8 @@ const SecuritySettings = () => {
           <TableBody>
             {apiKeys &&
               apiKeys.map((apiKey) => (
-                <TableRow key={apiKey}>
-                  <TableCell>{apiKey}</TableCell>
+                <TableRow key={apiKey.key}>
+                  <TableCell>{apiKey.key}</TableCell>
                   <TableCell className="flex justify-end">
                     <Button
                       onClick={() => {

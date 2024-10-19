@@ -67,6 +67,7 @@ function Page({ params }: { params: { product: string } }) {
       };
       return productData;
     },
+    staleTime: 1000 * 10,
   });
 
   useEffect(() => {
