@@ -5,7 +5,6 @@ import { ChevronLeft } from "lucide-react";
 import React, { useEffect } from "react";
 import ProductDetailsCard from "./components/ProductDetails";
 import ProductImagesCard from "./components/ProductImage";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useProducts } from "@/store/products";
 import { Product, Variant } from "@/types/product";
@@ -25,7 +24,6 @@ import { useStore } from "@/store/storeInfos";
 
 function Page({ params }: { params: { product: string; variant: string } }) {
   const { currentProduct, setCurrentProduct } = useProducts();
-  const router = useRouter();
   const productId = params.product;
   const variantId = params.variant;
   const { storeId } = useStore();
