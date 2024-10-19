@@ -14,6 +14,7 @@ import {
 import {
   Bar,
   BarChart,
+  CartesianGrid,
   Label,
   Rectangle,
   ReferenceLine,
@@ -30,14 +31,13 @@ import {
 } from "firebase/firestore";
 import { db } from "@/firebase";
 import { useStore } from "@/store/storeInfos";
-import { startOfDay } from "date-fns";
 
 function OrdersGraph() {
   // start date is 30 days before
   const [startDate] = React.useState(
-    new Date(new Date().setDate(startOfDay(new Date()).getDate() - 10)),
+    new Date(new Date().setDate(new Date().getDate() - 14)),
   );
-  const [endDate] = React.useState(startOfDay(new Date()));
+  const [endDate] = React.useState(new Date());
   const { storeId } = useStore();
 
   // Helper function to format dates as 'YYYY-MM-DD'
@@ -120,6 +120,7 @@ function OrdersGraph() {
               }}
               data={chartData || []}
             >
+              <CartesianGrid vertical={false} />
               <Bar
                 dataKey="orders"
                 fill="var(--color-steps)"
@@ -168,20 +169,26 @@ function OrdersGraph() {
                 cursor={false}
               />
               <ReferenceLine
-                y={1200}
+                y={
+                  chartData.reduce((acc, day) => acc + day.orders, 0) /
+                  chartData.length
+                }
                 stroke="hsl(var(--muted-foreground))"
                 strokeDasharray="3 3"
                 strokeWidth={1}
               >
                 <Label
                   position="insideBottomLeft"
-                  value="Average Steps"
+                  value="Average Orders per Day"
                   offset={10}
                   fill="hsl(var(--foreground))"
                 />
                 <Label
                   position="insideTopLeft"
-                  value="12,343"
+                  value={(
+                    chartData.reduce((acc, day) => acc + day.orders, 0) /
+                    chartData.length
+                  ).toFixed(2)}
                   className="text-lg"
                   fill="hsl(var(--foreground))"
                   offset={10}
