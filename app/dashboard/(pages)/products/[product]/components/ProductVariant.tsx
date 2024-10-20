@@ -174,13 +174,6 @@ const ProductVariantsCard = ({}: { saveProduct: () => void }) => {
               >
                 Price
               </TableHead>
-              <TableHead
-                className={
-                  currentProduct?.variantsAreOneProduct ? "hidden" : ""
-                }
-              >
-                Stock
-              </TableHead>
               <TableHead>SKU</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -287,48 +280,6 @@ const ProductVariantsCard = ({}: { saveProduct: () => void }) => {
                   ) : (
                     <div>
                       <b>{variant.price}</b> Dh
-                    </div>
-                  )}
-                </TableCell>
-                <TableCell
-                  className={
-                    currentProduct?.variantsAreOneProduct ? "hidden" : ""
-                  }
-                >
-                  {variant?.hasInfiniteStock ? (
-                    <div>Infinite</div>
-                  ) : editMode ? (
-                    <Input
-                      defaultValue={variant.inventoryQuantity}
-                      value={variant.inventoryQuantity}
-                      onChange={(e) => {
-                        const newQuantity = parseInt(e.target.value);
-                        setProductVariants((prev) =>
-                          prev.map((v) =>
-                            v.id === variant.id
-                              ? { ...v, inventoryQuantity: newQuantity }
-                              : v,
-                          ),
-                        );
-                      }}
-                      type="text"
-                      onBlur={(e) => {
-                        const newQuantity = parseInt(e.target.value);
-                        const vrnts = productVariants.map((v) =>
-                          selectedVariants.includes(v.id)
-                            ? { ...v, inventoryQuantity: newQuantity }
-                            : v,
-                        );
-                        setProductVariants(vrnts);
-                        setCurrentProduct({
-                          ...currentProduct,
-                          variants: vrnts as Variant[],
-                        } as Product);
-                      }}
-                    />
-                  ) : (
-                    <div>
-                      <b>{variant.inventoryQuantity}</b> in stock
                     </div>
                   )}
                 </TableCell>

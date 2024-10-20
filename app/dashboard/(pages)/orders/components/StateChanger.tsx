@@ -18,10 +18,10 @@ import {
   UserCheck,
 } from "lucide-react";
 import { Order } from "@/types/order";
-import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { doc, setDoc, Timestamp, updateDoc } from "firebase/firestore";
 import { db } from "@/firebase";
 import { useOrderStore } from "@/store/orders";
-import { Product } from "@/types/product";
+import { v4 } from "uuid";
 
 export type OrderStatus =
   | "pending"
@@ -194,47 +194,26 @@ const updateStockOfProductsBasedOnStatus = async (
   ) {
     // Decrease stock based on the order items
     for (const item of products) {
-      const productRef = doc(db, "products", item.productId);
-      const productSnapshot = await getDoc(productRef);
-
-      if (productSnapshot.exists()) {
-        const productData = productSnapshot.data() as Product;
-
-        if (
-          productData.variants &&
-          productData.variants.length > 0 &&
-          productData.variantsAreOneProduct === false
-        ) {
-          const newUpdatedProductVariants = productData.variants.map(
-            (variant) => {
-              if (variant.id === item.variantId) {
-                return {
-                  ...variant,
-                  inventoryQuantity: variant.hasInfiniteStock
-                    ? variant.inventoryQuantity
-                    : variant.inventoryQuantity - item.quantity,
-                  totalSales: (variant?.totalSales ?? 0) + item.quantity,
-                };
-              } else {
-                return variant;
-              }
-            },
-          );
-
-          await updateDoc(productRef, {
-            variants: newUpdatedProductVariants,
-          });
-        } else {
-          if (productData.stockQuantity >= item.quantity) {
-            await updateDoc(productRef, {
-              stockQuantity: productData.hasInfiniteStock
-                ? productData.stockQuantity
-                : productData.stockQuantity - item.quantity,
-              totalSales: (productData?.totalSales ?? 0) + item.quantity,
-            });
-          }
-        }
-      }
+      setDoc(doc(db, "inventoryItems", order.id + item.id), {
+        id: "",
+        productId: item.productId,
+        variantId: item?.variantId,
+        title: item.title,
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now(),
+        quantity: -item.quantity,
+        storeId: order.storeId,
+        imageUrl: item.imageUrl,
+        cost: item.totalPrice,
+        unitPrice: item.price,
+        vendorId: "",
+        orderId: order.id,
+        note: "",
+        createdById: order.customer.name,
+        type: "OUT",
+        status: "APPROVED",
+        referenceNumber: "SO-" + v4().substring(0, 8),
+      });
     }
   }
 
@@ -247,47 +226,152 @@ const updateStockOfProductsBasedOnStatus = async (
   ) {
     // Restore stock based on the order items
     for (const item of products) {
-      const productRef = doc(db, "products", item.productId);
-      const productSnapshot = await getDoc(productRef);
-
-      if (productSnapshot.exists()) {
-        const productData = productSnapshot.data() as Product;
-
-        if (
-          productData.variants &&
-          productData.variants.length > 0 &&
-          productData.variantsAreOneProduct === false
-        ) {
-          const newUpdatedProductVariants = productData.variants.map(
-            (variant) => {
-              if (variant.id === item.variantId) {
-                return {
-                  ...variant,
-                  inventoryQuantity: variant.hasInfiniteStock
-                    ? variant.inventoryQuantity
-                    : variant.inventoryQuantity + item.quantity,
-                  totalSales:
-                    (variant?.totalSales ?? item.quantity) - item.quantity,
-                };
-              } else {
-                return variant;
-              }
-            },
-          );
-
-          await updateDoc(productRef, {
-            variants: newUpdatedProductVariants,
-          });
-        } else {
-          await updateDoc(productRef, {
-            stockQuantity: productData.hasInfiniteStock
-              ? productData.stockQuantity
-              : productData.stockQuantity + item.quantity,
-            totalSales:
-              (productData?.totalSales ?? item.quantity) - item.quantity,
-          });
-        }
-      }
+      setDoc(doc(db, "inventoryItems", order.id + item.id), {
+        id: "",
+        productId: item.productId,
+        variantId: item?.variantId,
+        title: item.title,
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now(),
+        quantity: -item.quantity,
+        storeId: order.storeId,
+        imageUrl: item.imageUrl,
+        cost: item.totalPrice,
+        unitPrice: item.price,
+        vendorId: "",
+        orderId: order.id,
+        note: "",
+        createdById: order.customer.name,
+        type: "OUT",
+        status: "REJECTED",
+        referenceNumber: "SO-" + v4().substring(0, 8),
+      });
     }
   }
 };
+
+//
+//const updateStockOfProductsBasedOnStatus = async (
+//  status: OrderStatus,
+//  oldStatus: OrderStatus,
+//  products: Order["items"],
+//  order: Order,
+//) => {
+//  // Check if the order status is transitioning to "shipped" or "delivered"
+//  //
+//  //
+//  //
+//
+//  setDoc(doc(db, "sales", order.id), {
+//    phoneNumber: order.customer.phoneNumber,
+//    totalPrice: order.totalPrice,
+//    status,
+//    storeId: order.storeId,
+//    createdAt: order.createdAt,
+//  });
+//
+//  if (
+//    (oldStatus === "pending" ||
+//      oldStatus === "cancelled" ||
+//      oldStatus === "returned") &&
+//    (status === "processing" || status === "shipped" || status === "delivered")
+//  ) {
+//    // Decrease stock based on the order items
+//    for (const item of products) {
+//      const productRef = doc(db, "products", item.productId);
+//      const productSnapshot = await getDoc(productRef);
+//
+//      if (productSnapshot.exists()) {
+//        const productData = productSnapshot.data() as Product;
+//
+//        if (
+//          productData.variants &&
+//          productData.variants.length > 0 &&
+//          productData.variantsAreOneProduct === false
+//        ) {
+//          const newUpdatedProductVariants = productData.variants.map(
+//            (variant) => {
+//              if (variant.id === item.variantId) {
+//                return {
+//                  ...variant,
+//                  inventoryQuantity: variant.hasInfiniteStock
+//                    ? variant.inventoryQuantity
+//                    : variant.inventoryQuantity - item.quantity,
+//                  totalSales: (variant?.totalSales ?? 0) + item.quantity,
+//                };
+//              } else {
+//                return variant;
+//              }
+//            },
+//          );
+//
+//          await updateDoc(productRef, {
+//            variants: newUpdatedProductVariants,
+//          });
+//        } else {
+//          if (productData.stockQuantity >= item.quantity) {
+//            await updateDoc(productRef, {
+//              stockQuantity: productData.hasInfiniteStock
+//                ? productData.stockQuantity
+//                : productData.stockQuantity - item.quantity,
+//              totalSales: (productData?.totalSales ?? 0) + item.quantity,
+//            });
+//          }
+//        }
+//      }
+//    }
+//  }
+//
+//  // If the order is being canceled or returned, revert the stock
+//  if (
+//    (oldStatus === "processing" ||
+//      oldStatus === "shipped" ||
+//      oldStatus === "delivered") &&
+//    (status === "cancelled" || status === "returned" || status === "pending")
+//  ) {
+//    // Restore stock based on the order items
+//    for (const item of products) {
+//      const productRef = doc(db, "products", item.productId);
+//      const productSnapshot = await getDoc(productRef);
+//
+//      if (productSnapshot.exists()) {
+//        const productData = productSnapshot.data() as Product;
+//
+//        if (
+//          productData.variants &&
+//          productData.variants.length > 0 &&
+//          productData.variantsAreOneProduct === false
+//        ) {
+//          const newUpdatedProductVariants = productData.variants.map(
+//            (variant) => {
+//              if (variant.id === item.variantId) {
+//                return {
+//                  ...variant,
+//                  inventoryQuantity: variant.hasInfiniteStock
+//                    ? variant.inventoryQuantity
+//                    : variant.inventoryQuantity + item.quantity,
+//                  totalSales:
+//                    (variant?.totalSales ?? item.quantity) - item.quantity,
+//                };
+//              } else {
+//                return variant;
+//              }
+//            },
+//          );
+//
+//          await updateDoc(productRef, {
+//            variants: newUpdatedProductVariants,
+//          });
+//        } else {
+//          await updateDoc(productRef, {
+//            stockQuantity: productData.hasInfiniteStock
+//              ? productData.stockQuantity
+//              : productData.stockQuantity + item.quantity,
+//            totalSales:
+//              (productData?.totalSales ?? item.quantity) - item.quantity,
+//          });
+//        }
+//      }
+//    }
+//  }
+//};

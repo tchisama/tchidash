@@ -210,6 +210,22 @@ export function OrdersTable({
                       </div>
                     );
                   })}
+                  {order.items.length > 3 && (
+                    <div className="mask absolute top-0 left-[70px] w-10 aspect-square left-18">
+                      <div className="w-10 h-10 bg-slate-100 relative rounded-xl border-[2px] flex items-center justify-center">
+                        <Image
+                          width={50}
+                          height={50}
+                          src={order.items[3].imageUrl ?? ""}
+                          alt="Avatar Tailwind CSS Component"
+                          className="w-10 filter opacity-20 rounded-xl bg-slate-100  aspect-square  shadow-lg object-cover"
+                        />
+                        <span className="text-xs font-bold z-10 text-muted-foreground absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                          +{order.items.length - 3}
+                        </span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </TableCell>
               <TableCell>

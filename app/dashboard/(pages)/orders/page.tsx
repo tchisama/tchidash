@@ -54,7 +54,7 @@ export default function Page() {
         currentOrder && "lg:grid-cols-3",
       )}
     >
-      <div className="grid auto-rows-max items-start gap-4  lg:col-span-2">
+      <div className="grid duration-200 auto-rows-max items-start gap-4  lg:col-span-2">
         {/* <Analytic /> */}
         <Analytic />
         <div className="">

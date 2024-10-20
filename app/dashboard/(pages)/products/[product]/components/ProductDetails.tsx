@@ -94,22 +94,6 @@ const ProductDetailsCard = () => {
                   }
                   value={currentProduct.price}
                 />
-                <Label htmlFor="price" className="">
-                  Inventory Quantity
-                </Label>
-                <Input
-                  id="inventoryQuantity"
-                  type="number"
-                  className="w-full max-w-[300px] mt-2"
-                  disabled={currentProduct?.hasInfiniteStock}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setCurrentProduct({
-                      ...currentProduct,
-                      stockQuantity: parseFloat(e.target.value) ?? 0,
-                    } as Product)
-                  }
-                  value={currentProduct.stockQuantity}
-                />
                 <div className="flex gap-2 items-center">
                   <Checkbox
                     id="hasInfiniteStock"

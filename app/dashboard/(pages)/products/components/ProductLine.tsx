@@ -33,9 +33,11 @@ import Link from "next/link";
 import { addDoc, collection, updateDoc, doc } from "firebase/firestore";
 import { useProducts } from "@/store/products";
 import { db } from "@/firebase";
-import { Product } from "@/types/product";
+import { Product, Variant } from "@/types/product";
 import { uniqueId } from "lodash";
 import { useStore } from "@/store/storeInfos";
+import { getStock } from "@/lib/fetchs/stock";
+import { useQuery } from "@tanstack/react-query";
 
 const ProductLine = ({ product }: { product: Product }) => {
   const [showVariants, setShowVariants] = useState(false);
@@ -80,6 +82,15 @@ const ProductLine = ({ product }: { product: Product }) => {
   // const stock = (product.variants && product.variants.length > 0)
   //   ? product.variants.reduce((acc, variant) => acc + variant.inventoryQuantity, 0)
   //   : product.stockQuantity;
+  //
+  //
+  //
+  const { data: stockQuantity, error } = useQuery({
+    queryKey: ["inventoryStock", product?.id],
+    queryFn: () => getStock(store?.id ?? "", product),
+  });
+  console.log(stockQuantity);
+  if (error) console.error(error);
 
   return (
     <>
@@ -136,13 +147,14 @@ const ProductLine = ({ product }: { product: Product }) => {
         </TableCell>
         <TableCell className="hidden md:table-cell">
           <div>
-            {product.variants &&
+            {/*product.variants &&
             product.variants.length > 0 &&
             product.variantsAreOneProduct === false
               ? "Have variants"
               : product.hasInfiniteStock
                 ? "Infinite Stock"
-                : product.stockQuantity + " Items"}{" "}
+                : product.stockQuantity + " Items"*/}{" "}
+            {stockQuantity}
           </div>
         </TableCell>
         <TableCell className="hidden md:table-cell">
@@ -228,49 +240,11 @@ const ProductLine = ({ product }: { product: Product }) => {
                 <TableBody>
                   {product?.variants &&
                     product?.variants.map((variant, index) => (
-                      <TableRow key={index}>
-                        <TableCell>
-                          {variant.image ? (
-                            <Image
-                              src={variant.image}
-                              alt={variant.title || "Variant Image"}
-                              width={60}
-                              height={60}
-                              className="w-12 aspect-square object-contain border rounded-md p-[2px]"
-                            />
-                          ) : (
-                            <div className="w-12 aspect-square rounded-xl border bg-slate-50 flex justify-center items-center">
-                              <Image
-                                src={Photo}
-                                alt="No image available"
-                                width={30}
-                                height={30}
-                                className="w-6 h-6 opacity-50"
-                              />
-                            </div>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {variant.title || "Untitled Variant"}
-                        </TableCell>
-                        <TableCell
-                          className={
-                            product.variantsAreOneProduct ? "hidden" : ""
-                          }
-                        >
-                          {variant.price} Dh
-                        </TableCell>
-                        <TableCell
-                          className={
-                            product.variantsAreOneProduct ? "hidden" : ""
-                          }
-                        >
-                          {variant.hasInfiniteStock
-                            ? "infinite"
-                            : variant.inventoryQuantity || 0}
-                        </TableCell>
-                        <TableCell>{variant.totalSales || 0}</TableCell>
-                      </TableRow>
+                      <VariantLine
+                        variant={variant}
+                        product={product}
+                        key={index}
+                      />
                     ))}
                 </TableBody>
               </Table>
@@ -281,4 +255,55 @@ const ProductLine = ({ product }: { product: Product }) => {
     </>
   );
 };
+
+const VariantLine = ({
+  variant,
+  product,
+}: {
+  variant: Variant;
+  product: Product;
+}) => {
+  const { storeId } = useStore();
+  const { data: stockQuantity, error } = useQuery({
+    queryKey: ["inventoryStock", product?.id, variant?.id],
+    queryFn: () => getStock(storeId ?? "", product, variant),
+  });
+
+  if (error) console.error(error);
+
+  return (
+    <TableRow>
+      <TableCell>
+        {variant.image ? (
+          <Image
+            src={variant.image}
+            alt={variant.title || "Variant Image"}
+            width={60}
+            height={60}
+            className="w-12 aspect-square object-contain border rounded-md p-[2px]"
+          />
+        ) : (
+          <div className="w-12 aspect-square rounded-xl border bg-slate-50 flex justify-center items-center">
+            <Image
+              src={Photo}
+              alt="No image available"
+              width={30}
+              height={30}
+              className="w-6 h-6 opacity-50"
+            />
+          </div>
+        )}
+      </TableCell>
+      <TableCell>{variant.title || "Untitled Variant"}</TableCell>
+      <TableCell className={product.variantsAreOneProduct ? "hidden" : ""}>
+        {variant.price} Dh
+      </TableCell>
+      <TableCell className={product.variantsAreOneProduct ? "hidden" : ""}>
+        {variant.hasInfiniteStock ? "infinite" : stockQuantity || 0}
+      </TableCell>
+      <TableCell>{variant.totalSales || 0}</TableCell>
+    </TableRow>
+  );
+};
+
 export { ProductLine };

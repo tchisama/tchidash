@@ -10,6 +10,7 @@ import Product from "@/public/images/svgs/icons/product.svg";
 import Mail from "@/public/images/svgs/icons/mail.svg";
 import Customers from "@/public/images/svgs/icons/customers.svg";
 import Stars from "@/public/images/svgs/icons/stars.svg";
+import Box from "@/public/images/svgs/icons/box.svg";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 
@@ -48,6 +49,13 @@ export const navLinks = [
         alt="Product"
         className={cn(iconsClass, className)}
       />
+    ),
+  },
+  {
+    href: "/dashboard/inventory",
+    label: "Inventory",
+    icon: ({ className }: NavIconClass) => (
+      <Image src={Box} alt="Box" className={cn(iconsClass, className)} />
     ),
   },
   {

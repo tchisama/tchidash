@@ -136,6 +136,7 @@ export async function POST(request: NextRequest) {
         storeId: order.storeId,
         createdAt: order.createdAt,
       });
+      return response.id;
     },
   );
 
