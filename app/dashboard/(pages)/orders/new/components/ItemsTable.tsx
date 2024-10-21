@@ -40,7 +40,7 @@ function ItemsTable() {
 
     setNewOrder({
       ...newOrder,
-      items: [...newOrder.items, newItem],
+      items: [newItem, ...newOrder.items],
     });
   };
 

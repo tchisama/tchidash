@@ -19,18 +19,19 @@ import { cn } from "@/lib/utils";
 import { useStore } from "@/store/storeInfos";
 import { PurchaseOrder } from "@/types/inventory";
 import { useQuery } from "@tanstack/react-query";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
 import Image from "next/image";
 import { StateChanger } from "./StateChanger";
 
 export function InventoryMovementTable() {
   const { storeId, store } = useStore();
-  const { data: purchaseOrders } = useQuery({
+  const { data: purchaseOrders, error } = useQuery({
     queryKey: ["purchaseOrders", storeId],
     queryFn: async () => {
       const q = query(
         collection(db, "purchaseOrders"),
         where("storeId", "==", storeId),
+        orderBy("createdAt", "desc"),
       );
       return getDocs(q).then((response) =>
         response.docs.map(
@@ -39,6 +40,9 @@ export function InventoryMovementTable() {
       );
     },
   });
+  if (error) {
+    console.error(error);
+  }
   return (
     purchaseOrders && (
       <Card className="w-full">
@@ -63,7 +67,7 @@ export function InventoryMovementTable() {
               {purchaseOrders.map((movement, index) => (
                 <TableRow key={index}>
                   <TableCell className="relative">
-                    <div className="py-2 h-16">
+                    <div className="py-2 h-10">
                       {movement.itemsMoves.slice(0, 3).map((item, i) => {
                         return (
                           <div

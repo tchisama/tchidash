@@ -19,7 +19,7 @@ function Protected({ children }: { children: React.ReactNode }) {
   });
   const { storeId, loadStoreId, setStore } = useStore();
   const [dontHaveAccess, setDontHaveAccess] = React.useState(false);
-  const [loading, setLoading] = React.useState(true);
+  //const [loading, setLoading] = React.useState(true);
 
   const { data: store } = useQuery({
     queryKey: ["store", storeId],
@@ -38,7 +38,7 @@ function Protected({ children }: { children: React.ReactNode }) {
   }, [store, setStore]);
 
   useEffect(() => {
-    setLoading(true);
+    //setLoading(true);
     if (!store) return;
     if (!session) return;
     if (session?.user == undefined) return;
@@ -48,7 +48,7 @@ function Protected({ children }: { children: React.ReactNode }) {
       pathname === "/dashboard/create-store" ||
       pathname === "/dashboard/switch-store"
     ) {
-      setLoading(false);
+      //setLoading(false);
       return setDontHaveAccess(false);
     }
 
@@ -59,26 +59,31 @@ function Protected({ children }: { children: React.ReactNode }) {
     if (store.ownerEmail === session?.user.email) {
       employee = "admin";
     }
-    setLoading(false);
+    //setLoading(false);
     if (!employee) {
       //redirect("/dashboard/switch-store");
+      //setLoading(false);
       return setDontHaveAccess(true);
     }
     if (employee === "admin") {
       // Do something
+      //setLoading(false);
       return setDontHaveAccess(false);
     }
     if (employee.access[pathname.split("/")[2]]) {
+      //setLoading(false);
       return setDontHaveAccess(false);
     } else {
       //redirect("/dashboard/switch-store");
       setDontHaveAccess(false);
       if (Object.keys(employee.access).filter((key) => key).length === 0) {
+        //setLoading(false);
         return redirect("/dashboard/switch-store");
       }
+      //setLoading(false);
       return redirect("/dashboard/" + Object.keys(employee.access)[0]);
     }
-  }, [store, session, pathname, setDontHaveAccess, setLoading]);
+  }, [store, session, pathname, setDontHaveAccess]);
 
   useEffect(() => {
     loadStoreId();
@@ -132,13 +137,13 @@ function Protected({ children }: { children: React.ReactNode }) {
   if (!session) {
     return null;
   }
-  if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        Loading...
-      </div>
-    );
-  }
+  //if (loading) {
+  //  return (
+  //    <div className="flex h-screen items-center justify-center">
+  //      Loading...
+  //    </div>
+  //  );
+  //}
   if (dontHaveAccess) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -151,4 +156,3 @@ function Protected({ children }: { children: React.ReactNode }) {
 }
 
 export default Protected;
-

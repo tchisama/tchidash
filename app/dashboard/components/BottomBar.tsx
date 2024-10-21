@@ -9,6 +9,7 @@ import Settings from "@/public/images/svgs/icons/settings.svg";
 import Product from "@/public/images/svgs/icons/product.svg";
 import Mail from "@/public/images/svgs/icons/mail.svg";
 import Customers from "@/public/images/svgs/icons/customers.svg";
+import Folder from "@/public/images/svgs/icons/folder.svg";
 import Stars from "@/public/images/svgs/icons/stars.svg";
 import Box from "@/public/images/svgs/icons/box.svg";
 import { cn } from "@/lib/utils";
@@ -88,6 +89,13 @@ export const navLinks = [
         alt="Customers"
         className={cn(iconsClass, className)}
       />
+    ),
+  },
+  {
+    href: "/dashboard/filesystem",
+    label: "Filesystem",
+    icon: ({ className }: NavIconClass) => (
+      <Image src={Folder} alt="Folder" className={cn(iconsClass, className)} />
     ),
   },
   {

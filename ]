@@ -1,0 +1,100 @@
+"use client";
+import * as React from "react";
+import { File, Upload, FolderPlus } from "lucide-react";
+import Folder from "@/public/images/svgs/icons/folder.svg";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Card, CardContent } from "@/components/ui/card";
+
+interface FileSystemItem {
+  id: string;
+  name: string;
+  type: "folder" | "image";
+}
+
+export default function FilesystemInterface() {
+  const [items, setItems] = React.useState<FileSystemItem[]>([
+    { id: "1", name: "Documents", type: "folder" },
+    { id: "2", name: "Images", type: "folder" },
+    { id: "3", name: "profile.jpg", type: "image" },
+    { id: "4", name: "screenshot.png", type: "image" },
+  ]);
+
+  const [newFolderName, setNewFolderName] = React.useState("");
+
+  const handleUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files) {
+      const newItems = Array.from(files).map((file, index) => ({
+        id: `new-${Date.now()}-${index}`,
+        name: file.name,
+        type: "image" as const,
+      }));
+      setItems([...items, ...newItems]);
+    }
+  };
+
+  const handleCreateFolder = () => {
+    if (newFolderName.trim()) {
+      const newFolder: FileSystemItem = {
+        id: `folder-${Date.now()}`,
+        name: newFolderName.trim(),
+        type: "folder",
+      };
+      setItems([...items, newFolder]);
+      setNewFolderName("");
+    }
+  };
+
+  return (
+    <div className="container mx-auto p-4">
+      <div className="mb-4 flex justify-between">
+        <div className="ml-auto flex gap-2">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant={"outline"}>
+                <FolderPlus className="mr-2 h-4 w-4" /> Create Folder
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Create New Folder</DialogTitle>
+              </DialogHeader>
+              <Input
+                placeholder="Folder name"
+                value={newFolderName}
+                onChange={(e) => setNewFolderName(e.target.value)}
+              />
+              <Button onClick={handleCreateFolder}>Create</Button>
+            </DialogContent>
+          </Dialog>
+          <Button>
+            <Upload className="mr-2 h-4 w-4" /> Upload
+          </Button>
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+        {items.map((item) => (
+          <Card key={item.id} className="overflow-hidden">
+            <CardContent className="flex flex-col items-center justify-center p-4">
+              {item.type === "folder" ? (
+                <Folder className="mb-2 h-12 w-12 text-blue-500" />
+              ) : (
+                <File className="mb-2 h-12 w-12 text-gray-500" />
+              )}
+              <span className="text-center text-sm">{item.name}</span>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
