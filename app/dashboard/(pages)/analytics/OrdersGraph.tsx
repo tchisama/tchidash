@@ -90,7 +90,7 @@ function OrdersGraph() {
 
   return (
     chartData && (
-      <Card className="max-w-7xl" x-chunk="charts-01-chunk-0">
+      <Card className="flex-1" x-chunk="charts-01-chunk-0">
         <CardHeader className="space-y-0 pb-2">
           <CardDescription>Last {10} Days</CardDescription>
           <CardTitle className="text-4xl tabular-nums">

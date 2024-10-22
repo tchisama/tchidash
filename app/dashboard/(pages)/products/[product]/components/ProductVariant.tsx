@@ -31,7 +31,7 @@ import { Check, Copy, Edit, MoreVertical, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import UploadImageProvider from "@/components/UploadImageProvider";
+import FilesystemExplorer from "@/components/FilesystemExplorer";
 
 const ProductVariantsCard = ({}: { saveProduct: () => void }) => {
   const { currentProduct, setCurrentProduct } = useProducts();
@@ -127,7 +127,18 @@ const ProductVariantsCard = ({}: { saveProduct: () => void }) => {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setEditMode((p) => !p)}
+                onClick={() => {
+                  if (editMode) {
+                    // Save the product
+                    console.log("Save the product");
+                    if (!currentProduct) return;
+                    setCurrentProduct({
+                      ...currentProduct,
+                      variants: productVariants,
+                    });
+                  }
+                  setEditMode((p) => !p);
+                }}
               >
                 {editMode ? (
                   <>
@@ -204,9 +215,22 @@ const ProductVariantsCard = ({}: { saveProduct: () => void }) => {
                 </TableCell>
                 <TableCell>
                   {editMode ? (
-                    <UploadImageProvider
-                      folder="products"
-                      name={variant.id}
+                    //<UploadImageProvider
+                    //  folder="products"
+                    //  name={variant.id}
+                    //  callback={(url) => {
+                    //    setProductVariants((prev) =>
+                    //      prev.map((v) =>
+                    //        // if the id is the same as the variant id or if its selected
+                    //        v.id === variant.id ||
+                    //        selectedVariants.includes(v.id)
+                    //          ? { ...v, image: url }
+                    //          : v,
+                    //      ),
+                    //    );
+                    //  }}
+                    //>
+                    <FilesystemExplorer
                       callback={(url) => {
                         setProductVariants((prev) =>
                           prev.map((v) =>
@@ -229,8 +253,9 @@ const ProductVariantsCard = ({}: { saveProduct: () => void }) => {
                         height={60}
                         className="rounded-md w-14 object-contain h-14 p-1 bg-slate-50 border"
                       />
-                    </UploadImageProvider>
+                    </FilesystemExplorer>
                   ) : (
+                    //</UploadImageProvider>
                     <Image
                       src={
                         //variant.image ? `${variant.image}?${Math.random()}` : ""

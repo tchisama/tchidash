@@ -31,6 +31,7 @@ import UploadImageProvider from "@/components/UploadImageProvider";
 import { v4 } from "uuid";
 import { ImageCard } from "./ImageCard";
 import { FolderCard } from "./FolderCard";
+import FilesystemExplorer from "@/components/FilesystemExplorer";
 
 export default function FilesystemInterface({
   folderId,
@@ -201,6 +202,7 @@ export default function FilesystemInterface({
               <Upload className="mr-2 h-4 w-4" /> Upload Image
             </span>
           </UploadImageProvider>
+          <FilesystemExplorer />
         </div>
       </div>
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7">

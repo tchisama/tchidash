@@ -9,10 +9,10 @@ import {
 import Image from "next/image";
 import Photo from "@/public/images/svgs/icons/photo.svg";
 import { Upload, X } from "lucide-react";
-import UploadImageProvider from "@/components/UploadImageProvider";
 import { useProducts } from "@/store/products";
 import { Product } from "@/types/product";
 import { Button } from "@/components/ui/button";
+import FilesystemExplorer from "@/components/FilesystemExplorer";
 
 const ProductImagesCard = () => {
   const { setCurrentProduct, currentProduct } = useProducts();
@@ -31,11 +31,26 @@ const ProductImagesCard = () => {
             <div className="grid grid-cols-3 gap-2 overflow-hidden ">
               <ImageView index={1} />
               <ImageView index={2} />
-              <UploadImageProvider
-                folder="products"
-                name={
-                  "product-" + currentProduct.id + "-image-" + Math.random()
-                }
+              {
+                //<UploadImageProvider
+                //  folder="products"
+                //  name={
+                //    "product-" + currentProduct.id + "-image-" + Math.random()
+                //  }
+                //  callback={(url) => {
+                //    if (!currentProduct) return;
+                //    setCurrentProduct({
+                //      ...currentProduct,
+                //      images: [...(currentProduct.images ?? []), url],
+                //    } as Product);
+                //  }}
+                //>
+                //  <div className="w-full h-full flex justify-center items-center bg-slate-50 border border-dashed rounded-md">
+                //    <Upload className="h-4 w-4 text-muted-foreground" />
+                //  </div>
+                //</UploadImageProvider>
+              }
+              <FilesystemExplorer
                 callback={(url) => {
                   if (!currentProduct) return;
                   setCurrentProduct({
@@ -44,10 +59,12 @@ const ProductImagesCard = () => {
                   } as Product);
                 }}
               >
-                <div className="w-full h-full flex justify-center items-center bg-slate-50 border border-dashed rounded-md">
-                  <Upload className="h-4 w-4 text-muted-foreground" />
-                </div>
-              </UploadImageProvider>
+                {
+                  <div className="w-full h-full flex justify-center items-center bg-slate-50 border border-dashed rounded-md">
+                    <Upload className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                }
+              </FilesystemExplorer>
             </div>
           </div>
         </CardContent>

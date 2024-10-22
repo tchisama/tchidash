@@ -1,5 +1,6 @@
 "use client";
 
+import { OrdersDonutChart } from "./OrdersDonutChart";
 //import {
 //  Area,
 //  AreaChart,
@@ -37,8 +38,9 @@ import OrdersGraph from "./OrdersGraph";
 
 export default function page() {
   return (
-    <div>
+    <div className="flex gap-4">
       <OrdersGraph />
+      <OrdersDonutChart />
     </div>
   );
 }

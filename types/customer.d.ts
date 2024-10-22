@@ -32,4 +32,5 @@ export interface Customer {
   dateOfBirth?: Date;
   totalAmountSpent?: number;
   storeId: string;
+  profilePicture?: string;
 }

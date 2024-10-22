@@ -6,7 +6,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { deleteObject, getStorage, ref } from "firebase/storage";
+import {
+  deleteObject,
+  getDownloadURL,
+  getStorage,
+  ref,
+} from "firebase/storage";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,7 +20,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Trash } from "lucide-react";
+import { Download, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DotsVerticalIcon } from "@radix-ui/react-icons";
 import { deleteDoc, doc } from "firebase/firestore";
@@ -26,7 +31,7 @@ const storage = getStorage();
 
 export const ImageCard = ({ item }: { item: FileSystemItem }) => {
   const queryClient = useQueryClient();
-  const deteImage = () => {
+  const deleteImage = () => {
     if (item.type === "folder") return;
     const ImageRef = ref(storage, item.storagePath);
     deleteObject(ImageRef)
@@ -44,6 +49,21 @@ export const ImageCard = ({ item }: { item: FileSystemItem }) => {
         console.error("Error removing image: ", error);
       });
   };
+  const downloadImage = () => {
+    if (item.type === "folder") return;
+
+    const imageRef = ref(storage, item.storagePath);
+
+    getDownloadURL(imageRef)
+      .then((url) => {
+        // Create an anchor element to trigger the download
+        window.open(url, "_blank");
+      })
+      .catch((error) => {
+        console.error("Error downloading image: ", error);
+      });
+  };
+
   return (
     item.type === "image" && (
       <Popover>
@@ -74,7 +94,7 @@ export const ImageCard = ({ item }: { item: FileSystemItem }) => {
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      deteImage();
+                      deleteImage();
                     }}
                     className="flex gap-2"
                   >
@@ -82,7 +102,17 @@ export const ImageCard = ({ item }: { item: FileSystemItem }) => {
                     Delete
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>Download</DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      downloadImage();
+                    }}
+                    className="flex gap-2"
+                  >
+                    <Download className="h-4 w-4" />
+                    Download
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </CardContent>
