@@ -12,14 +12,7 @@ import { Input } from "@/components/ui/input";
 import ChooseProductWithVariant from "./ChooseProductWithVariant";
 import { PlusCircle, X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import {
-  and,
-  collection,
-  getDocs,
-  query,
-  Timestamp,
-  where,
-} from "firebase/firestore";
+import { and, collection, query, Timestamp, where } from "firebase/firestore";
 import { db } from "@/firebase";
 import { useStore } from "@/store/storeInfos";
 import { cn } from "@/lib/utils";
@@ -31,6 +24,7 @@ import {
   InventoryMoveType,
 } from "@/types/inventory";
 import { v4 } from "uuid";
+import { dbGetDocs } from "@/lib/dbFuntions/fbFuns";
 
 function ItemsTable() {
   const { purchaseOrderItmes, setPurchaseOrderItems } = usePurchaseOrderStore();
@@ -112,7 +106,8 @@ const ItemRow = ({ item }: { item: InventoryItemMove }) => {
         collection(db, "products"),
         and(where("storeId", "==", storeId), where("status", "==", "active")),
       );
-      const response = getDocs(q).then((response) =>
+      if (!storeId) return;
+      const response = dbGetDocs(q, storeId, "").then((response) =>
         response.docs.map((doc) => ({ ...doc.data(), id: doc.id }) as Product),
       );
       return response;

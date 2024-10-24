@@ -22,6 +22,7 @@ import { useRouter } from "next/navigation";
 import useClean from "@/hooks/useClean";
 import { DashboardCommand } from "./Command";
 import BottomBar from "./BottomBar";
+import { useStore } from "@/store/storeInfos";
 
 export const description =
   "An orders dashboard with a sidebar navigation. The sidebar has icon navigation. The content area has a breadcrumb and search in the header. The main area has a list of recent orders with a filter and export button. The main area also has a detailed view of a single order with order details, shipping information, billing information, customer information, and payment information.";
@@ -35,6 +36,7 @@ export default function DashboardUiProvider({
   const router = useRouter();
   const { cleanAll } = useClean();
   const { actions } = useNavbar();
+  const { setStoreId } = useStore();
   return (
     <div className="flex min-h-screen w-full  bg-muted">
       {/*
@@ -93,7 +95,12 @@ export default function DashboardUiProvider({
                 Support
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => signOut()}>
+              <DropdownMenuItem
+                onClick={() => {
+                  setStoreId("");
+                  signOut();
+                }}
+              >
                 <Image src={Logout} alt="Logout" className="mr-2 h-5 w-5" />
                 Logout
               </DropdownMenuItem>

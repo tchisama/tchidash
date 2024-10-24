@@ -12,7 +12,7 @@ import { db } from "@/firebase";
 import { useStore } from "@/store/storeInfos";
 import { Employee, Store } from "@/types/store";
 import { useQuery } from "@tanstack/react-query";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import {
   Popover,
@@ -23,6 +23,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { v4 } from "uuid";
 import { useSession } from "next-auth/react";
+import { dbGetDoc, dbUpdateDoc } from "@/lib/dbFuntions/fbFuns";
 
 const accesses = [
   {
@@ -66,8 +67,9 @@ const Emplyies = () => {
     queryKey: ["store", storeId],
     queryFn: async () => {
       if (!storeId) return null;
-      const store: Store = await getDoc(doc(db, "stores", storeId)).then(
+      const store: Store = await dbGetDoc(doc(db, "stores"), storeId, "").then(
         (doc) => {
+          if (!doc) return {} as Store;
           return { ...doc.data(), id: doc.id } as Store;
         },
       );
@@ -97,13 +99,18 @@ const Emplyies = () => {
       id: v4(),
     };
 
-    updateDoc(doc(db, "stores", storeId), {
-      employees: [...(store?.employees || []), uploadedEmployee],
-      employeesEmails: [
-        ...(store?.employeesEmails || []),
-        uploadedEmployee.email,
-      ],
-    } as Store).then(() => {
+    dbUpdateDoc(
+      doc(db, "stores", storeId),
+      {
+        employees: [...(store?.employees || []), uploadedEmployee],
+        employeesEmails: [
+          ...(store?.employeesEmails || []),
+          uploadedEmployee.email,
+        ],
+      },
+      storeId,
+      "",
+    ).then(() => {
       setSaved(true);
       setNewEmployee({
         name: "",
@@ -258,11 +265,16 @@ const UpdateAccesses = ({
               if (!storeId) return;
               if (!store) return;
               if (!store.employees) return;
-              updateDoc(doc(db, "stores", storeId), {
-                employees: store.employees.map((e) =>
-                  e.id === employee.id ? updatedEmployee : e,
-                ),
-              });
+              dbUpdateDoc(
+                doc(db, "stores", storeId),
+                {
+                  employees: store.employees.map((e) =>
+                    e.id === employee.id ? updatedEmployee : e,
+                  ),
+                },
+                storeId,
+                "",
+              );
             }}
             variant="ghost"
             key={access.key}

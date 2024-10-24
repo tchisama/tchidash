@@ -17,10 +17,8 @@ import {
   and,
   collection,
   doc,
-  getDocs,
   query,
   Timestamp,
-  updateDoc,
   where,
 } from "firebase/firestore";
 import { db } from "@/firebase";
@@ -33,6 +31,7 @@ import { useNavbar } from "@/store/navbar";
 import { toast } from "@/hooks/use-toast";
 import ProductDynamicVariantsImages from "./components/ProductDynamicVariantsImages";
 import ProductDiscount from "./components/ProductDiscount";
+import { dbGetDocs, dbUpdateDoc } from "@/lib/dbFuntions/fbFuns";
 
 function Page({ params }: { params: { product: string } }) {
   const {
@@ -58,7 +57,8 @@ function Page({ params }: { params: { product: string } }) {
         ),
       );
       if (productId == "new") return null;
-      const response = await getDocs(q);
+      if (!storeId) return;
+      const response = await dbGetDocs(q, storeId, "");
       console.log(response.docs[0].data());
       if (response.docs.length === 0) return null;
       const productData = {
@@ -86,10 +86,16 @@ function Page({ params }: { params: { product: string } }) {
     // Check if all the required fields are present
     if (title && price) {
       // Update an existing product
-      updateDoc(doc(db, "products", currentProduct.id), {
-        ...currentProduct,
-        updatedAt: Timestamp.now(),
-      });
+      if (!storeId) return;
+      dbUpdateDoc(
+        doc(db, "products", currentProduct.id),
+        {
+          ...currentProduct,
+          updatedAt: Timestamp.now(),
+        },
+        storeId,
+        "",
+      );
       setLastUploadedProduct(currentProduct);
       setProducts(
         products.map((p) => (p.id === currentProduct.id ? currentProduct : p)),
@@ -117,34 +123,6 @@ function Page({ params }: { params: { product: string } }) {
       `/dashboard/products/${currentProduct?.title.replaceAll(" ", "_")}`,
     );
   }, [lastUploadedProduct, currentProduct, setLastUploadedProduct]);
-
-  //useEffect(() => {
-  //  const handleScroll = () => {
-  //    // Check if scroll position is greater than 100px
-  //    if (window.scrollY > 80) {
-  //      setActions([
-  //        <>
-  //          {!areProductsEqual && (
-  //            <Button size="sm" onClick={saveProduct}>
-  //              Save Product
-  //            </Button>
-  //          )}
-  //        </>,
-  //      ]);
-  //    } else {
-  //      // If scroll is less than 100px, clear actions
-  //      setActions([]);
-  //    }
-  //  };
-  //
-  //  // Attach scroll event listener
-  //  window.addEventListener("scroll", handleScroll);
-  //
-  //  // Clean up the event listener on component unmount
-  //  return () => {
-  //    window.removeEventListener("scroll", handleScroll);
-  //  };
-  //}, [areProductsEqual, currentProduct]);
 
   const [preProduct, setPreProduct] = React.useState<Product | null>(null);
   const [nextProduct, setNextProduct] = React.useState<Product | null>(null);

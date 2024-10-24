@@ -15,12 +15,13 @@ import ChooseProductWithVariant from "./ChooseProductWithVariant";
 import { getTotalPriceFromItem } from "@/lib/orders";
 import { PlusCircle, X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { and, collection, getDocs, query, where } from "firebase/firestore";
+import { and, collection, query, where } from "firebase/firestore";
 import { db } from "@/firebase";
 import { useStore } from "@/store/storeInfos";
 import { cn } from "@/lib/utils";
 import { Product } from "@/types/product";
 import { getStock } from "@/lib/fetchs/stock";
+import { dbGetDocs } from "@/lib/dbFuntions/fbFuns";
 
 function ItemsTable() {
   const { newOrder, setNewOrder } = useOrderStore();
@@ -95,7 +96,8 @@ const ItemRow = ({ item }: { item: OrderItem }) => {
         collection(db, "products"),
         and(where("storeId", "==", storeId), where("status", "==", "active")),
       );
-      const response = getDocs(q).then((response) =>
+      if (!storeId) return;
+      const response = dbGetDocs(q, storeId, "").then((response) =>
         response.docs.map((doc) => ({ ...doc.data(), id: doc.id }) as Product),
       );
       return response;

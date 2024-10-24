@@ -1,5 +1,5 @@
-"use client"
-import React from 'react'
+"use client";
+import React from "react";
 import {
   Table,
   TableBody,
@@ -8,30 +8,50 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { collection, getDocs, query } from 'firebase/firestore'
-import { Review } from '@/types/reviews'
-import { db } from '@/firebase'
-import { useQuery } from '@tanstack/react-query'
-import CreateReviewDialog from './components/CreateReviewDialog'
+} from "@/components/ui/table";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { collection, query, where } from "firebase/firestore";
+import { Review } from "@/types/reviews";
+import { db } from "@/firebase";
+import { useQuery } from "@tanstack/react-query";
+import CreateReviewDialog from "./components/CreateReviewDialog";
+import { useStore } from "@/store/storeInfos";
+import { dbGetDocs } from "@/lib/dbFuntions/fbFuns";
 
 export default function Page() {
-  const { data: reviews, isLoading, error } = useQuery({
+  const { storeId } = useStore();
+  const {
+    data: reviews,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["reviews"],
     queryFn: async () => {
-      const q = query(collection(db, "reviews"));
-      const response = await getDocs(q);
-      const data = response.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id,
-      } as Review));
+      const q = query(
+        collection(db, "reviews"),
+        where("storeId", "==", storeId),
+      );
+      if (!storeId) return;
+      const response = await dbGetDocs(q, storeId, "");
+      const data = response.docs.map(
+        (doc) =>
+          ({
+            ...doc.data(),
+            id: doc.id,
+          }) as Review,
+      );
       return data;
-    }
+    },
   });
 
   if (error) {
-    return <div className='text-red-500'>Error: {error.message}</div>;
+    return <div className="text-red-500">Error: {error.message}</div>;
   }
   if (isLoading) {
     return <div>Loading...</div>;
@@ -47,12 +67,9 @@ export default function Page() {
       <Card>
         <CardHeader>
           <CardTitle>Customer Reviews</CardTitle>
-          <CardDescription>
-            View all customer reviews
-          </CardDescription>
+          <CardDescription>View all customer reviews</CardDescription>
         </CardHeader>
         <CardContent>
-
           <Table>
             <TableCaption>Customer Reviews</TableCaption>
             <TableHeader>
@@ -65,8 +82,7 @@ export default function Page() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {
-                reviews &&
+              {reviews &&
                 reviews.map((review: Review) => (
                   <TableRow key={review.id}>
                     <TableCell>{review.reviewerName}</TableCell>
@@ -76,19 +92,27 @@ export default function Page() {
                       {review.images && review.images.length > 0 ? (
                         <div className="flex space-x-2">
                           {review.images.map((image, index) => (
-                            <img key={index} src={image} alt="review" className="w-16 h-16 object-cover" />
+                            <img
+                              key={index}
+                              src={image}
+                              alt="review"
+                              className="w-16 h-16 object-cover"
+                            />
                           ))}
                         </div>
-                      ) : "N/A"}
+                      ) : (
+                        "N/A"
+                      )}
                     </TableCell>
-                    <TableCell>{review.createdAt.toDate().toLocaleString()}</TableCell>
+                    <TableCell>
+                      {review.createdAt.toDate().toLocaleString()}
+                    </TableCell>
                   </TableRow>
-                ))
-              }
+                ))}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
     </>
-  )
+  );
 }

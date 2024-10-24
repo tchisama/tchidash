@@ -48,11 +48,11 @@ const chartConfig = {
   },
   cancelled: {
     label: "Cancelled",
-    color: "#e63946",
+    color: "#f8961e",
   },
   returned: {
     label: "Returned",
-    color: "#f8961e",
+    color: "#e63946",
   },
 } satisfies ChartConfig;
 

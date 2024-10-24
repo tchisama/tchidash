@@ -43,19 +43,23 @@ import {
 import Image from "next/image";
 import CustomerShield from "./CustomerShield";
 import { db } from "@/firebase";
-import { deleteDoc, doc } from "firebase/firestore";
+import { doc } from "firebase/firestore";
 import QRCode from "react-qr-code";
 import { AnimatePresence, motion } from "framer-motion";
+import { dbDeleteDoc } from "@/lib/dbFuntions/fbFuns";
+import { useStore } from "@/store/storeInfos";
 function OrderView() {
   const { currentOrder, setCurrentOrder } = useOrderStore();
+  const { storeId } = useStore();
 
   const deleteOrder = async (orderId: string) => {
     if (!currentOrder) return;
     if (
       ["cancelled", "returned", "pending"].includes(currentOrder.orderStatus)
     ) {
-      deleteDoc(doc(db, "orders", orderId));
-      deleteDoc(doc(db, "sales", orderId));
+      if (!storeId) return;
+      dbDeleteDoc(doc(db, "orders", orderId), storeId, "");
+      dbDeleteDoc(doc(db, "sales", orderId), storeId, "");
       setCurrentOrder("");
       return;
     } else {

@@ -15,11 +15,8 @@ import {
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useStore } from "@/store/storeInfos";
 import {
-  addDoc,
   collection,
-  deleteDoc,
   doc,
-  getDocs,
   orderBy,
   query,
   Timestamp,
@@ -31,7 +28,7 @@ import UploadImageProvider from "@/components/UploadImageProvider";
 import { v4 } from "uuid";
 import { ImageCard } from "./ImageCard";
 import { FolderCard } from "./FolderCard";
-import FilesystemExplorer from "@/components/FilesystemExplorer";
+import { dbAddDoc, dbDeleteDoc, dbGetDocs } from "@/lib/dbFuntions/fbFuns";
 
 export default function FilesystemInterface({
   folderId,
@@ -50,7 +47,8 @@ export default function FilesystemInterface({
         where("parentFolderId", "==", folderId ?? "/"),
         orderBy("createdAt"),
       );
-      const snapshot = await getDocs(q);
+      if (!storeId) return [];
+      const snapshot = await dbGetDocs(q, storeId, "");
       const data: FileSystemItem[] = [];
       snapshot.forEach((doc) => {
         data.push({ ...(doc.data() as FileSystemItem), id: doc.id });
@@ -75,7 +73,12 @@ export default function FilesystemInterface({
       type: "folder",
     };
 
-    const docRef = await addDoc(collection(db, "filesystem"), newFolder);
+    const docRef = await dbAddDoc(
+      collection(db, "filesystem"),
+      newFolder,
+      storeId,
+      "",
+    );
     const addedFolder = { ...newFolder, id: docRef.id };
 
     queryClient.setQueryData(
@@ -114,7 +117,12 @@ export default function FilesystemInterface({
       type: "image",
     };
 
-    const docRef = await addDoc(collection(db, "filesystem"), newImage);
+    const docRef = await dbAddDoc(
+      collection(db, "filesystem"),
+      newImage,
+      storeId,
+      "",
+    );
     const addedImage = { ...newImage, id: docRef.id };
 
     queryClient.setQueryData(
@@ -131,7 +139,9 @@ export default function FilesystemInterface({
 
   const deleteItem = (id: string) => {
     if (window.confirm("Are you sure you want to delete this item?")) {
-      deleteDoc(doc(db, "filesystem", id));
+      //deleteDoc(doc(db, "filesystem", id));
+      if (!storeId) return;
+      dbDeleteDoc(doc(db, "filesystem", id), storeId, "");
       queryClient.setQueryData(
         ["filesystem", storeId, folderId],
         (oldData: FileSystemItem[] | undefined) => {
@@ -202,7 +212,6 @@ export default function FilesystemInterface({
               <Upload className="mr-2 h-4 w-4" /> Upload Image
             </span>
           </UploadImageProvider>
-          <FilesystemExplorer />
         </div>
       </div>
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7">

@@ -23,20 +23,23 @@ import {
 import { Download, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DotsVerticalIcon } from "@radix-ui/react-icons";
-import { deleteDoc, doc } from "firebase/firestore";
+import { doc } from "firebase/firestore";
 import { db } from "@/firebase";
 import { useQueryClient } from "@tanstack/react-query";
+import { dbDeleteDoc } from "@/lib/dbFuntions/fbFuns";
+import { useStore } from "@/store/storeInfos";
 
 const storage = getStorage();
 
 export const ImageCard = ({ item }: { item: FileSystemItem }) => {
+  const { storeId } = useStore();
   const queryClient = useQueryClient();
   const deleteImage = () => {
     if (item.type === "folder") return;
     const ImageRef = ref(storage, item.storagePath);
     deleteObject(ImageRef)
       .then(() => {
-        deleteDoc(doc(db, "filesystem", item.id));
+        dbDeleteDoc(doc(db, "filesystem", item.id), storeId, "");
         queryClient.setQueryData(
           ["filesystem", item.storeId, item.parentFolderId],
           (oldData: FileSystemItem[] | undefined) => {

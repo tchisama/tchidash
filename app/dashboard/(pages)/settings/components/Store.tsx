@@ -23,10 +23,11 @@ import { Textarea } from "@/components/ui/textarea";
 import UploadImageProvider from "@/components/UploadImageProvider";
 import { db } from "@/firebase";
 import { useToast } from "@/hooks/use-toast";
+import { dbGetDoc, dbUpdateDoc } from "@/lib/dbFuntions/fbFuns";
 import { currencyOptions, useStore } from "@/store/storeInfos";
 import { Store } from "@/types/store";
 import { useQuery } from "@tanstack/react-query";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc } from "firebase/firestore";
 import { CheckCircle } from "lucide-react";
 import Image from "next/image";
 
@@ -38,11 +39,14 @@ const StoreDetailsCard = () => {
     queryKey: ["store", storeId],
     queryFn: async () => {
       if (!storeId) return null;
-      const store: Store = await getDoc(doc(db, "stores", storeId)).then(
-        (doc) => {
-          return { ...doc.data(), id: doc.id } as Store;
-        },
-      );
+      const store: Store = await dbGetDoc(
+        doc(db, "stores", storeId),
+        storeId,
+        "",
+      ).then((doc) => {
+        if (!doc) return {} as Store;
+        return { ...doc.data(), id: doc.id } as Store;
+      });
       return store;
     },
     refetchOnWindowFocus: false,
@@ -76,7 +80,7 @@ const StoreDetailsCard = () => {
       description: storeDescription,
     };
 
-    updateDoc(doc(db, "stores", storeId), newStore).then(() => {
+    dbUpdateDoc(doc(db, "stores", storeId), newStore, storeId, "").then(() => {
       setSaved(true);
     });
     toast({

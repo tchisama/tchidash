@@ -18,10 +18,11 @@ import {
   UserCheck,
 } from "lucide-react";
 import { Order } from "@/types/order";
-import { doc, setDoc, Timestamp, updateDoc } from "firebase/firestore";
+import { doc, Timestamp } from "firebase/firestore";
 import { db } from "@/firebase";
 import { useOrderStore } from "@/store/orders";
 import { v4 } from "uuid";
+import { dbSetDoc, dbUpdateDoc } from "@/lib/dbFuntions/fbFuns";
 
 export type OrderStatus =
   | "pending"
@@ -56,12 +57,12 @@ export const orderStatusValuesWithIcon = [
   {
     name: "cancelled",
     icon: <PackageX className="h-4 w-4" />,
-    color: "#e63946",
+    color: "#f8961e",
   },
   {
     name: "returned",
     icon: <Undo className="h-4 w-4" />,
-    color: "#f8961e",
+    color: "#e63946",
   },
 ];
 
@@ -130,10 +131,15 @@ export function StateChanger({
                 onClick={async () => {
                   setActionLoading(true);
                   setState(status.name as OrderStatus);
-                  await updateDoc(doc(db, "orders", order.id), {
-                    ...order,
-                    orderStatus: status.name as OrderStatus,
-                  });
+                  await dbUpdateDoc(
+                    doc(db, "orders", order.id),
+                    {
+                      ...order,
+                      orderStatus: status.name as OrderStatus,
+                    },
+                    order.storeId,
+                    "",
+                  );
                   await updateStockOfProductsBasedOnStatus(
                     status.name as OrderStatus,
                     order.orderStatus,
@@ -178,13 +184,18 @@ const updateStockOfProductsBasedOnStatus = async (
   //
   //
 
-  setDoc(doc(db, "sales", order.id), {
-    phoneNumber: order.customer.phoneNumber,
-    totalPrice: order.totalPrice,
-    status,
-    storeId: order.storeId,
-    createdAt: order.createdAt,
-  });
+  dbSetDoc(
+    doc(db, "sales", order.id),
+    {
+      phoneNumber: order.customer.phoneNumber,
+      totalPrice: order.totalPrice,
+      status,
+      storeId: order.storeId,
+      createdAt: order.createdAt,
+    },
+    order.storeId,
+    "",
+  );
 
   if (
     (oldStatus === "pending" ||
@@ -194,26 +205,31 @@ const updateStockOfProductsBasedOnStatus = async (
   ) {
     // Decrease stock based on the order items
     for (const item of products) {
-      setDoc(doc(db, "inventoryItems", order.id + item.id), {
-        id: "",
-        productId: item.productId,
-        variantId: item?.variantId,
-        title: item.title,
-        createdAt: Timestamp.now(),
-        updatedAt: Timestamp.now(),
-        quantity: -item.quantity,
-        storeId: order.storeId,
-        imageUrl: item.imageUrl,
-        cost: item.totalPrice,
-        unitPrice: item.price,
-        vendorId: "",
-        orderId: order.id,
-        note: "",
-        createdById: order.customer.name,
-        type: "OUT",
-        status: "APPROVED",
-        referenceNumber: "SO-" + v4().substring(0, 8),
-      });
+      dbSetDoc(
+        doc(db, "inventoryItems", order.id + item.id),
+        {
+          id: "",
+          productId: item.productId,
+          variantId: item?.variantId,
+          title: item.title,
+          createdAt: Timestamp.now(),
+          updatedAt: Timestamp.now(),
+          quantity: -item.quantity,
+          storeId: order.storeId,
+          imageUrl: item.imageUrl,
+          cost: item.totalPrice,
+          unitPrice: item.price,
+          vendorId: "",
+          orderId: order.id,
+          note: "",
+          createdById: order.customer.name,
+          type: "OUT",
+          status: "APPROVED",
+          referenceNumber: "SO-" + v4().substring(0, 8),
+        },
+        order.storeId,
+        "",
+      );
     }
   }
 
@@ -226,7 +242,7 @@ const updateStockOfProductsBasedOnStatus = async (
   ) {
     // Restore stock based on the order items
     for (const item of products) {
-      setDoc(doc(db, "inventoryItems", order.id + item.id), {
+      const inventoryItem = {
         id: "",
         productId: item.productId,
         variantId: item?.variantId,
@@ -245,7 +261,13 @@ const updateStockOfProductsBasedOnStatus = async (
         type: "OUT",
         status: "REJECTED",
         referenceNumber: "SO-" + v4().substring(0, 8),
-      });
+      };
+      dbSetDoc(
+        doc(db, "inventoryItems", order.id + item.id),
+        inventoryItem,
+        order.storeId,
+        "",
+      );
     }
   }
 };

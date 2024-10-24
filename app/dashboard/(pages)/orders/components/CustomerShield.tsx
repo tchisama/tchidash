@@ -8,8 +8,9 @@ import Shield from "@/public/images/svgs/icons/shield.svg";
 import Image from "next/image";
 import { useStore } from "@/store/storeInfos";
 import { useQuery } from "@tanstack/react-query";
-import { query, where, and, collection, getDocs } from "firebase/firestore";
+import { query, where, and, collection } from "firebase/firestore";
 import { db } from "@/firebase";
+import { dbGetDocs } from "@/lib/dbFuntions/fbFuns";
 
 function CustomerShield({
   number,
@@ -30,7 +31,8 @@ function CustomerShield({
         ),
       );
 
-      const querySnapshot = await getDocs(q);
+      if (!storeId) return;
+      const querySnapshot = await dbGetDocs(q, storeId, "");
 
       // Extract only the orderStatus from each document
       const orderStatuses = querySnapshot.docs.map((doc) => doc.data().status);

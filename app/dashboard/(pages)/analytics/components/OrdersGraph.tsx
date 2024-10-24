@@ -22,15 +22,10 @@ import {
   YAxis,
 } from "recharts";
 import { useQuery } from "@tanstack/react-query";
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-  Timestamp,
-} from "firebase/firestore";
+import { collection, query, where, Timestamp } from "firebase/firestore";
 import { db } from "@/firebase";
 import { useStore } from "@/store/storeInfos";
+import { dbGetDocs } from "@/lib/dbFuntions/fbFuns";
 
 function OrdersGraph() {
   // start date is 30 days before
@@ -54,7 +49,8 @@ function OrdersGraph() {
         where("createdAt", ">=", Timestamp.fromDate(startDate)),
         where("createdAt", "<=", Timestamp.fromDate(endDate)),
       );
-      const querySnapshot = await getDocs(q);
+      if (!storeId) return;
+      const querySnapshot = await dbGetDocs(q, storeId, "");
       let ordersData: {
         [key: string]: number;
       } = {};

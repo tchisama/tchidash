@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/table";
 import Photo from "@/public/images/svgs/icons/photo.svg";
 import Link from "next/link";
-import { addDoc, collection, updateDoc, doc } from "firebase/firestore";
+import { collection, doc } from "firebase/firestore";
 import { useProducts } from "@/store/products";
 import { db } from "@/firebase";
 import { Product, Variant } from "@/types/product";
@@ -38,12 +38,13 @@ import { uniqueId } from "lodash";
 import { useStore } from "@/store/storeInfos";
 import { getStock } from "@/lib/fetchs/stock";
 import { useQuery } from "@tanstack/react-query";
+import { dbAddDoc, dbUpdateDoc } from "@/lib/dbFuntions/fbFuns";
 
 const ProductLine = ({ product }: { product: Product }) => {
   const [showVariants, setShowVariants] = useState(false);
   const { setCurrentProduct, setLastUploadedProduct, setProducts, products } =
     useProducts();
-  const { store } = useStore();
+  const { store, storeId } = useStore();
   const router = useRouter();
 
   const toggleVariants = () => {
@@ -56,15 +57,22 @@ const ProductLine = ({ product }: { product: Product }) => {
       title: product.title + " copy",
       id: uniqueId(),
     };
+    if (!storeId) return;
     setProducts([...products, newProduct]);
-    addDoc(collection(db, "products"), newProduct);
+    dbAddDoc(collection(db, "products"), newProduct, storeId, "");
   };
 
   const archiveProduct = () => {
-    updateDoc(doc(db, "products", product.id), {
-      ...product,
-      status: "archived",
-    });
+    if (!storeId) return;
+    dbUpdateDoc(
+      doc(db, "products", product.id),
+      {
+        ...product,
+        status: "archived",
+      },
+      storeId,
+      "",
+    );
     setProducts(
       products.map((p) =>
         p.id === product.id ? { ...product, status: "archived" } : p,
@@ -73,7 +81,8 @@ const ProductLine = ({ product }: { product: Product }) => {
   };
 
   const deleteProduct = () => {
-    updateDoc(doc(db, "products", product.id), {
+    if (!storeId) return;
+    dbUpdateDoc(doc(db, "products", product.id), {
       ...product,
       status: "deleted",
     });

@@ -8,7 +8,7 @@ import { AlertCircle } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-import { addDoc, collection, doc, setDoc, Timestamp } from "firebase/firestore";
+import { collection, doc, Timestamp } from "firebase/firestore";
 import ItemsTable from "./components/ItemsTable";
 import { useRouter } from "next/navigation";
 import { useStore } from "@/store/storeInfos";
@@ -23,6 +23,7 @@ import {
 import { usePurchaseOrderStore } from "@/store/purchase";
 import { db } from "@/firebase";
 import { v4 } from "uuid";
+import { dbAddDoc, dbSetDoc } from "@/lib/dbFuntions/fbFuns";
 
 // Default canvas for a new order
 const defaultPurchaseOrder: PurchaseOrder = {
@@ -74,16 +75,22 @@ export default function CreateOrder() {
       return;
     }
 
+    if (!storeId) return;
     purchaseOrderItmes.forEach(async (item) => {
-      await setDoc(doc(db, "inventoryItems", item.id), {
-        ...item,
-        storeId: storeId,
-        vendorId: currentPurchaseOrder.vendorId,
-        createdById: session?.user?.email,
-        createdAt: Timestamp.now(),
-        updatedAt: Timestamp.now(),
-        cost: item.unitPrice * item.quantity,
-      });
+      await dbSetDoc(
+        doc(db, "inventoryItems", item.id),
+        {
+          ...item,
+          storeId: storeId,
+          vendorId: currentPurchaseOrder.vendorId,
+          createdById: session?.user?.email,
+          createdAt: Timestamp.now(),
+          updatedAt: Timestamp.now(),
+          cost: item.unitPrice * item.quantity,
+        },
+        storeId,
+        "",
+      );
     });
     const purchaseForUpload = {
       ...currentPurchaseOrder,
@@ -103,10 +110,15 @@ export default function CreateOrder() {
         (item: InventoryItemMove) => item.id,
       ),
     };
-    const order = await addDoc(collection(db, "purchaseOrders"), {
-      ...purchaseForUpload,
-      referenceNumber: "PO-" + v4().substring(0, 8),
-    });
+    const order = await dbAddDoc(
+      collection(db, "purchaseOrders"),
+      {
+        ...purchaseForUpload,
+        referenceNumber: "PO-" + v4().substring(0, 8),
+      },
+      storeId,
+      "",
+    );
 
     if (order) {
       toast({

@@ -29,21 +29,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  addDoc,
-  and,
-  collection,
-  getDocs,
-  query,
-  Timestamp,
-  where,
-} from "firebase/firestore";
+import { and, collection, query, Timestamp, where } from "firebase/firestore";
 import { useProducts } from "@/store/products";
 import { useQuery } from "@tanstack/react-query";
 import { db } from "@/firebase";
 import { Product } from "@/types/product";
 import { useStore } from "@/store/storeInfos";
 import { ProductLine } from "./components/ProductLine";
+import { dbAddDoc, dbGetDocs } from "@/lib/dbFuntions/fbFuns";
 // Sample product data
 
 export default function Page() {
@@ -56,7 +49,8 @@ export default function Page() {
         collection(db, "products"),
         and(where("storeId", "==", storeId), where("status", "!=", "deleted")),
       );
-      const response = await getDocs(q);
+      if (!storeId) return;
+      const response = await dbGetDocs(q, storeId, "");
       const data = response.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
@@ -105,11 +99,14 @@ export default function Page() {
       canBeSaled: true,
       variantsAreOneProduct: false,
     };
-    addDoc(collection(db, "products"), newProduct).then((docRef) => {
-      setCurrentProduct({ ...newProduct, id: docRef.id } as Product);
-      setProducts([...products, { ...newProduct, id: docRef.id } as Product]);
-      router.push(`/dashboard/products/${productName.replaceAll(" ", "_")}`);
-    });
+    if (!storeId) return;
+    dbAddDoc(collection(db, "products"), newProduct, storeId, "").then(
+      (docRef) => {
+        setCurrentProduct({ ...newProduct, id: docRef.id } as Product);
+        setProducts([...products, { ...newProduct, id: docRef.id } as Product]);
+        router.push(`/dashboard/products/${productName.replaceAll(" ", "_")}`);
+      },
+    );
   };
 
   return (

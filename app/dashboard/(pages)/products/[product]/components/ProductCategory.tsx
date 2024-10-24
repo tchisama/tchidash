@@ -10,14 +10,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/store/storeInfos";
-import {
-  addDoc,
-  and,
-  collection,
-  getDocs,
-  query,
-  where,
-} from "firebase/firestore";
+import { and, collection, query, where } from "firebase/firestore";
 import { db } from "@/firebase";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -25,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { ProductCategory } from "@/types/categories";
 import { useCategories } from "@/store/categories";
 import { useProducts } from "@/store/products";
+import { dbAddDoc, dbGetDocs } from "@/lib/dbFuntions/fbFuns";
 
 const ProductCategoryCard = () => {
   const { storeId } = useStore();
@@ -35,7 +29,8 @@ const ProductCategoryCard = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ["categories", storeId],
     queryFn: async () => {
-      const response = await getDocs(
+      if (!storeId) return;
+      const response = await dbGetDocs(
         query(
           collection(db, "categories"),
           and(
@@ -43,6 +38,8 @@ const ProductCategoryCard = () => {
             where("motherCategory", "==", ""),
           ),
         ),
+        storeId,
+        "",
       );
       return response.docs.map(
         (doc) =>
@@ -85,11 +82,17 @@ const ProductCategoryCard = () => {
                 <Label htmlFor="category">Category</Label>
                 <Button
                   onClick={() => {
-                    addDoc(collection(db, "categories"), {
-                      name: categoryInputName,
+                    if (!storeId) return;
+                    dbAddDoc(
+                      collection(db, "categories"),
+                      {
+                        name: categoryInputName,
+                        storeId,
+                        motherCategory: "",
+                      },
                       storeId,
-                      motherCategory: "",
-                    }).then((r) => {
+                      "",
+                    ).then((r) => {
                       if (!categories) return;
                       if (!storeId) return;
                       console.log({

@@ -2,7 +2,7 @@
 import React, { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useStore } from "@/store/storeInfos";
-import { and, collection, getDocs, query, where } from "firebase/firestore";
+import { and, collection, query, where } from "firebase/firestore";
 import { db } from "@/firebase";
 import { Product, Variant } from "@/types/product";
 import {
@@ -25,6 +25,7 @@ import {
 import Image from "next/image";
 import { InventoryItemMove } from "@/types/inventory";
 import { usePurchaseOrderStore } from "@/store/purchase";
+import { dbGetDocs } from "@/lib/dbFuntions/fbFuns";
 
 function ChooseProductWithVariant({ item }: { item: InventoryItemMove }) {
   const { storeId } = useStore();
@@ -37,7 +38,8 @@ function ChooseProductWithVariant({ item }: { item: InventoryItemMove }) {
         collection(db, "products"),
         and(where("storeId", "==", storeId), where("status", "==", "active")),
       );
-      const response = getDocs(q).then((response) =>
+      if (!storeId) return;
+      const response = dbGetDocs(q, storeId, "").then((response) =>
         response.docs.map((doc) => ({ ...doc.data(), id: doc.id }) as Product),
       );
       return response;

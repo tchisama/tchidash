@@ -36,6 +36,7 @@ import {
 import { db } from "@/firebase";
 import { StateChanger } from "./StateChanger";
 import { Skeleton } from "@/components/ui/skeleton";
+import { trackUserUsage } from "@/lib/queries/usage";
 
 export function OrdersTable({
   filter,
@@ -70,8 +71,17 @@ export function OrdersTable({
       //   );
       // }
 
+      if (!storeId) return null;
       const queryBuilder = query(collection(db, "orders"), and(...wheres));
       const response = await getPage(queryBuilder, currentPage, pageSize);
+      trackUserUsage({
+        userEmail: "",
+        storeId: storeId,
+        action: "download",
+        data: response.documents,
+        clctn: "orders",
+        endpoint: "/api/orders",
+      });
       return response;
     },
     refetchOnWindowFocus: false,

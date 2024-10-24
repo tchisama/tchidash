@@ -11,19 +11,13 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { useOrderStore } from "@/store/orders";
 import { cn } from "@/lib/utils";
-import {
-  and,
-  collection,
-  getAggregateFromServer,
-  query,
-  sum,
-  where,
-} from "firebase/firestore";
+import { and, collection, query, sum, where } from "firebase/firestore";
 import { db } from "@/firebase";
 import { startOfMonth, startOfWeek } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
 import { useStore } from "@/store/storeInfos";
 import { ArrowUpRightIcon } from "lucide-react";
+import { dbGetAggregateFromServer } from "@/lib/dbFuntions/fbFuns";
 
 function Analytic() {
   const { currentOrder } = useOrderStore();
@@ -43,9 +37,15 @@ function Analytic() {
           where("orderStatus", "==", "delivered"),
         ),
       );
-      const querySnapshot = await getAggregateFromServer(q, {
-        totalProfit: sum("totalPrice"),
-      });
+      if (!storeId) return;
+      const querySnapshot = await dbGetAggregateFromServer(
+        q,
+        {
+          totalProfit: sum("totalPrice"),
+        },
+        storeId,
+        "",
+      );
       return querySnapshot.data().totalProfit;
     },
   });
@@ -70,9 +70,15 @@ function Analytic() {
           where("orderStatus", "==", "delivered"),
         ),
       );
-      const querySnapshot = await getAggregateFromServer(q, {
-        totalProfit: sum("totalPrice"),
-      });
+      if (!storeId) return;
+      const querySnapshot = await dbGetAggregateFromServer(
+        q,
+        {
+          totalProfit: sum("totalPrice"),
+        },
+        storeId,
+        "",
+      );
       return querySnapshot.data().totalProfit;
     },
   });
@@ -92,9 +98,15 @@ function Analytic() {
           where("orderStatus", "==", "delivered"),
         ),
       );
-      const querySnapshot = await getAggregateFromServer(q, {
-        totalProfit: sum("totalPrice"),
-      });
+      if (!storeId) return;
+      const querySnapshot = await dbGetAggregateFromServer(
+        q,
+        {
+          totalProfit: sum("totalPrice"),
+        },
+        storeId,
+        "",
+      );
       return querySnapshot.data().totalProfit;
     },
   });
@@ -117,9 +129,15 @@ function Analytic() {
           where("orderStatus", "==", "delivered"),
         ),
       );
-      const querySnapshot = await getAggregateFromServer(q, {
-        totalProfit: sum("totalPrice"),
-      });
+      if (!storeId) return;
+      const querySnapshot = await dbGetAggregateFromServer(
+        q,
+        {
+          totalProfit: sum("totalPrice"),
+        },
+        storeId,
+        "",
+      );
       return querySnapshot.data().totalProfit;
     },
   });

@@ -11,11 +11,12 @@ import { Label } from "@/components/ui/label";
 import { Product } from "@/types/product";
 import { useProducts } from "@/store/products";
 import { Checkbox } from "@/components/ui/checkbox";
-import { and, collection, getDocs, query, where } from "firebase/firestore";
+import { and, collection, query, where } from "firebase/firestore";
 import { db } from "@/firebase";
 import { useQuery } from "@tanstack/react-query";
 import { useStore } from "@/store/storeInfos";
 import { Button } from "@/components/ui/button";
+import { dbGetDocs } from "@/lib/dbFuntions/fbFuns";
 
 function ProductBundel() {
   const { setCurrentProduct, currentProduct } = useProducts();
@@ -37,7 +38,8 @@ function ProductBundel() {
           where("hasBundle", "!=", true),
         ),
       );
-      const products = getDocs(q).then((res) => ({
+      if (!storeId) return;
+      const products = dbGetDocs(q, storeId, "").then((res) => ({
         docs: res.docs.map(
           (doc) =>
             ({

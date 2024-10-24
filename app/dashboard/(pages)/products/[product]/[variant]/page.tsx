@@ -9,18 +9,11 @@ import Link from "next/link";
 import { useProducts } from "@/store/products";
 import { Product, Variant } from "@/types/product";
 import { db } from "@/firebase";
-import {
-  and,
-  collection,
-  doc,
-  getDocs,
-  query,
-  updateDoc,
-  where,
-} from "firebase/firestore";
+import { and, collection, doc, query, where } from "firebase/firestore";
 import ProductVariantsCard from "./components/ProductVariants";
 import { useQuery } from "@tanstack/react-query";
 import { useStore } from "@/store/storeInfos";
+import { dbGetDocs, dbUpdateDoc } from "@/lib/dbFuntions/fbFuns";
 
 function Page({ params }: { params: { product: string; variant: string } }) {
   const { currentProduct, setCurrentProduct } = useProducts();
@@ -43,7 +36,8 @@ function Page({ params }: { params: { product: string; variant: string } }) {
         ),
       );
       if (productId == "new") return null;
-      const response = await getDocs(q);
+      if (!storeId) return;
+      const response = await dbGetDocs(q, storeId, "");
       console.log(response.docs[0].data());
       if (response.docs.length === 0) return null;
       const productData = {
@@ -70,7 +64,13 @@ function Page({ params }: { params: { product: string; variant: string } }) {
       ) as Variant[],
     } as Product;
     setCurrentProduct(newProduct);
-    updateDoc(doc(db, "products", newProduct.id), newProduct).then(() => {});
+    //updateDoc(doc(db, "products", newProduct.id), newProduct).then(() => {});
+    dbUpdateDoc(
+      doc(db, "products", newProduct.id),
+      newProduct,
+      storeId,
+      "",
+    ).then(() => {});
   };
   const [variantProduct, setVariantProduct] = React.useState<Variant | null>(
     null,
