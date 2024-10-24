@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import Avvvatars from "avvvatars-react";
 import {
   Table,
   TableBody,
@@ -16,7 +17,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, orderBy, query, where } from "firebase/firestore";
 import { db } from "@/firebase";
 import { useQuery } from "@tanstack/react-query";
 import { Customer } from "@/types/customer"; // Import your customer type
@@ -32,6 +33,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Copy, Eye, MoreHorizontal, Phone } from "lucide-react";
 import { useStore } from "@/store/storeInfos";
+import { dbGetDocs } from "@/lib/dbFuntions/fbFuns";
 
 export default function CustomerPage() {
   const { storeId, store } = useStore();
@@ -40,14 +42,17 @@ export default function CustomerPage() {
     data: customers,
     isLoading,
     isError,
+    error,
   } = useQuery({
     queryKey: ["customers"],
     queryFn: async () => {
       const q = query(
         collection(db, "customers"),
         where("storeId", "==", storeId),
+        orderBy("createdAt", "desc"),
       );
-      const response = await getDocs(q);
+      if (!storeId) return;
+      const response = await dbGetDocs(q, storeId, "");
       const data = response.docs.map(
         (doc) =>
           ({
@@ -61,7 +66,7 @@ export default function CustomerPage() {
 
   // Loading and error states
   if (isLoading) return <p>Loading...</p>;
-  if (isError) return <p>Failed to load customer data.</p>;
+  if (isError) return <p>Failed to load customer data {error.message}.</p>;
 
   return (
     <Card>
@@ -74,6 +79,7 @@ export default function CustomerPage() {
           <TableCaption>All Registered Customers</TableCaption>
           <TableHeader>
             <TableRow>
+              <TableHead>Avatar</TableHead>
               <TableHead>First Name</TableHead>
               <TableHead>Last Name</TableHead>
               <TableHead>Email</TableHead>
@@ -89,7 +95,14 @@ export default function CustomerPage() {
           <TableBody>
             {customers &&
               customers.map((customer: Customer) => (
-                <TableRow key={customer.id}>
+                <TableRow key={customer.id} className="h-16">
+                  <TableCell>
+                    <Avvvatars
+                      size={35}
+                      style="shape"
+                      value={customer?.phoneNumber ?? ""}
+                    />
+                  </TableCell>
                   <TableCell>{customer.firstName}</TableCell>
                   <TableCell>{customer.lastName}</TableCell>
                   <TableCell>{customer.email || "N/A"}</TableCell>

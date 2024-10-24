@@ -12,7 +12,14 @@ import { Input } from "@/components/ui/input";
 import ChooseProductWithVariant from "./ChooseProductWithVariant";
 import { PlusCircle, X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { and, collection, query, Timestamp, where } from "firebase/firestore";
+import {
+  and,
+  collection,
+  orderBy,
+  query,
+  Timestamp,
+  where,
+} from "firebase/firestore";
 import { db } from "@/firebase";
 import { useStore } from "@/store/storeInfos";
 import { cn } from "@/lib/utils";
@@ -105,6 +112,7 @@ const ItemRow = ({ item }: { item: InventoryItemMove }) => {
       const q = query(
         collection(db, "products"),
         and(where("storeId", "==", storeId), where("status", "==", "active")),
+        orderBy("createdAt"),
       );
       if (!storeId) return;
       const response = dbGetDocs(q, storeId, "").then((response) =>
