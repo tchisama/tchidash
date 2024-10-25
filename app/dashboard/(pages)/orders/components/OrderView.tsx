@@ -96,7 +96,7 @@ function OrderView() {
         cityAi: {
           city: dataFromApi.city,
           region: dataFromApi.region,
-          "R-ID": dataFromApi["R-ID"],
+          ID: dataFromApi["R-ID"],
         },
       },
       storeId,
