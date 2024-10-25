@@ -25,11 +25,12 @@ import { Button } from "@/components/ui/button";
 import {
   Copy,
   DownloadIcon,
+  Loader,
   MoreVertical,
   Phone,
   QrCodeIcon,
+  StarsIcon,
   Trash2,
-  Truck,
   X,
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
@@ -46,10 +47,13 @@ import { db } from "@/firebase";
 import { doc } from "firebase/firestore";
 import QRCode from "react-qr-code";
 import { AnimatePresence, motion } from "framer-motion";
-import { dbDeleteDoc } from "@/lib/dbFuntions/fbFuns";
+import { dbDeleteDoc, dbUpdateDoc } from "@/lib/dbFuntions/fbFuns";
 import { useStore } from "@/store/storeInfos";
+import Avvvatars from "avvvatars-react";
+import axios from "axios";
 function OrderView() {
-  const { currentOrder, setCurrentOrder } = useOrderStore();
+  const { currentOrder, setCurrentOrder, setCurrentOrderData } =
+    useOrderStore();
   const { storeId } = useStore();
 
   const deleteOrder = async (orderId: string) => {
@@ -65,6 +69,49 @@ function OrderView() {
     } else {
       alert("You can't delete an order that is not cancelled or returned");
     }
+  };
+
+  const [loadingOptimize, setLoadingOptimize] = React.useState(false);
+
+  const optimize = async () => {
+    setLoadingOptimize(true);
+    const res = await axios.post("/api/openai/order-city", {
+      misspelledCity: currentOrder?.customer.shippingAddress.city,
+    });
+    console.log(res.data.correction);
+    const dataFromApi: {
+      city: string;
+      region: string;
+      "R-ID": string;
+    } = JSON.parse(res.data.correction);
+    if (!dataFromApi.city || !dataFromApi.region || !dataFromApi["R-ID"]) {
+      alert("Couldn't optimize the city");
+      setLoadingOptimize(false);
+    }
+    if (!currentOrder) return;
+    if (!storeId) return;
+    dbUpdateDoc(
+      doc(db, "orders", currentOrder.id),
+      {
+        cityAi: {
+          city: dataFromApi.city,
+          region: dataFromApi.region,
+          "R-ID": dataFromApi["R-ID"],
+        },
+      },
+      storeId,
+      "",
+    );
+    setCurrentOrderData({
+      ...currentOrder,
+      cityAi: {
+        city: dataFromApi.city,
+        region: dataFromApi.region,
+        "R-ID": dataFromApi["R-ID"],
+      },
+    });
+
+    setLoadingOptimize(false);
   };
 
   return (
@@ -97,11 +144,27 @@ function OrderView() {
                 </CardDescription>
               </div>
               <div className="ml-auto flex items-center gap-1">
-                <Button size="sm" variant="outline" className="h-8 gap-1">
-                  <Truck className="h-3.5 w-3.5" />
-                  <span className="lg:sr-only xl:not-sr-only xl:whitespace-nowrap">
-                    Track Order
-                  </span>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-8 gap-1"
+                  onClick={optimize}
+                >
+                  {loadingOptimize ? (
+                    <>
+                      <Loader className="animate-spin h-3.5 w-3.5" />
+                      <span className="lg:sr-only xl:not-sr-only xl:whitespace-nowrap">
+                        Optimizing
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <StarsIcon className="h-3.5 w-3.5" />
+                      <span className="lg:sr-only xl:not-sr-only xl:whitespace-nowrap">
+                        Optimize
+                      </span>
+                    </>
+                  )}
                 </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -225,41 +288,60 @@ function OrderView() {
                       orderId={currentOrder.id}
                     />
                   </div>
-                  <dl className="grid gap-3">
-                    <div className="flex items-center justify-between">
-                      <dt className="text-muted-foreground">Customer</dt>
-                      <dd>{currentOrder.customer.name}</dd>
-                    </div>
-                    {currentOrder.customer.email && (
+                  <dl className=" gap-4 flex  ">
+                    <Avvvatars
+                      style={"shape"}
+                      value={currentOrder.customer.phoneNumber ?? ""}
+                    />
+                    <div className="flex-1">
                       <div className="flex items-center justify-between">
-                        <dt className="text-muted-foreground">Email</dt>
+                        <dt className="text-muted-foreground">Customer</dt>
+                        <dd>{currentOrder.customer.name}</dd>
+                      </div>
+                      {currentOrder.customer.email && (
+                        <div className="flex items-center justify-between">
+                          <dt className="text-muted-foreground">Email</dt>
+                          <dd>
+                            <a href="mailto:">
+                              {currentOrder.customer?.email ?? "no email"}
+                            </a>
+                          </dd>
+                        </div>
+                      )}
+                      <div className="flex items-center justify-between">
+                        <dt className="text-muted-foreground">Phone</dt>
                         <dd>
-                          <a href="mailto:">
-                            {currentOrder.customer?.email ?? "no email"}
+                          <a href="tel:" className="font-semibold">
+                            {currentOrder.customer.phoneNumber}
                           </a>
                         </dd>
                       </div>
-                    )}
-                    <div className="flex items-center justify-between">
-                      <dt className="text-muted-foreground">Phone</dt>
-                      <dd>
-                        <a href="tel:" className="font-semibold">
-                          {currentOrder.customer.phoneNumber}
-                        </a>
-                      </dd>
                     </div>
                   </dl>
                 </div>
                 <Separator className="my-4" />
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid  gap-4">
                   <div className="grid gap-3">
                     <div className="font-semibold">Shipping Information</div>
-                    <address className="grid gap-0.5 not-italic text-muted-foreground">
-                      <span>{currentOrder.customer.shippingAddress.city}</span>
-                      <span>
-                        {currentOrder.customer.shippingAddress.address}
-                      </span>
-                    </address>
+
+                    <div className="flex w-full">
+                      <address className="flex-1 grid gap-0.5 not-italic text-muted-foreground">
+                        <span>
+                          {currentOrder.customer.shippingAddress.city}
+                        </span>
+                        <span>
+                          {currentOrder.customer.shippingAddress.address}
+                        </span>
+                      </address>
+                      {currentOrder.cityAi && currentOrder.cityAi.city && (
+                        <address className="flex-1  grid gap-0.5 not-italic text-primary/80 font-bold">
+                          <span>{currentOrder.cityAi.city}</span>
+                          <span className="font-medium opacity-70">
+                            {currentOrder.cityAi.region}
+                          </span>
+                        </address>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <Separator className="my-2" />

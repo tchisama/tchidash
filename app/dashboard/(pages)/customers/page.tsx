@@ -85,7 +85,6 @@ export default function CustomerPage() {
               <TableHead>Email</TableHead>
               <TableHead>Phone Number</TableHead>
               <TableHead>Address</TableHead>
-              <TableHead>Status</TableHead>
               <TableHead>Created At</TableHead>
               <TableHead>total purchases</TableHead>
               <TableHead>total revenue</TableHead>
@@ -110,7 +109,6 @@ export default function CustomerPage() {
                   <TableCell>
                     {customer?.address?.street}, {customer?.address?.city}
                   </TableCell>
-                  <TableCell>{customer.status}</TableCell>
                   <TableCell>
                     {customer.createdAt.toDate().toLocaleString()}
                   </TableCell>

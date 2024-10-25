@@ -22,6 +22,7 @@ import { useQuery } from "@tanstack/react-query";
 import { doc, getDoc } from "firebase/firestore";
 import { useSession } from "next-auth/react";
 import FloatingDock from "./FloatingDock";
+import { Loader } from "lucide-react";
 
 const iconsClass =
   "h-6 w-6 group-hover:scale-[1.05] duration-200 hover:cursor-pointer";
@@ -117,7 +118,7 @@ function BottomBar() {
 
   const { storeId } = useStore();
   const { data: session } = useSession();
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["store", storeId],
     queryFn: async () => {
       if (!storeId) return null;
@@ -153,29 +154,35 @@ function BottomBar() {
   return (
     <div className="fixed w-fit left-1/2 bottom-4 transform -translate-x-1/2">
       <FloatingDock
-        items={[
-          //{
-          //  title: "Dashboard",
-          //  icon: <Image src={Store} alt="Dashboard" />,
-          //  href: "/dashboard",
-          //},
-          ...navLinks
-            .filter((link) => {
-              if (employee === "admin") return true;
-              if (!employee) return false;
-              if (employee?.access?.[link?.label.toLowerCase()]) {
-                return true;
-              } else {
-                return false;
-              }
-            })
-            .map((link) => ({
-              title: link.label,
-              icon: link.icon({}),
-              href: link.href,
-              active: pathname === link.href,
-            })),
-        ]}
+        items={
+          isLoading
+            ? [
+                {
+                  title: "loading",
+                  icon: <Loader className="animate-spin" />,
+                  href: "/dashboard",
+                  active: false,
+                },
+              ]
+            : [
+                ...navLinks
+                  .filter((link) => {
+                    if (employee === "admin") return true;
+                    if (!employee) return false;
+                    if (employee?.access?.[link?.label.toLowerCase()]) {
+                      return true;
+                    } else {
+                      return false;
+                    }
+                  })
+                  .map((link) => ({
+                    title: link.label,
+                    icon: link.icon({}),
+                    href: link.href,
+                    active: pathname === link.href,
+                  })),
+              ]
+        }
       />
     </div>
   );

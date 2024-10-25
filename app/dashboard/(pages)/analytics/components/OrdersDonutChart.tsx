@@ -126,7 +126,7 @@ export function OrdersDonutChart() {
 
   return (
     totalOrders && (
-      <Card className="flex flex-col w-[400px]">
+      <Card className="flex flex-col ">
         <CardHeader className="items-center pb-0">
           <CardTitle>Order Status Donut Chart</CardTitle>
           <CardDescription>Order Status Overview</CardDescription>

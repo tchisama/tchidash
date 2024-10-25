@@ -24,6 +24,7 @@ import { Separator } from "@/components/ui/separator";
 import { v4 } from "uuid";
 import { useSession } from "next-auth/react";
 import { dbGetDoc, dbUpdateDoc } from "@/lib/dbFuntions/fbFuns";
+import Avvvatars from "avvvatars-react";
 
 const accesses = [
   {
@@ -206,14 +207,17 @@ const Emplyies = () => {
             </Button>
           </div>
           <Separator className="mb-2 mt-4" />
-          <div className="p-2  mt-2">
+          <div className="p-2  mt-2 space-y-2">
             {store?.employees &&
               store?.employees.map((employee) => (
                 <div
                   key={employee.id}
-                  className="flex px-4 items-center p-2 border rounded-xl justify-between"
+                  className="flex px-4 gap-4 items-center p-2 border rounded-xl "
                 >
                   <div>
+                    <Avvvatars size={40} value={employee.name} style="shape" />
+                  </div>
+                  <div className="flex-1">
                     <p>{employee.name}</p>
                     <p>{employee.email}</p>
                   </div>

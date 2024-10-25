@@ -32,9 +32,9 @@ const links = [
 function Navbar() {
   const pathName = usePathname();
   return (
-    <div>
+    <div className="h-full">
       <nav
-        className="grid gap-4 text-sm text-muted-foreground"
+        className="grid gap-4 sticky top-32 text-sm text-muted-foreground"
         x-chunk="dashboard-04-chunk-0"
       >
         {links.map((link) => (

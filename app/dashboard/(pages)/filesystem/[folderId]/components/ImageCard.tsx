@@ -39,6 +39,7 @@ export const ImageCard = ({ item }: { item: FileSystemItem }) => {
     const ImageRef = ref(storage, item.storagePath);
     deleteObject(ImageRef)
       .then(() => {
+        if (!storeId) return;
         dbDeleteDoc(doc(db, "filesystem", item.id), storeId, "");
         queryClient.setQueryData(
           ["filesystem", item.storeId, item.parentFolderId],
@@ -70,9 +71,9 @@ export const ImageCard = ({ item }: { item: FileSystemItem }) => {
   return (
     item.type === "image" && (
       <Popover>
-        <PopoverTrigger className="w-fit h-fit p-0">
+        <PopoverTrigger className=" p-0">
           <Card key={item.id} className="overflow-hidden">
-            <CardContent className="flex flex-col gap-4 aspect-square relative items-center justify-center p-0">
+            <CardContent className="flex w-full flex-col gap-4 aspect-square relative items-center justify-center p-0">
               <Image
                 key={item.id}
                 width={300}

@@ -47,6 +47,7 @@
     "lucide-react": "^0.447.0",
     "next": "14.2.14",
     "next-auth": "^4.24.8",
+    "openai": "^4.68.4",
     "qrcode-terminal": "^0.12.0",
     "react": "^18",
     "react-day-picker": "^8.10.1",
