@@ -17,7 +17,7 @@ export default function page() {
           <div className="col-span-3 flex">
             <OrdersGraph />
           </div>
-          <div className="w-full col-span-3">
+          <div className="w-full col-span-2">
             <MoroccanMap />
           </div>
         </div>
