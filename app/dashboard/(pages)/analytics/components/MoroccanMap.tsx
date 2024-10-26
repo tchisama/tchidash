@@ -71,7 +71,7 @@ const MoroccoMap = () => {
         <div className="bg-slate-50 w-fit rounded-2xl border">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="550"
+            width="600"
             height="450"
             className=" drop-shadow-[0px_20px_10px_#3331] p-3 rounded-2xl"
             viewBox="0 0 612.51373 654.53473"
