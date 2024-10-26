@@ -5,14 +5,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useStore } from "@/store/storeInfos";
-import { collection, count, query, where } from "firebase/firestore";
-import { dbGetAggregateFromServer } from "@/lib/dbFuntions/fbFuns";
+import { collection, query, where } from "firebase/firestore";
+import { dbGetDocs } from "@/lib/dbFuntions/fbFuns";
 import { db } from "@/firebase";
 import { useQuery } from "@tanstack/react-query";
 import { regions } from "@/lib/datajson/moroccan-regions-full";
 import { cn } from "@/lib/utils";
+import { Order } from "@/types/order";
 
 const MoroccoMap = () => {
   // Track hovered region
@@ -28,17 +29,44 @@ const MoroccoMap = () => {
         where(`cityAi.ID`, "==", selectedRegion),
       );
       if (!storeId) return 0;
-      const snapshot = await dbGetAggregateFromServer(
-        q,
-        {
-          count: count(),
-        },
-        storeId,
-        "",
-      );
-      return snapshot.data().count;
+      //const snapshot = await dbGetAggregateFromServer(
+      //  q,
+      //  {
+      //    count: count(),
+      //  },
+      //  storeId,
+      //  "",
+      //);
+      const snapshot = await dbGetDocs(q, storeId, "").then((docs) => {
+        const res: Order[] = [];
+        docs.forEach((doc) => {
+          //return { ...doc.data(), id: doc.id };
+          res.push({
+            ...doc.data(),
+            id: doc.id,
+          } as Order);
+        });
+        return res;
+      });
+      return snapshot;
     },
   });
+  const [Cities, setCities] = useState<{ city: string; orders: number }[]>([]);
+  useEffect(() => {
+    if (data) {
+      const cities = data.map((order) => order?.cityAi && order?.cityAi.city);
+      const citiesSet = new Set(cities);
+      const citiesArray = Array.from(citiesSet);
+      const citiesCount = citiesArray.map((city) => {
+        return {
+          city: city ?? "",
+          orders: cities.filter((c) => c === city).length,
+        };
+      });
+      setCities(citiesCount);
+    }
+  }, [data]);
+
   if (error) {
     return <div>Error: {error.message}</div>;
   }
@@ -46,14 +74,14 @@ const MoroccoMap = () => {
   return (
     <Card className="w-full h-full">
       <CardHeader>
-        <CardTitle>Top Cities by Orders</CardTitle>
+        <CardTitle>Top Regions by Orders</CardTitle>
         <CardDescription>
           Explore the cities with the highest order activity to gain insights on
           regional demand.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex gap-8 ">
-        <div className=" w-fit flex-1 rounded-2xl border relative from-primary/20 to-primary/10 bg-gradient-to-t">
+        <div className=" w-fit flex-1 rounded-2xl border relative from-primary/10 to-primary/5 bg-gradient-to-t">
           <h3 className="text-md absolute top-3 left-3 text-muted-foreground">
             {selectedRegion}
           </h3>
@@ -62,8 +90,24 @@ const MoroccoMap = () => {
           </h1>
 
           <h3 className="text-9xl font-bold absolute bottom-4 right-6 text-primary">
-            {data?.toString()}
+            {data && data.length.toString()}
           </h3>
+          <Card className="absolute top-20 text-sm left-3 text-muted-foreground p-2 px-4">
+            <CardHeader className="p-0 pb-3 pt-2">
+              <CardTitle>Cities</CardTitle>
+            </CardHeader>
+            <ul>
+              {Cities.sort((a, b) => b.orders - a.orders).map((city) => (
+                <li
+                  key={city.city}
+                  className="w-full flex gap-2 justify-between"
+                >
+                  {city.city} :{" "}
+                  <span className="text-primary ">{city.orders}</span>
+                </li>
+              ))}
+            </ul>
+          </Card>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="600"
