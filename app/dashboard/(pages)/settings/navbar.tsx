@@ -13,6 +13,10 @@ const links = [
     label: "Security",
   },
   {
+    href: "/dashboard/settings/whatsapp",
+    label: "WhatsApp",
+  },
+  {
     href: "/dashboard/settings/integrations",
     label: "Integrations",
   },

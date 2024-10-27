@@ -18,11 +18,8 @@ import {
   UserCheck,
 } from "lucide-react";
 import { Order } from "@/types/order";
-import { doc, Timestamp } from "firebase/firestore";
-import { db } from "@/firebase";
 import { useOrderStore } from "@/store/orders";
-import { v4 } from "uuid";
-import { dbSetDoc, dbUpdateDoc } from "@/lib/dbFuntions/fbFuns";
+import axios from "axios";
 
 export type OrderStatus =
   | "pending"
@@ -32,7 +29,6 @@ export type OrderStatus =
   | "cancelled"
   | "returned";
 
-// import { orderStatusValues } from "@/constents/order";
 export const orderStatusValuesWithIcon = [
   {
     name: "pending",
@@ -131,32 +127,55 @@ export function StateChanger({
                 onClick={async () => {
                   setActionLoading(true);
                   setState(status.name as OrderStatus);
-                  await dbUpdateDoc(
-                    doc(db, "orders", order.id),
-                    {
-                      ...order,
-                      orderStatus: status.name as OrderStatus,
-                    },
-                    order.storeId,
-                    "",
-                  );
-                  await updateStockOfProductsBasedOnStatus(
-                    status.name as OrderStatus,
-                    order.orderStatus,
-                    order.items,
-                    order,
-                  );
-                  setOrders(
-                    orders.map((o) =>
-                      o.id === order.id
-                        ? { ...order, orderStatus: status.name as OrderStatus }
-                        : o,
-                    ),
-                  );
-                  if (currentOrder?.id === order.id) {
-                    setCurrentOrder(order.id);
+
+                  //await dbUpdateDoc(
+                  //  doc(db, "orders", order.id),
+                  //  {
+                  //    ...order,
+                  //    orderStatus: status.name as OrderStatus,
+                  //  },
+                  //  order.storeId,
+                  //  "",
+                  //);
+                  //await updateStockOfProductsBasedOnStatus(
+                  //  status.name as OrderStatus,
+                  //  order.orderStatus,
+                  //  order.items,
+                  //  order,
+                  //);
+                  //
+                  //
+                  //
+
+                  try {
+                    const response = await axios.post(
+                      "/api/order-status-changer",
+                      {
+                        orderId: order.id,
+                        newStatus: status.name as OrderStatus,
+                        storeId: order.storeId,
+                      },
+                    );
+                    console.log("Order status updated:", response.data);
+                  } catch (error) {
+                    console.error("Error updating order status:", error);
+
+                    setOrders(
+                      orders.map((o) =>
+                        o.id === order.id
+                          ? {
+                              ...order,
+                              orderStatus: status.name as OrderStatus,
+                            }
+                          : o,
+                      ),
+                    );
+                    if (currentOrder?.id === order.id) {
+                      setCurrentOrder(order.id);
+                    }
+                  } finally {
+                    setActionLoading(false);
                   }
-                  setActionLoading(false);
                 }}
               >
                 <span className="mr-2">{status.icon}</span>
@@ -173,104 +192,104 @@ export function StateChanger({
   );
 }
 
-const updateStockOfProductsBasedOnStatus = async (
-  status: OrderStatus,
-  oldStatus: OrderStatus,
-  products: Order["items"],
-  order: Order,
-) => {
-  // Check if the order status is transitioning to "shipped" or "delivered"
-  //
-  //
-  //
-
-  dbSetDoc(
-    doc(db, "sales", order.id),
-    {
-      phoneNumber: order.customer.phoneNumber,
-      totalPrice: order.totalPrice,
-      status,
-      storeId: order.storeId,
-      createdAt: order.createdAt,
-    },
-    order.storeId,
-    "",
-  );
-
-  if (
-    (oldStatus === "pending" ||
-      oldStatus === "cancelled" ||
-      oldStatus === "returned") &&
-    (status === "processing" || status === "shipped" || status === "delivered")
-  ) {
-    // Decrease stock based on the order items
-    for (const item of products) {
-      dbSetDoc(
-        doc(db, "inventoryItems", order.id + item.id),
-        {
-          id: "",
-          productId: item.productId,
-          variantId: item?.variantId,
-          title: item.title,
-          createdAt: Timestamp.now(),
-          updatedAt: Timestamp.now(),
-          quantity: -item.quantity,
-          storeId: order.storeId,
-          imageUrl: item.imageUrl,
-          cost: item.totalPrice,
-          unitPrice: item.price,
-          vendorId: "",
-          orderId: order.id,
-          note: "",
-          createdById: order.customer.name,
-          type: "OUT",
-          status: "APPROVED",
-          referenceNumber: "SO-" + v4().substring(0, 8),
-        },
-        order.storeId,
-        "",
-      );
-    }
-  }
-
-  // If the order is being canceled or returned, revert the stock
-  if (
-    (oldStatus === "processing" ||
-      oldStatus === "shipped" ||
-      oldStatus === "delivered") &&
-    (status === "cancelled" || status === "returned" || status === "pending")
-  ) {
-    // Restore stock based on the order items
-    for (const item of products) {
-      const inventoryItem = {
-        id: "",
-        productId: item.productId,
-        variantId: item?.variantId,
-        title: item.title,
-        createdAt: Timestamp.now(),
-        updatedAt: Timestamp.now(),
-        quantity: -item.quantity,
-        storeId: order.storeId,
-        imageUrl: item.imageUrl,
-        cost: item.totalPrice,
-        unitPrice: item.price,
-        vendorId: "",
-        orderId: order.id,
-        note: "",
-        createdById: order.customer.name,
-        type: "OUT",
-        status: "REJECTED",
-        referenceNumber: "SO-" + v4().substring(0, 8),
-      };
-      dbSetDoc(
-        doc(db, "inventoryItems", order.id + item.id),
-        inventoryItem,
-        order.storeId,
-        "",
-      );
-    }
-  }
-};
+//const updateStockOfProductsBasedOnStatus = async (
+//  status: OrderStatus,
+//  oldStatus: OrderStatus,
+//  products: Order["items"],
+//  order: Order,
+//) => {
+//  // Check if the order status is transitioning to "shipped" or "delivered"
+//  //
+//  //
+//  //
+//
+//  dbSetDoc(
+//    doc(db, "sales", order.id),
+//    {
+//      phoneNumber: order.customer.phoneNumber,
+//      totalPrice: order.totalPrice,
+//      status,
+//      storeId: order.storeId,
+//      createdAt: order.createdAt,
+//    },
+//    order.storeId,
+//    "",
+//  );
+//
+//  if (
+//    (oldStatus === "pending" ||
+//      oldStatus === "cancelled" ||
+//      oldStatus === "returned") &&
+//    (status === "processing" || status === "shipped" || status === "delivered")
+//  ) {
+//    // Decrease stock based on the order items
+//    for (const item of products) {
+//      dbSetDoc(
+//        doc(db, "inventoryItems", order.id + item.id),
+//        {
+//          id: "",
+//          productId: item.productId,
+//          variantId: item?.variantId,
+//          title: item.title,
+//          createdAt: Timestamp.now(),
+//          updatedAt: Timestamp.now(),
+//          quantity: -item.quantity,
+//          storeId: order.storeId,
+//          imageUrl: item.imageUrl,
+//          cost: item.totalPrice,
+//          unitPrice: item.price,
+//          vendorId: "",
+//          orderId: order.id,
+//          note: "",
+//          createdById: order.customer.name,
+//          type: "OUT",
+//          status: "APPROVED",
+//          referenceNumber: "SO-" + v4().substring(0, 8),
+//        },
+//        order.storeId,
+//        "",
+//      );
+//    }
+//  }
+//
+//  // If the order is being canceled or returned, revert the stock
+//  if (
+//    (oldStatus === "processing" ||
+//      oldStatus === "shipped" ||
+//      oldStatus === "delivered") &&
+//    (status === "cancelled" || status === "returned" || status === "pending")
+//  ) {
+//    // Restore stock based on the order items
+//    for (const item of products) {
+//      const inventoryItem = {
+//        id: "",
+//        productId: item.productId,
+//        variantId: item?.variantId,
+//        title: item.title,
+//        createdAt: Timestamp.now(),
+//        updatedAt: Timestamp.now(),
+//        quantity: -item.quantity,
+//        storeId: order.storeId,
+//        imageUrl: item.imageUrl,
+//        cost: item.totalPrice,
+//        unitPrice: item.price,
+//        vendorId: "",
+//        orderId: order.id,
+//        note: "",
+//        createdById: order.customer.name,
+//        type: "OUT",
+//        status: "REJECTED",
+//        referenceNumber: "SO-" + v4().substring(0, 8),
+//      };
+//      dbSetDoc(
+//        doc(db, "inventoryItems", order.id + item.id),
+//        inventoryItem,
+//        order.storeId,
+//        "",
+//      );
+//    }
+//  }
+//};
 
 //
 //const updateStockOfProductsBasedOnStatus = async (

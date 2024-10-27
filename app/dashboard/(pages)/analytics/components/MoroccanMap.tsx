@@ -29,14 +29,6 @@ const MoroccoMap = () => {
         where(`cityAi.ID`, "==", selectedRegion),
       );
       if (!storeId) return 0;
-      //const snapshot = await dbGetAggregateFromServer(
-      //  q,
-      //  {
-      //    count: count(),
-      //  },
-      //  storeId,
-      //  "",
-      //);
       const snapshot = await dbGetDocs(q, storeId, "").then((docs) => {
         const res: Order[] = [];
         docs.forEach((doc) => {
@@ -85,7 +77,7 @@ const MoroccoMap = () => {
           <h3 className="text-md absolute top-3 left-3 text-muted-foreground">
             {selectedRegion}
           </h3>
-          <h1 className="text-xl font-bold absolute top-8 left-3 text-muted-foreground">
+          <h1 className="text-xl font-bold absolute top-8 z-10 left-3 text-muted-foreground">
             {regions && regions.find((p) => p.id === selectedRegion)?.title}
           </h1>
 

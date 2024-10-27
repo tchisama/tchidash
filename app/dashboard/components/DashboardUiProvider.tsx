@@ -38,12 +38,12 @@ export default function DashboardUiProvider({
   const { actions } = useNavbar();
   const { setStoreId } = useStore();
   return (
-    <div className="flex min-h-screen w-full  bg-muted">
+    <div className="flex min-h-screen w-full bg-slate-100 dark:bg-slate-900">
       {/*
       <SideBar />
        * */}
       <div className="flex-col relative flex-1 sm:gap-4 sm:py-4 ">
-        <header className="sticky  top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:py-3  sm:h-auto sm:border-0 sm:bg-muted sm:px-6">
+        <header className="sticky  top-0 z-30 flex h-14 items-center gap-4 border-b  px-4 sm:py-3  sm:h-auto sm:border-0 sm:bg-muted sm:px-6">
           <div className="flex-1 ">
             <PhoneBar />
             <BreadcrumbCom />
@@ -82,16 +82,16 @@ export default function DashboardUiProvider({
                   router.push("/dashboard/switch-store");
                 }}
               >
-                <Image src={Store} alt="Settings" className="mr-2 h-5 w-5" />
+                <Image src={Store} alt="Settings" className="mr-2 h-4 w-4" />
                 Switch Store
               </DropdownMenuItem>
 
               <DropdownMenuItem>
-                <Image src={Settings} alt="Settings" className="mr-2 h-5 w-5" />
+                <Image src={Settings} alt="Settings" className="mr-2 h-4 w-4" />
                 Settings
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Image src={Help} alt="Help" className="mr-2 h-5 w-5" />
+                <Image src={Help} alt="Help" className="mr-2 h-4 w-4" />
                 Support
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -101,7 +101,7 @@ export default function DashboardUiProvider({
                   signOut();
                 }}
               >
-                <Image src={Logout} alt="Logout" className="mr-2 h-5 w-5" />
+                <Image src={Logout} alt="Logout" className="mr-2 h-4 w-4" />
                 Logout
               </DropdownMenuItem>
             </DropdownMenuContent>
