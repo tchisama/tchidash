@@ -34,7 +34,14 @@ function OneVariant({
 
     // Firebase storage reference
     if (!currentProduct) return;
-    const iamgeId = `dynamicVariantsOptionsImages/stage-image-${currentProductVariant.id + currentProduct.title}.png`;
+    const iamgeId = `dynamicVariantsOptionsImages/${
+      currentProduct.id +
+      currentProductVariant.id
+        .split("-")
+        // remove first item
+        .slice(1)
+        .join("-")
+    }.png`;
     const storageRef = ref(storage, iamgeId);
 
     // Upload the image as a base64 string to Firebase

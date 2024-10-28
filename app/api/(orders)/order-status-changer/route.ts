@@ -16,6 +16,7 @@ export async function POST(req: Request) {
     const { orderId, newStatus, storeId }: OrderUpdateRequest =
       await req.json();
 
+    console.log("orderId", orderId);
     const orderRef = doc(db, "orders", orderId);
     const orderDoc = await dbGetDoc(orderRef, storeId, "");
     if (!orderDoc) {

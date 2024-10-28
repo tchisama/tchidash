@@ -81,6 +81,22 @@ const ProductVariantsCard = ({}: { saveProduct: () => void }) => {
     })) as Variant[];
   };
 
+  const correctVariantId = () => {
+    if (currentProduct) {
+      const variants = currentProduct.variants as Variant[];
+      const newVariants = variants.map((variant, index) => {
+        return {
+          ...variant,
+          id: `${currentProduct.id}-variant-${index}`,
+        };
+      });
+      setCurrentProduct({
+        ...currentProduct,
+        variants: newVariants,
+      });
+    }
+  };
+
   // Using useMemo to avoid unnecessary updates
   const generateAction = () => {
     if (currentProduct) {
@@ -123,6 +139,15 @@ const ProductVariantsCard = ({}: { saveProduct: () => void }) => {
               >
                 <RefreshCw className="h-3 w-3" />
                 Generate Variants
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  correctVariantId();
+                }}
+              >
+                Correct Variant ID
               </Button>
               <Button
                 variant="outline"

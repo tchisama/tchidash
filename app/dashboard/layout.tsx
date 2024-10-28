@@ -1,17 +1,19 @@
-import React from 'react'
-import Protected from './components/Protected'
+import React from "react";
+import Protected from "./components/Protected";
+import AppCodeProvider from "./components/AppCodeProvider";
 
 type Props = {
-  children: React.ReactNode
-}
-function layout({children}: Props) {
+  children: React.ReactNode;
+};
+function layout({ children }: Props) {
   return (
     <div>
       <Protected>
-      {children}
+        <AppCodeProvider>{children}</AppCodeProvider>
       </Protected>
     </div>
-  )
+  );
 }
 
-export default layout
+export default layout;
+
