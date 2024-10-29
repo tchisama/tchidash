@@ -46,7 +46,7 @@ import CustomerShield from "./CustomerShield";
 import { db } from "@/firebase";
 import { doc } from "firebase/firestore";
 import QRCode from "react-qr-code";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { dbDeleteDoc, dbUpdateDoc } from "@/lib/dbFuntions/fbFuns";
 import { useStore } from "@/store/storeInfos";
 import Avvvatars from "avvvatars-react";
@@ -114,360 +114,348 @@ function OrderView() {
     setLoadingOptimize(false);
   };
 
-  return (
-    <AnimatePresence>
-      {currentOrder ? (
-        <motion.div className="h-full ">
-          <Card className=" sticky top-20" x-chunk="dashboard-05-chunk-4">
-            <CardHeader className="flex flex-row items-start bg-muted/50">
-              <div className="grid gap-0.5">
-                <CardTitle className="group flex items-center gap-2 text-lg">
-                  Order {currentOrder?.id.slice(0, 8)}..
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    className="h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
-                    onClick={() =>
-                      navigator.clipboard.writeText(currentOrder?.id)
-                    }
-                  >
-                    <Copy className="h-3 w-3" />
-                    <span className="sr-only">Copy Order ID</span>
-                  </Button>
-                </CardTitle>
-                <CardDescription className="text-xs">
-                  {currentOrder?.createdAt
-                    .toDate()
-                    .toLocaleDateString()
-                    .replaceAll("/", ",")}{" "}
-                  at {currentOrder?.createdAt.toDate().toLocaleTimeString()}
-                </CardDescription>
-              </div>
-              <div className="ml-auto flex items-center gap-1">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="h-8 gap-1"
-                  onClick={optimize}
-                >
-                  {loadingOptimize ? (
-                    <>
-                      <Loader className="animate-spin h-3.5 w-3.5" />
-                      <span className="lg:sr-only xl:not-sr-only xl:whitespace-nowrap">
-                        Optimizing
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <StarsIcon className="h-3.5 w-3.5" />
-                      <span className="lg:sr-only xl:not-sr-only xl:whitespace-nowrap">
-                        Optimize
-                      </span>
-                    </>
-                  )}
+  return currentOrder ? (
+    <motion.div className="h-full">
+      <Card className=" sticky top-20" x-chunk="dashboard-05-chunk-4">
+        <CardHeader className="flex flex-row items-start bg-muted/50">
+          <div className="grid gap-0.5">
+            <CardTitle className="group flex items-center gap-2 text-lg">
+              Order {currentOrder?.id.slice(0, 8)}..
+              <Button
+                size="icon"
+                variant="outline"
+                className="h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
+                onClick={() => navigator.clipboard.writeText(currentOrder?.id)}
+              >
+                <Copy className="h-3 w-3" />
+                <span className="sr-only">Copy Order ID</span>
+              </Button>
+            </CardTitle>
+            <CardDescription className="text-xs">
+              {currentOrder?.createdAt
+                .toDate()
+                .toLocaleDateString()
+                .replaceAll("/", ",")}{" "}
+              at {currentOrder?.createdAt.toDate().toLocaleTimeString()}
+            </CardDescription>
+          </div>
+          <div className="ml-auto flex items-center gap-1">
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-8 gap-1"
+              onClick={optimize}
+            >
+              {loadingOptimize ? (
+                <>
+                  <Loader className="animate-spin h-3.5 w-3.5" />
+                  <span className="lg:sr-only xl:not-sr-only xl:whitespace-nowrap">
+                    Optimizing
+                  </span>
+                </>
+              ) : (
+                <>
+                  <StarsIcon className="h-3.5 w-3.5" />
+                  <span className="lg:sr-only xl:not-sr-only xl:whitespace-nowrap">
+                    Optimize
+                  </span>
+                </>
+              )}
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="icon" variant="outline" className="h-8 w-8">
+                  <MoreVertical className="h-3.5 w-3.5" />
+                  <span className="sr-only">More</span>
                 </Button>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button size="icon" variant="outline" className="h-8 w-8">
-                      <MoreVertical className="h-3.5 w-3.5" />
-                      <span className="sr-only">More</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    {/* <DropdownMenuItem>Edit</DropdownMenuItem>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {/* <DropdownMenuItem>Edit</DropdownMenuItem>
                   <DropdownMenuItem>Export</DropdownMenuItem> */}
-                    {/* <DropdownMenuItem>Print</DropdownMenuItem> */}
-                    <DropdownMenuItem
-                      onClick={() => {
-                        window.open(
-                          `https://wa.me/212${currentOrder?.customer?.phoneNumber}`,
-                        );
-                      }}
-                    >
-                      <Phone className="h-3.5 w-3.5 mr-2" /> Contact Whatsapp
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => {
-                        window.open(
-                          `tel:+212${currentOrder?.customer?.phoneNumber}`,
-                        );
-                      }}
-                    >
-                      <Phone className="h-3.5 w-3.5 mr-2" />
-                      Call Customer
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onClick={() => {
-                        navigator.clipboard.writeText(currentOrder?.id);
-                      }}
-                    >
-                      <Copy className="h-3.5 w-3.5 mr-2" />
-                      Copy Order ID
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => {
-                        navigator.clipboard.writeText(
-                          currentOrder?.customer?.phoneNumber ?? "",
-                        );
-                      }}
-                    >
-                      <Copy className="h-3.5 w-3.5 mr-2" />
-                      Copy Customer Phone
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Copy className="h-3.5 w-3.5 mr-2" />
-                      Copy Order Tracking number
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem>
-                      <DownloadIcon className="h-3.5 w-3.5 mr-2" />
-                      Export Order Excel
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onClick={() => {
-                        deleteOrder(currentOrder.id);
-                      }}
-                    >
-                      <Trash2 className="h-3.5 w-3.5 mr-2" />
-                      Trash
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                <Button
-                  size="icon"
-                  variant="outline"
-                  className="h-8 w-8"
+                {/* <DropdownMenuItem>Print</DropdownMenuItem> */}
+                <DropdownMenuItem
                   onClick={() => {
-                    // close the order view
-                    setCurrentOrder("");
+                    window.open(
+                      `https://wa.me/212${currentOrder?.customer?.phoneNumber}`,
+                    );
                   }}
                 >
-                  <X className="h-3.5 w-3.5" />
-                </Button>
+                  <Phone className="h-3.5 w-3.5 mr-2" /> Contact Whatsapp
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    window.open(
+                      `tel:+212${currentOrder?.customer?.phoneNumber}`,
+                    );
+                  }}
+                >
+                  <Phone className="h-3.5 w-3.5 mr-2" />
+                  Call Customer
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => {
+                    navigator.clipboard.writeText(currentOrder?.id);
+                  }}
+                >
+                  <Copy className="h-3.5 w-3.5 mr-2" />
+                  Copy Order ID
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    navigator.clipboard.writeText(
+                      currentOrder?.customer?.phoneNumber ?? "",
+                    );
+                  }}
+                >
+                  <Copy className="h-3.5 w-3.5 mr-2" />
+                  Copy Customer Phone
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Copy className="h-3.5 w-3.5 mr-2" />
+                  Copy Order Tracking number
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <DownloadIcon className="h-3.5 w-3.5 mr-2" />
+                  Export Order Excel
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => {
+                    deleteOrder(currentOrder.id);
+                  }}
+                >
+                  <Trash2 className="h-3.5 w-3.5 mr-2" />
+                  Trash
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <Button
+              size="icon"
+              variant="outline"
+              className="h-8 w-8"
+              onClick={() => {
+                // close the order view
+                setCurrentOrder("");
+              }}
+            >
+              <X className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="p-4 text-sm">
+          <div className="grid gap-2">
+            <ul className="grid gap-2">
+              <li className="flex items-center justify-between">
+                <PopoverRoot>
+                  <PopoverTrigger className="border-none w-fit p-0">
+                    <Button size="sm" variant="outline" className="flex gap-2 ">
+                      <QrCodeIcon className="h-5 w-5 " />
+                      QR Code
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[250px] h-[250px] p-4">
+                    <QRCode
+                      className="w-full h-full"
+                      value={"Order:" + currentOrder.id}
+                      fgColor="#444"
+                    />
+                  </PopoverContent>
+                </PopoverRoot>
+
+                <StateChanger
+                  state={currentOrder.orderStatus}
+                  order={currentOrder}
+                />
+              </li>
+            </ul>
+
+            <Separator className="my-2" />
+            <div className="grid gap-3">
+              <div className="flex justify-between">
+                <div className="font-semibold">Customer Information</div>
+                <CustomerShield
+                  number={currentOrder.customer.phoneNumber ?? ""}
+                  orderId={currentOrder.id}
+                />
               </div>
-            </CardHeader>
-            <CardContent className="p-4 text-sm">
-              <div className="grid gap-2">
-                <ul className="grid gap-2">
-                  <li className="flex items-center justify-between">
-                    <PopoverRoot>
-                      <PopoverTrigger className="border-none w-fit p-0">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="flex gap-2 "
-                        >
-                          <QrCodeIcon className="h-5 w-5 " />
-                          QR Code
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-[250px] h-[250px] p-4">
-                        <QRCode
-                          className="w-full h-full"
-                          value={"Order:" + currentOrder.id}
-                          fgColor="#444"
-                        />
-                      </PopoverContent>
-                    </PopoverRoot>
-
-                    <StateChanger
-                      state={currentOrder.orderStatus}
-                      order={currentOrder}
-                    />
-                  </li>
-                </ul>
-
-                <Separator className="my-2" />
-                <div className="grid gap-3">
-                  <div className="flex justify-between">
-                    <div className="font-semibold">Customer Information</div>
-                    <CustomerShield
-                      number={currentOrder.customer.phoneNumber ?? ""}
-                      orderId={currentOrder.id}
-                    />
+              <dl className=" gap-4 flex  ">
+                <Avvvatars
+                  style={"shape"}
+                  value={currentOrder.customer.phoneNumber ?? ""}
+                />
+                <div className="flex-1">
+                  <div className="flex items-center justify-between">
+                    <dt className="text-muted-foreground">Customer</dt>
+                    <dd>{currentOrder.customer.name}</dd>
                   </div>
-                  <dl className=" gap-4 flex  ">
-                    <Avvvatars
-                      style={"shape"}
-                      value={currentOrder.customer.phoneNumber ?? ""}
-                    />
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <dt className="text-muted-foreground">Customer</dt>
-                        <dd>{currentOrder.customer.name}</dd>
-                      </div>
-                      {currentOrder.customer.email && (
-                        <div className="flex items-center justify-between">
-                          <dt className="text-muted-foreground">Email</dt>
-                          <dd>
-                            <a href="mailto:">
-                              {currentOrder.customer?.email ?? "no email"}
-                            </a>
-                          </dd>
-                        </div>
-                      )}
-                      <div className="flex items-center justify-between">
-                        <dt className="text-muted-foreground">Phone</dt>
-                        <dd>
-                          <a href="tel:" className="font-semibold">
-                            {currentOrder.customer.phoneNumber}
-                          </a>
-                        </dd>
-                      </div>
+                  {currentOrder.customer.email && (
+                    <div className="flex items-center justify-between">
+                      <dt className="text-muted-foreground">Email</dt>
+                      <dd>
+                        <a href="mailto:">
+                          {currentOrder.customer?.email ?? "no email"}
+                        </a>
+                      </dd>
                     </div>
-                  </dl>
-                </div>
-                <Separator className="my-4" />
-                <div className="grid  gap-4">
-                  <div className="grid gap-3">
-                    <div className="font-semibold">Shipping Information</div>
-
-                    <div className="flex w-full">
-                      <address className="flex-1 grid gap-0.5 not-italic text-muted-foreground">
-                        <span>
-                          {currentOrder.customer.shippingAddress.city}
-                        </span>
-                        <span>
-                          {currentOrder.customer.shippingAddress.address}
-                        </span>
-                      </address>
-                      {currentOrder.cityAi && currentOrder.cityAi.city && (
-                        <address className="flex-1  grid gap-0.5 not-italic text-primary/80 font-bold">
-                          <span>{currentOrder.cityAi.city}</span>
-                          <span className="font-medium opacity-70">
-                            {currentOrder.cityAi.region}
-                          </span>
-                        </address>
-                      )}
-                    </div>
+                  )}
+                  <div className="flex items-center justify-between">
+                    <dt className="text-muted-foreground">Phone</dt>
+                    <dd>
+                      <a href="tel:" className="font-semibold">
+                        {currentOrder.customer.phoneNumber}
+                      </a>
+                    </dd>
                   </div>
                 </div>
-                <Separator className="my-2" />
-                <div className="font-semibold">Order Details</div>
-                <ul className="grid gap-3">
-                  {/* <li className="flex items-center justify-between">
+              </dl>
+            </div>
+            <Separator className="my-4" />
+            <div className="grid  gap-4">
+              <div className="grid gap-3">
+                <div className="font-semibold">Shipping Information</div>
+
+                <div className="flex w-full">
+                  <address className="flex-1 grid gap-0.5 not-italic text-muted-foreground">
+                    <span>{currentOrder.customer.shippingAddress.city}</span>
+                    <span>{currentOrder.customer.shippingAddress.address}</span>
+                  </address>
+                  {currentOrder.cityAi && currentOrder.cityAi.city && (
+                    <address className="flex-1  grid gap-0.5 not-italic text-primary/80 font-bold">
+                      <span>{currentOrder.cityAi.city}</span>
+                      <span className="font-medium opacity-70">
+                        {currentOrder.cityAi.region}
+                      </span>
+                    </address>
+                  )}
+                </div>
+              </div>
+            </div>
+            <Separator className="my-2" />
+            <div className="font-semibold">Order Details</div>
+            <ul className="grid gap-3">
+              {/* <li className="flex items-center justify-between">
                   <span className="text-muted-foreground">
                     Glimmer Lamps x <span>2</span>
                   </span>
                   <span>$250.00</span>
                 </li> */}
-                  {currentOrder?.items?.map((item, index) => {
-                    return (
-                      <li
-                        key={index}
-                        className="flex border-t pt-1 border-slate-100 items-center justify-between"
-                      >
-                        <span className="text-muted-foreground flex gap-2">
-                          <HoverCard>
-                            <HoverCardTrigger>
-                              {item.title} x{" "}
-                              <span className="font-semibold">
-                                {item.quantity}
-                              </span>
-                            </HoverCardTrigger>
-                            <HoverCardContent>
-                              <div className="flex gap-4">
-                                <Image
-                                  className="w-24 h-24 object-cover border rounded-md "
-                                  src={item.imageUrl ?? ""}
-                                  alt=""
-                                  width={100}
-                                  height={100}
-                                />
-                                <div>
-                                  <div className="font-semibold">
-                                    {item.title}
-                                  </div>
-                                  <div className="text-sm text-muted-foreground mt-1">
-                                    {item.price} dh x {item.quantity} ={" "}
-                                    {item.totalPrice} dh
-                                  </div>
-                                </div>
+              {currentOrder?.items?.map((item, index) => {
+                return (
+                  <li
+                    key={index}
+                    className="flex border-t pt-1 border-slate-100 items-center justify-between"
+                  >
+                    <span className="text-muted-foreground flex gap-2">
+                      <HoverCard>
+                        <HoverCardTrigger className="flex gap-2 items-center cursor-pointer">
+                          <Image
+                            className="w-8 bg-slate-50 h-8 object-cover border rounded-sm "
+                            src={item.imageUrl ?? ""}
+                            alt=""
+                            width={32}
+                            height={32}
+                          />
+                          {item.title} x{" "}
+                          <span className="font-semibold">{item.quantity}</span>
+                        </HoverCardTrigger>
+                        <HoverCardContent>
+                          <div className="flex gap-4">
+                            <Image
+                              className="w-24 h-24 object-cover border rounded-md "
+                              src={item.imageUrl ?? ""}
+                              alt=""
+                              width={100}
+                              height={100}
+                            />
+                            <div>
+                              <div className="font-semibold">{item.title}</div>
+                              <div className="text-sm text-muted-foreground mt-1">
+                                {item.price} dh x {item.quantity} ={" "}
+                                {item.totalPrice} dh
                               </div>
-                            </HoverCardContent>
-                          </HoverCard>
-                          <br />
-                          {item.discount && (
-                            <span className="text-xs text-green-600">
-                              Discount: {item.discount.amount}{" "}
-                              {item.discount.type === "percentage" ? "%" : "Dh"}
-                            </span>
-                          )}
-                        </span>
-                        {item.discount ? (
-                          <div className="flex gap-2">
-                            <span className="line-through  text-muted-foreground">
-                              {item.price * item.quantity} Dh
-                            </span>
-                            <span>
-                              {item.price * item.quantity -
-                                (item.discount.type === "percentage"
-                                  ? ((item.price * item.discount.amount) /
-                                      100) *
-                                    item.quantity
-                                  : item.discount.amount * item.quantity)}{" "}
-                              Dh
-                            </span>
+                            </div>
                           </div>
-                        ) : (
-                          <span>{item.totalPrice} Dh</span>
-                        )}
-                      </li>
-                    );
-                  })}
-                </ul>
-                <Separator className="my-2" />
-                <ul className="grid gap-3">
-                  <li className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Subtotal</span>
-                    <span>{currentOrder.subtotal} Dh</span>
+                        </HoverCardContent>
+                      </HoverCard>
+                      {item.discount && (
+                        <>
+                          <br />
+                          <span className="text-xs text-green-600">
+                            Discount: {item.discount.amount}{" "}
+                            {item.discount.type === "percentage" ? "%" : "Dh"}
+                          </span>
+                        </>
+                      )}
+                    </span>
+                    {item.discount ? (
+                      <div className="flex gap-2">
+                        <span className="line-through  text-muted-foreground">
+                          {item.price * item.quantity} Dh
+                        </span>
+                        <span>
+                          {item.price * item.quantity -
+                            (item.discount.type === "percentage"
+                              ? ((item.price * item.discount.amount) / 100) *
+                                item.quantity
+                              : item.discount.amount * item.quantity)}{" "}
+                          Dh
+                        </span>
+                      </div>
+                    ) : (
+                      <span>{item.totalPrice} Dh</span>
+                    )}
                   </li>
-                  {currentOrder?.discountAmount ? (
-                    <li className="flex items-center justify-between">
-                      <span className="text-muted-foreground">
-                        Discount Amount
-                      </span>
-                      <span>- {currentOrder?.discountAmount} Dh</span>
-                    </li>
-                  ) : null}
-                  <li className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Shipping</span>
-                    <span>+ {currentOrder.shippingInfo.cost || 0} Dh</span>
-                  </li>
-                  <li className="flex items-center justify-between font-semibold">
-                    <span className="text-muted-foreground">Total</span>
-                    <span>{currentOrder.totalPrice} Dh</span>
-                  </li>
-                </ul>
+                );
+              })}
+            </ul>
+            <Separator className="my-2" />
+            <ul className="grid gap-3">
+              <li className="flex items-center justify-between">
+                <span className="text-muted-foreground">Subtotal</span>
+                <span>{currentOrder.subtotal} Dh</span>
+              </li>
+              {currentOrder?.discountAmount ? (
+                <li className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Discount Amount</span>
+                  <span>- {currentOrder?.discountAmount} Dh</span>
+                </li>
+              ) : null}
+              <li className="flex items-center justify-between">
+                <span className="text-muted-foreground">Shipping</span>
+                <span>+ {currentOrder.shippingInfo.cost || 0} Dh</span>
+              </li>
+              <li className="flex items-center justify-between font-semibold">
+                <span className="text-muted-foreground">Total</span>
+                <span>{currentOrder.totalPrice} Dh</span>
+              </li>
+            </ul>
+          </div>
+          {currentOrder.note && currentOrder.note?.content && (
+            <div>
+              <Separator className="my-4" />
+              <div className="grid gap-3">
+                <div className="font-semibold">Note</div>
+                <p className="text-muted-foreground">
+                  {currentOrder.note?.content ?? "No note"}
+                </p>
               </div>
-              {currentOrder.note && currentOrder.note?.content && (
-                <div>
-                  <Separator className="my-4" />
-                  <div className="grid gap-3">
-                    <div className="font-semibold">Note</div>
-                    <p className="text-muted-foreground">
-                      {currentOrder.note?.content ?? "No note"}
-                    </p>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-            <CardFooter className="flex flex-row items-center border-t bg-muted/50 px-6 py-3">
-              <div className="text-xs text-muted-foreground">
-                Updated{" "}
-                {currentOrder &&
-                  currentOrder.updatedAt &&
-                  currentOrder.updatedAt.toDate().toLocaleDateString()}{" "}
-                at{" "}
-              </div>
-            </CardFooter>
-          </Card>
-        </motion.div>
-      ) : null}
-    </AnimatePresence>
-  );
+            </div>
+          )}
+        </CardContent>
+        <CardFooter className="flex flex-row items-center border-t bg-muted/50 px-6 py-3">
+          <div className="text-xs text-muted-foreground">
+            Updated{" "}
+            {currentOrder &&
+              currentOrder.updatedAt &&
+              currentOrder.updatedAt.toDate().toLocaleDateString()}{" "}
+            at{" "}
+          </div>
+        </CardFooter>
+      </Card>
+    </motion.div>
+  ) : null;
 }
 
 export default OrderView;

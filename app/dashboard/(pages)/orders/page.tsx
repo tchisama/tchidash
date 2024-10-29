@@ -1,5 +1,5 @@
 "use client";
-import { Check, Filter, PlusCircle } from "lucide-react";
+import { Check, Filter, PlusCircle, TicketsIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -33,7 +33,7 @@ import { Label } from "@/components/ui/label";
 import Analytic from "./components/analytic";
 
 export default function Page() {
-  const { currentOrder } = useOrderStore();
+  const { currentOrder, selectedOrder } = useOrderStore();
   const [pageSize, setPageSize] = useState(25);
   const [filter, setFilter] = useState({
     status: [
@@ -128,9 +128,22 @@ export default function Page() {
             </div>
           </div>
           <Card x-chunk="dashboard-05-chunk-3">
-            <CardHeader className="px-7">
-              <CardTitle>Orders</CardTitle>
-              <CardDescription>Recent orders from your store.</CardDescription>
+            <CardHeader className="px-7 flex flex-row items-start justify-between">
+              <div>
+                <CardTitle>Orders</CardTitle>
+                <CardDescription>
+                  Recent orders from your store.
+                </CardDescription>
+              </div>
+              <div>
+                {selectedOrder && selectedOrder.length > 0 && (
+                  <Link href="/dashboard/none-layout/tickets">
+                    <Button variant="outline" className="text-sm flex gap-2">
+                      Tickets <TicketsIcon className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                )}
+              </div>
             </CardHeader>
             <CardContent>
               <OrdersTable

@@ -37,6 +37,7 @@ import { db } from "@/firebase";
 import { StateChanger } from "./StateChanger";
 import { Skeleton } from "@/components/ui/skeleton";
 import { trackUserUsage } from "@/lib/queries/usage";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export function OrdersTable({
   filter,
@@ -48,7 +49,14 @@ export function OrdersTable({
   filter: { status: string[]; search: string };
 }) {
   const { storeId } = useStore();
-  const { orders, setOrders, currentOrder, setCurrentOrder } = useOrderStore();
+  const {
+    orders,
+    setOrders,
+    currentOrder,
+    setCurrentOrder,
+    selectedOrder,
+    setSelectedOrder,
+  } = useOrderStore();
   const [currentPage, setCurrentPage] = React.useState(1);
   const [totalPages, setTotalPages] = React.useState(0);
   const [totalCount, setTotalCount] = React.useState(0);
@@ -123,13 +131,15 @@ export function OrdersTable({
   const renderPageNumbers = () => {
     const pages: JSX.Element[] = [];
 
-    for (let i = 1; i <= totalPages; i++) {
+    for (let i = 1; i <= Math.min(totalPages, 10); i++) {
       pages.push(
         <PaginationItem key={i}>
           <PaginationLink
             href="#"
             onClick={() => handlePageClick(i)}
-            className={currentPage === i ? "active" : ""}
+            className={
+              currentPage === i ? "bg-slate-200 hover:bg-slate-300" : ""
+            }
           >
             {i}
           </PaginationLink>
@@ -146,6 +156,7 @@ export function OrdersTable({
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="">Select</TableHead>
               <TableHead className="">Product</TableHead>
               <TableHead>Customer</TableHead>
               <TableHead className="">Status</TableHead>
@@ -179,6 +190,24 @@ export function OrdersTable({
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead className="">
+              <div className="flex   justify-start items-center">
+                <Checkbox
+                  checked={orders.every((order) =>
+                    selectedOrder.includes(order.id),
+                  )}
+                  onCheckedChange={() => {
+                    if (
+                      orders.every((order) => selectedOrder.includes(order.id))
+                    ) {
+                      setSelectedOrder([]);
+                    } else {
+                      setSelectedOrder(orders.map((order) => order.id));
+                    }
+                  }}
+                />
+              </div>
+            </TableHead>
             <TableHead className="">Product</TableHead>
             <TableHead>Customer</TableHead>
             <TableHead className="">Status</TableHead>
@@ -197,6 +226,26 @@ export function OrdersTable({
                 currentOrder && currentOrder.id === order.id && "bg-muted",
               )}
             >
+              <TableCell
+                className="group"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (selectedOrder.includes(order.id)) {
+                    setSelectedOrder(
+                      selectedOrder.filter((id) => id !== order.id),
+                    );
+                  } else {
+                    setSelectedOrder([...selectedOrder, order.id]);
+                  }
+                }}
+              >
+                <div className="flex   justify-start items-center">
+                  <Checkbox
+                    className="group-hover:outline outline-primary/30"
+                    checked={selectedOrder.includes(order.id)}
+                  />
+                </div>
+              </TableCell>
               <TableCell className="">
                 <div className="relative h-10 w-20">
                   {order.items.slice(0, 3).map((item, i) => {
@@ -262,15 +311,29 @@ export function OrdersTable({
                   {order.customer.shippingAddress.city}
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  {order.customer.shippingAddress.address}
+                  {order.customer.shippingAddress.address.slice(0, 40)}
+                  {order.customer.shippingAddress.address.length > 40 && "..."}
                 </div>
               </TableCell>
               <TableCell className="">
                 <div className="text-sm">
-                  {order.createdAt.toDate().toDateString()}
+                  {order.createdAt.toDate().toLocaleDateString("en-US", {
+                    // i want to get the same order as year/month/day
+
+                    year: "numeric",
+                    month: "numeric",
+                    day: "numeric",
+                  })}
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  {order.createdAt.toDate().toLocaleTimeString()}
+                  {order.createdAt.toDate().toLocaleTimeString(
+                    // without seconds
+                    "en-US",
+                    {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    },
+                  )}
                 </div>
               </TableCell>
               <TableCell className="text-right">

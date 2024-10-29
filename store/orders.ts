@@ -9,6 +9,9 @@ interface OrderState {
   setOrders: (orders: Order[]) => void;
   currentOrder: Order | null; // The current order being worked on
 
+  selectedOrder: string[];
+  setSelectedOrder: (order: string[]) => void;
+
   newOrder: Order | null;
   setNewOrder: (order: Order | null) => void;
 
@@ -26,6 +29,9 @@ export const useOrderStore = create<OrderState>((set) => ({
   orders: [],
   setOrders: (orders: Order[]) => set({ orders }),
   currentOrder: null,
+
+  selectedOrder: [],
+  setSelectedOrder: (order: string[]) => set({ selectedOrder: order }),
 
   newOrder: null,
   setNewOrder: (order: Order | null) => set({ newOrder: order }),

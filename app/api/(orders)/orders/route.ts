@@ -53,8 +53,9 @@ export async function POST(request: NextRequest) {
   const order = {
     ...body,
     storeId,
-    createdAt: Timestamp.now(),
-    updatedAt: Timestamp.now(),
+    createdAt: Timestamp.fromDate(
+      new Date(body.createdAt || new Date().toISOString()),
+    ),
   } as Order;
 
   if (!order.customer.firstName)
