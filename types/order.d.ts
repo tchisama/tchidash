@@ -102,6 +102,6 @@ export type Order = {
   cityAi?: {
     city: string;
     region: string;
-    "R-ID": string;
+    ID: string;
   };
 };

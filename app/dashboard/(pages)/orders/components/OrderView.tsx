@@ -23,9 +23,9 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
+  ArrowRightIcon,
   Copy,
   DownloadIcon,
-  Loader,
   MoreVertical,
   Phone,
   QrCodeIcon,
@@ -47,13 +47,11 @@ import { db } from "@/firebase";
 import { doc } from "firebase/firestore";
 import QRCode from "react-qr-code";
 import { motion } from "framer-motion";
-import { dbDeleteDoc, dbUpdateDoc } from "@/lib/dbFuntions/fbFuns";
+import { dbDeleteDoc } from "@/lib/dbFuntions/fbFuns";
 import { useStore } from "@/store/storeInfos";
 import Avvvatars from "avvvatars-react";
-import axios from "axios";
 function OrderView() {
-  const { currentOrder, setCurrentOrder, setCurrentOrderData } =
-    useOrderStore();
+  const { currentOrder, setCurrentOrder } = useOrderStore();
   const { storeId } = useStore();
 
   const deleteOrder = async (orderId: string) => {
@@ -69,49 +67,6 @@ function OrderView() {
     } else {
       alert("You can't delete an order that is not cancelled or returned");
     }
-  };
-
-  const [loadingOptimize, setLoadingOptimize] = React.useState(false);
-
-  const optimize = async () => {
-    setLoadingOptimize(true);
-    const res = await axios.post("/api/openai/order-city", {
-      misspelledCity: currentOrder?.customer.shippingAddress.city,
-    });
-    console.log(res.data.correction);
-    const dataFromApi: {
-      city: string;
-      region: string;
-      "R-ID": string;
-    } = JSON.parse(res.data.correction);
-    if (!dataFromApi.city || !dataFromApi.region || !dataFromApi["R-ID"]) {
-      alert("Couldn't optimize the city");
-      setLoadingOptimize(false);
-    }
-    if (!currentOrder) return;
-    if (!storeId) return;
-    dbUpdateDoc(
-      doc(db, "orders", currentOrder.id),
-      {
-        cityAi: {
-          city: dataFromApi.city,
-          region: dataFromApi.region,
-          ID: dataFromApi["R-ID"],
-        },
-      },
-      storeId,
-      "",
-    );
-    setCurrentOrderData({
-      ...currentOrder,
-      cityAi: {
-        city: dataFromApi.city,
-        region: dataFromApi.region,
-        "R-ID": dataFromApi["R-ID"],
-      },
-    });
-
-    setLoadingOptimize(false);
   };
 
   return currentOrder ? (
@@ -140,28 +95,6 @@ function OrderView() {
             </CardDescription>
           </div>
           <div className="ml-auto flex items-center gap-1">
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-8 gap-1"
-              onClick={optimize}
-            >
-              {loadingOptimize ? (
-                <>
-                  <Loader className="animate-spin h-3.5 w-3.5" />
-                  <span className="lg:sr-only xl:not-sr-only xl:whitespace-nowrap">
-                    Optimizing
-                  </span>
-                </>
-              ) : (
-                <>
-                  <StarsIcon className="h-3.5 w-3.5" />
-                  <span className="lg:sr-only xl:not-sr-only xl:whitespace-nowrap">
-                    Optimize
-                  </span>
-                </>
-              )}
-            </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button size="icon" variant="outline" className="h-8 w-8">
@@ -318,17 +251,30 @@ function OrderView() {
 
                 <div className="flex w-full">
                   <address className="flex-1 grid gap-0.5 not-italic text-muted-foreground">
-                    <span>{currentOrder.customer.shippingAddress.city}</span>
+                    <div className="flex items-center gap-2">
+                      <span>{currentOrder.customer.shippingAddress.city}</span>
+                      <ArrowRightIcon className="h-4 w-4" />
+                      <span className="text-primary/80 font-bold flex gap-1">
+                        {currentOrder.cityAi && currentOrder.cityAi.city}
+                        <StarsIcon className="h-4 w-4" />
+                      </span>
+                      <span className="">| </span>
+                      <span>
+                        {currentOrder.cityAi && currentOrder.cityAi.region}
+                      </span>
+                    </div>
                     <span>{currentOrder.customer.shippingAddress.address}</span>
                   </address>
-                  {currentOrder.cityAi && currentOrder.cityAi.city && (
-                    <address className="flex-1  grid gap-0.5 not-italic text-primary/80 font-bold">
-                      <span>{currentOrder.cityAi.city}</span>
-                      <span className="font-medium opacity-70">
-                        {currentOrder.cityAi.region}
-                      </span>
-                    </address>
-                  )}
+                  {
+                    //currentOrder.cityAi && currentOrder.cityAi.city && (
+                    //  <address className="flex-1  grid gap-0.5 not-italic text-primary/80 font-bold">
+                    //    <span>{currentOrder.cityAi.city}</span>
+                    //    <span className="font-medium opacity-70">
+                    //      {currentOrder.cityAi.region}
+                    //    </span>
+                    //  </address>
+                    //)
+                  }
                 </div>
               </div>
             </div>

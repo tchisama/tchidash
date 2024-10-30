@@ -30,7 +30,7 @@ import { dbGetDocs } from "@/lib/dbFuntions/fbFuns";
 function OrdersGraph() {
   // start date is 30 days before
   const [startDate] = React.useState(
-    new Date(new Date().setDate(new Date().getDate() - 14)),
+    new Date(new Date().setDate(new Date().getDate() - 15)),
   );
   const [endDate] = React.useState(new Date());
   const { storeId } = useStore();
@@ -132,7 +132,7 @@ function OrdersGraph() {
                 tickFormatter={(value) => {
                   return new Date(value).toLocaleDateString("en-US", {
                     day: "numeric",
-                    month: "short",
+                    month: "numeric",
                   });
                 }}
               />

@@ -14,6 +14,7 @@ import { db } from "@/firebase"; // Adjust this import based on your Firebase se
 import { Order } from "@/types/order";
 import { OrderItem } from "@/types/order";
 import { Customer } from "@/types/customer";
+import axios from "axios";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -53,9 +54,7 @@ export async function POST(request: NextRequest) {
   const order = {
     ...body,
     storeId,
-    createdAt: Timestamp.fromDate(
-      new Date(body.createdAt || new Date().toISOString()),
-    ),
+    createdAt: Timestamp.now(),
   } as Order;
 
   if (!order.customer.firstName)
@@ -89,9 +88,24 @@ export async function POST(request: NextRequest) {
       { status: 400 },
     );
 
-  //
-  //
-  //
+  // lets Correct the city name if it not already in the correct format
+  await axios
+    .get(
+      "http://localhost:3000/api/ai/city-corrector?city=" +
+        order.customer.shippingAddress.city,
+    )
+    .then((response) => {
+      console.log(response.data);
+      order.cityAi = {
+        city: response.data.city,
+        region: response.data.region,
+        ID: response.data["R-ID"],
+      };
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+
   const { items } = order;
 
   const subtotal = items.reduce(

@@ -113,7 +113,8 @@ export default function CreateOrder() {
 
     const orderForUpdate: Order = {
       ...order,
-      updatedAt: Timestamp.now(),
+      //createdAt: Timestamp.now(),
+      //updatedAt: Timestamp.now(),
       customer: {
         ...order.customer,
         name: order.customer.firstName + " " + order.customer.lastName,
