@@ -21,6 +21,8 @@ import { useOrderStore } from "@/store/orders";
 import { toPng } from "html-to-image";
 import { Button } from "@/components/ui/button";
 
+import Image from "next/image";
+
 export default function OrderToImage({
   children,
 }: {
@@ -31,19 +33,19 @@ export default function OrderToImage({
   const [open, setOpen] = useState(false);
 
   const handleDownloadImage = () => {
-    if (componentRef.current === null) return;
-
-    if (!componentRef.current) return;
-    toPng(componentRef.current)
-      .then((dataUrl) => {
-        const link = document.createElement("a");
-        link.href = dataUrl;
-        link.download = "component-image.png";
-        link.click();
-      })
-      .catch((err) => {
-        console.log("Error capturing image:", err);
-      });
+    setTimeout(() => {
+      if (!componentRef.current) return;
+      toPng(componentRef.current)
+        .then((dataUrl) => {
+          const link = document.createElement("a");
+          link.href = dataUrl;
+          link.download = "component-image.png";
+          link.click();
+        })
+        .catch((err) => {
+          console.log("Error capturing image:", err);
+        });
+    }, 1000);
   };
 
   return (
@@ -78,14 +80,13 @@ export default function OrderToImage({
                       key={`item-${item.id}`} // Ensure unique key for each item
                       className="flex items-center space-x-4 mb-4 pb-4 border-b last:border-b-0"
                     >
-                      <div
-                        className="rounded-lg border w-[70] h-[70] bg-slate-100"
-                        style={{
-                          backgroundImage: `url(${item.imageUrl || "/fallback-image.jpg"})`,
-                          backgroundSize: "cover",
-                          backgroundPosition: "center",
-                        }}
-                      ></div>
+                      <Image
+                        src={item.imageUrl || "/fallback-image.jpg"}
+                        width={70}
+                        height={70}
+                        alt={item.title}
+                        className="rounded-lg border w-[70px] h-[70px] bg-slate-100"
+                      />
                       <div className="flex-grow">
                         <h3 className="text-md font-semibold">{item.title}</h3>
                         <p className="text-sm text-gray-500">
