@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
   // lets Correct the city name if it not already in the correct format
   await axios
     .get(
-      "http://localhost:3000/api/ai/city-corrector?city=" +
+      "https://tchidash.vercel.app/api/ai/city-corrector?city=" +
         order.customer.shippingAddress.city,
     )
     .then((response) => {
