@@ -53,6 +53,7 @@ export type Store = {
   }[];
   employeesEmails?: string[];
   employees?: Employee[];
+  integrations?: Integration[];
 };
 
 export type Employee = {
@@ -61,5 +62,17 @@ export type Employee = {
   email: string;
   access: {
     [key: string]: boolean;
+  };
+};
+
+type Integration = digylogIntegration;
+
+type digylogIntegration = {
+  name: "digylog";
+  enabled: boolean;
+  phoneNumber: string;
+  password: string;
+  headers: {
+    authorization: string;
   };
 };

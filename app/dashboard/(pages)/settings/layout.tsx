@@ -14,7 +14,7 @@ function layout({ children }: Props) {
         </div>
         <div className="mx-auto grid w-full  items-start gap-6 md:grid-cols-[180px_1fr] lg:grid-cols-[250px_1fr]">
           <Navbar />
-          <div className=" max-w-3xl grid gap-6">{children}</div>
+          <div className=" max-w-7xl w-full ">{children}</div>
         </div>
       </main>
     </div>
