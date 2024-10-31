@@ -29,6 +29,7 @@ import {
   MoreVertical,
   Phone,
   QrCodeIcon,
+  ReceiptIcon,
   StarsIcon,
   Trash2,
   X,
@@ -50,6 +51,7 @@ import { motion } from "framer-motion";
 import { dbDeleteDoc } from "@/lib/dbFuntions/fbFuns";
 import { useStore } from "@/store/storeInfos";
 import Avvvatars from "avvvatars-react";
+import OrderToImage from "./OrderToImage";
 function OrderView() {
   const { currentOrder, setCurrentOrder } = useOrderStore();
   const { storeId } = useStore();
@@ -149,6 +151,12 @@ function OrderView() {
                   Copy Order Tracking number
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={(e) => e.preventDefault()}>
+                  <OrderToImage>
+                    <ReceiptIcon className="h-3.5 w-3.5 mr-2" />
+                    Download Image Receipt
+                  </OrderToImage>
+                </DropdownMenuItem>
                 <DropdownMenuItem>
                   <DownloadIcon className="h-3.5 w-3.5 mr-2" />
                   Export Order Excel
