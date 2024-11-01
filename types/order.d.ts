@@ -3,7 +3,8 @@ import { Timestamp } from "firebase/firestore";
 // Type for order status
 export type OrderStatus =
   | "pending"
-  | "processing"
+  | "confirmed"
+  | "packed"
   | "shipped"
   | "delivered"
   | "cancelled"
@@ -65,7 +66,10 @@ export interface ShippingInfo {
   method: string; // e.g., 'standard', 'express'
   cost: number; // Shipping cost
   trackingNumber?: string;
-  shippingStatus: ShippingStatus;
+  shippingProvider?: string;
+  shippingStatus?: ShippingStatus;
+  // the shipping cost i give the provider
+  shippingCost?: number;
 }
 
 // Type for payment information

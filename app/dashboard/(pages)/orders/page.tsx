@@ -38,11 +38,13 @@ export default function Page() {
   const [filter, setFilter] = useState({
     status: [
       "pending",
-      "processing",
+      "confirmed",
+      "packed",
       "shipped",
       "delivered",
       "cancelled",
       "returned",
+      "fake",
     ],
     search: "",
   });

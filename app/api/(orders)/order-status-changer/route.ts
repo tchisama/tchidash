@@ -11,6 +11,37 @@ interface OrderUpdateRequest {
   storeId: string;
 }
 
+export const orderStatusValuesWithIcon = [
+  {
+    name: "pending",
+    effectStock: false,
+  },
+  {
+    name: "confirmed",
+    effectStock: true,
+  },
+  {
+    name: "packed",
+    effectStock: true,
+  },
+  {
+    name: "shipped",
+    effectStock: true,
+  },
+  {
+    name: "delivered",
+    effectStock: true,
+  },
+  {
+    name: "cancelled",
+    effectStock: false,
+  },
+  {
+    name: "returned",
+    effectStock: false,
+  },
+];
+
 export async function POST(req: Request) {
   try {
     const { orderId, newStatus, storeId }: OrderUpdateRequest =
@@ -62,15 +93,19 @@ export async function POST(req: Request) {
       "",
     );
 
+    const statusEffect = orderStatusValuesWithIcon.find(
+      (status) => status.name === newStatus,
+    )?.effectStock;
+
+    const statusEffectOld = orderStatusValuesWithIcon.find(
+      (status) => status.name === oldStatus,
+    )?.effectStock;
+
+    console.log("statusEffect", statusEffect);
+    console.log("statusEffectOld", statusEffectOld);
+
     // Adjust inventory stock based on new status
-    if (
-      (oldStatus === "pending" ||
-        oldStatus === "cancelled" ||
-        oldStatus === "returned") &&
-      (newStatus === "processing" ||
-        newStatus === "shipped" ||
-        newStatus === "delivered")
-    ) {
+    if (statusEffect == true && statusEffectOld == false) {
       for (const item of items) {
         await dbSetDoc(
           doc(db, "inventoryItems", orderId + item.id),
@@ -102,12 +137,14 @@ export async function POST(req: Request) {
 
     // Restore stock if the order is cancelled or returned
     if (
-      (oldStatus === "processing" ||
-        oldStatus === "shipped" ||
-        oldStatus === "delivered") &&
-      (newStatus === "cancelled" ||
-        newStatus === "returned" ||
-        newStatus === "pending")
+      statusEffect == false &&
+      statusEffectOld == true
+      // (oldStatus === "processing" ||
+      //   oldStatus === "shipped" ||
+      //   oldStatus === "delivered") &&
+      // (newStatus === "cancelled" ||
+      //   newStatus === "returned" ||
+      //   newStatus === "pending")
     ) {
       for (const item of items) {
         await dbSetDoc(

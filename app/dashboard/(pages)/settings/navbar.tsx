@@ -1,5 +1,4 @@
 "use client";
-import { ChatBubbleIcon } from "@radix-ui/react-icons";
 import {
   Blocks,
   Cpu,

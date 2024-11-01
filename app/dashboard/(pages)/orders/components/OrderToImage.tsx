@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -24,15 +24,12 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useStore } from "@/store/storeInfos";
 import { Check } from "lucide-react";
+import { useDialogs } from "@/store/dialogs";
 
-export default function OrderToImage({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function OrderToImage() {
   const { currentOrder } = useOrderStore();
   const componentRef = useRef<HTMLDivElement | null>(null);
-  const [open, setOpen] = useState(false);
+  const { OrderToImageOpen: open, setOrderToImageOpen: setOpen } = useDialogs();
 
   const handleDownloadImage = () => {
     if (!componentRef.current) return;
@@ -60,10 +57,6 @@ export default function OrderToImage({
   return (
     currentOrder && (
       <div>
-        <div onClick={() => setOpen(true)} className="flex  items-center">
-          {children}
-        </div>
-
         <AlertDialog open={open} onOpenChange={setOpen}>
           <AlertDialogTrigger asChild>
             <div />

@@ -11,11 +11,13 @@ import {
 import { Button } from "@/components/ui/button";
 import {
   CircleDotDashed,
+  MapPinCheckInside,
   PackageCheck,
   PackageX,
   Truck,
   Undo,
-  UserCheck,
+  UserRoundCheck,
+  UserRoundX,
 } from "lucide-react";
 import { Order } from "@/types/order";
 import { useOrderStore } from "@/store/orders";
@@ -23,7 +25,8 @@ import axios from "axios";
 
 export type OrderStatus =
   | "pending"
-  | "processing"
+  | "confirmed"
+  | "packed"
   | "shipped"
   | "delivered"
   | "cancelled"
@@ -34,31 +37,49 @@ export const orderStatusValuesWithIcon = [
     name: "pending",
     icon: <CircleDotDashed className="h-4 w-4" />,
     color: "#534b52",
+    effectStock: false,
   },
   {
-    name: "processing",
+    name: "confirmed",
+    icon: <UserRoundCheck className="h-4 w-4" />,
+    color: "#3a86ff",
+    effectStock: true,
+  },
+  {
+    name: "packed",
     icon: <PackageCheck className="h-4 w-4" />,
-    color: "#3d348b",
+    color: "#3a86ff",
+    effectStock: true,
   },
   {
     name: "shipped",
     icon: <Truck className="h-4 w-4" />,
-    color: "#2667ff",
+    color: "#3a86ff",
+    effectStock: true,
   },
   {
     name: "delivered",
-    icon: <UserCheck className="h-4 w-4" />,
+    icon: <MapPinCheckInside className="h-4 w-4" />,
     color: "#43aa8b",
+    effectStock: true,
   },
   {
     name: "cancelled",
     icon: <PackageX className="h-4 w-4" />,
     color: "#f8961e",
+    effectStock: false,
   },
   {
     name: "returned",
     icon: <Undo className="h-4 w-4" />,
     color: "#e63946",
+    effectStock: false,
+  },
+  {
+    name: "fake",
+    icon: <UserRoundX className="h-4 w-4" />,
+    color: "#000000",
+    effectStock: false,
   },
 ];
 
@@ -111,7 +132,7 @@ export function StateChanger({
             {state}
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent>
+        <DropdownMenuContent align="start" side="right">
           <DropdownMenuLabel>Order Status</DropdownMenuLabel>
           <DropdownMenuSeparator />
           {orderStatusValuesWithIcon.map((status) => (
@@ -119,33 +140,14 @@ export function StateChanger({
               <DropdownMenuItem
                 key={status.name}
                 style={{
-                  background: status.color + "30",
-                  borderColor: status.color + "40",
+                  background: status.color + "20",
+                  borderColor: status.color + "30",
                   color: "#000a",
                 }}
-                className=" mt-[2px] cursor-pointer border"
+                className="py-1 mt-[2px] cursor-pointer border"
                 onClick={async () => {
                   setActionLoading(true);
                   setState(status.name as OrderStatus);
-
-                  //await dbUpdateDoc(
-                  //  doc(db, "orders", order.id),
-                  //  {
-                  //    ...order,
-                  //    orderStatus: status.name as OrderStatus,
-                  //  },
-                  //  order.storeId,
-                  //  "",
-                  //);
-                  //await updateStockOfProductsBasedOnStatus(
-                  //  status.name as OrderStatus,
-                  //  order.orderStatus,
-                  //  order.items,
-                  //  order,
-                  //);
-                  //
-                  //
-                  //
 
                   try {
                     const response = await axios.post(
@@ -181,7 +183,7 @@ export function StateChanger({
                 <span className="mr-2">{status.icon}</span>
                 {status.name}
               </DropdownMenuItem>
-              {status.name == "delivered" && (
+              {(status.name == "delivered" || status.name == "pending") && (
                 <DropdownMenuSeparator className="w-full h-[2px]" />
               )}
             </>

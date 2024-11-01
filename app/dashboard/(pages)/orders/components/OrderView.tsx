@@ -30,11 +30,9 @@ import {
   ArrowRightIcon,
   Bike,
   Copy,
-  DownloadIcon,
   MoreVertical,
   Phone,
   QrCodeIcon,
-  ReceiptIcon,
   ScrollIcon,
   StarsIcon,
   Trash2,
@@ -63,27 +61,44 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Badge } from "@/components/ui/badge";
 import DigylogDialog from "./DigylogDialog";
+import { useDialogs } from "@/store/dialogs";
 function OrderView() {
   const { currentOrder, setCurrentOrder } = useOrderStore();
   const { storeId, store } = useStore();
+  const { setDigylogOpen, setOrderToImageOpen } = useDialogs();
 
   const { data: digylogData } = useQuery({
-    queryKey: ["digylog", storeId, currentOrder?.id],
+    queryKey: [
+      "digylog",
+      storeId,
+      currentOrder?.id,
+      currentOrder?.shippingInfo?.trackingNumber,
+    ],
     queryFn: async () => {
-      if (!store) return;
-      if (!currentOrder) return;
+      if (!store) return null;
+      if (!currentOrder) return null;
 
-      if (!store.integrations) return;
+      if (!store.integrations) return null;
       if (!store.integrations.find((i) => i.name === "digylog")?.enabled)
-        return;
+        return null;
+      if (!storeId) return null;
+      if (!currentOrder?.shippingInfo?.trackingNumber) return null;
 
       const response = await axios.get(
         //http://localhost:3000/api/integrations/digylog?phone=0644424634)
-        `/api/integrations/digylog?phone=${currentOrder.customer.phoneNumber}`,
+        `/api/integrations/digylog`,
+        {
+          params: {
+            traking: currentOrder?.shippingInfo?.trackingNumber,
+            storeId,
+          },
+        },
       );
+      console.log(response.data);
+      if (response.data.data.length == 0) return null;
       return response.data.data[0];
     },
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 1,
   });
 
   const deleteOrder = async (orderId: string) => {
@@ -104,6 +119,8 @@ function OrderView() {
   return currentOrder
     ? store && (
         <motion.div className="h-full">
+          <DigylogDialog />
+          <OrderToImage />
           <Card className=" sticky top-20" x-chunk="dashboard-05-chunk-4">
             <CardHeader className="flex flex-row items-start bg-muted/50">
               <div className="grid gap-0.5">
@@ -138,9 +155,6 @@ function OrderView() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-[200px]">
-                    {/* <DropdownMenuItem>Edit</DropdownMenuItem>
-                  <DropdownMenuItem>Export</DropdownMenuItem> */}
-                    {/* <DropdownMenuItem>Print</DropdownMenuItem> */}
                     <DropdownMenuItem
                       onClick={() => {
                         window.open(
@@ -161,14 +175,14 @@ function OrderView() {
                       Call Customer
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={(e) => e.preventDefault()}>
-                      <OrderToImage>
-                        <ScrollIcon className="h-3.5 w-3.5 mr-2" />
-                        Get Order Receipt
-                      </OrderToImage>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        setOrderToImageOpen(true);
+                      }}
+                    >
+                      <ScrollIcon className="h-3.5 w-3.5 mr-2" />
+                      Get Order Receipt
                     </DropdownMenuItem>
-
-                    {/* new group */}
 
                     <DropdownMenuSub>
                       <DropdownMenuSubTrigger>
@@ -181,14 +195,18 @@ function OrderView() {
                             <Bike className="h-3.5 w-3.5 mr-2" />
                             Manual
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={(e) => e.preventDefault()}>
-                            <DigylogDialog>
+                          {store?.integrations?.find(
+                            (i) => i.name === "digylog",
+                          )?.enabled && (
+                            <DropdownMenuItem
+                              onClick={() => setDigylogOpen(true)}
+                            >
                               <div className="flex items-center">
                                 <TruckIcon className="h-3.5 w-3.5 mr-2" />
                                 Digylog
                               </div>
-                            </DigylogDialog>
-                          </DropdownMenuItem>
+                            </DropdownMenuItem>
+                          )}
                         </DropdownMenuSubContent>
                       </DropdownMenuPortal>
                     </DropdownMenuSub>
@@ -249,40 +267,7 @@ function OrderView() {
                   </li>
                 </ul>
 
-                <Separator className="my-2" />
-                <h1 className="font-semibold">Shipping Provider</h1>
-                {store &&
-                  store.integrations &&
-                  store?.integrations?.find((i) => i.name === "digylog")
-                    ?.enabled == true && (
-                    <>
-                      <div className="flex gap-2 justify-between">
-                        <h1 className="">Digylog</h1>
-                        {digylogData ? (
-                          <Badge
-                            style={{
-                              backgroundColor: digylogData.stColor + "44",
-                              borderColor: digylogData.stColor,
-                            }}
-                            className="text-slate-900 font-normal shadow-none"
-                          >
-                            {digylogData?.status}
-                          </Badge>
-                        ) : (
-                          <Badge
-                            style={{
-                              backgroundColor: "#8883",
-                              borderColor: "#aaa",
-                            }}
-                            className="text-slate-900 capitalize font-normal shadow-none"
-                          >
-                            not shipped yet
-                          </Badge>
-                        )}
-                      </div>
-                      <Separator className="my-4" />
-                    </>
-                  )}
+                <Separator className="my-4" />
                 <div className="grid gap-3">
                   <div className="flex justify-between">
                     <div className="font-semibold">Customer Information</div>
@@ -322,6 +307,76 @@ function OrderView() {
                     </div>
                   </dl>
                 </div>
+                <Separator className="my-2" />
+                <h1 className="font-semibold">Shipping Provider</h1>
+                {store &&
+                  store.integrations &&
+                  store?.integrations?.find((i) => i.name === "digylog")
+                    ?.enabled == true && (
+                    <>
+                      <div className="">
+                        <div>
+                          <div className="flex gap-2 justify-between">
+                            <span className="text-muted-foreground">
+                              Provider
+                            </span>
+                            <span className="">
+                              {currentOrder?.shippingInfo?.shippingProvider}
+                            </span>
+                          </div>
+                          <div className="flex gap-2 justify-between">
+                            <span className="text-muted-foreground">
+                              Tracking
+                            </span>
+                            <span className="">
+                              {currentOrder?.shippingInfo?.trackingNumber}
+                            </span>
+                          </div>
+                          <div className="flex gap-2 justify-between">
+                            <span className="text-muted-foreground">
+                              Shipping Cost
+                            </span>
+                            <span className="">
+                              {digylogData
+                                ? digylogData.delivery_cost + " Dh"
+                                : "no data yet"}
+                            </span>
+                          </div>
+                          <div className="flex mt-2 gap-2 justify-between">
+                            <span className="text-muted-foreground">
+                              Current Status
+                            </span>
+                            <span className="font-semibold">
+                              {digylogData !== null && digylogData ? (
+                                <div>
+                                  <Badge
+                                    style={{
+                                      backgroundColor:
+                                        digylogData.stColor + "44",
+                                      borderColor: digylogData.stColor,
+                                    }}
+                                    className="text-slate-900 font-normal shadow-none"
+                                  >
+                                    {digylogData?.statusEn}
+                                  </Badge>
+                                </div>
+                              ) : (
+                                <Badge
+                                  style={{
+                                    backgroundColor: "#8883",
+                                    borderColor: "#aaa",
+                                  }}
+                                  className="text-slate-900 capitalize font-normal shadow-none"
+                                >
+                                  not shipped yet
+                                </Badge>
+                              )}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 <Separator className="my-4" />
                 <div className="grid  gap-4">
                   <div className="grid gap-3">

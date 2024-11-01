@@ -51,9 +51,6 @@ export const trackUserUsage = async ({
         dataUsage = doc.data().dataAmount;
       }
     });
-    console.log("Data usage:", dataUsage);
-    console.log("Data amount:", dataAmount);
-
     // Add the usage record to the "usage" collection in Firestore
     await setDoc(
       ref,
