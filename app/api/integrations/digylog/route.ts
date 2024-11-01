@@ -4,6 +4,7 @@ import { digylogIntegration, Store } from "@/types/store";
 import { doc } from "firebase/firestore";
 import { NextRequest, NextResponse } from "next/server";
 
+// new start
 const headers = {
   "User-Agent":
     "Mozilla/5.0 (X11; Linux x86_64; rv:130.0) Gecko/20100101 Firefox/130.0",
