@@ -59,6 +59,7 @@ const StoreDetailsCard = () => {
     name: "",
     symbol: "",
   });
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [storeDescription, setStoreDescription] = useState("");
   const [image, setImage] = useState("");
   const [saved, setSaved] = useState(false);
@@ -72,6 +73,7 @@ const StoreDetailsCard = () => {
       ...store,
       name: storeName,
       logoUrl: image,
+      phoneNumber,
       settings: {
         country,
         currency,
@@ -99,6 +101,7 @@ const StoreDetailsCard = () => {
     setStoreName(store.name || "");
     setCountry(store.settings.country || "");
     setStoreDescription(store.description || "");
+    setPhoneNumber(store?.phoneNumber || "");
     setImage(store.logoUrl || "");
     const currencySelected = currencyOptions.find(
       (c) => c.name == store.settings.currency.name,
@@ -163,9 +166,12 @@ const StoreDetailsCard = () => {
                 </UploadImageProvider>
               </div>
               <div className="flex-1">
-                <div className="mb-4">
+                <div className="mb-4 grid gap-x-4 grid-cols-2">
                   <Label htmlFor="storeName" className="pb-2 font-medium">
                     Store Name
+                  </Label>
+                  <Label htmlFor="storeName" className="pb-2 font-medium">
+                    Phone Number
                   </Label>
                   <Input
                     id="storeName"
@@ -174,6 +180,14 @@ const StoreDetailsCard = () => {
                     className="w-full"
                     type="text"
                     placeholder="Store Name"
+                  />
+                  <Input
+                    id="phoneNumber"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    className="w-full"
+                    type="text"
+                    placeholder="Phone Number"
                   />
                 </div>
                 <div className="mb-4">

@@ -50,10 +50,10 @@ import {
 import Image from "next/image";
 import CustomerShield from "./CustomerShield";
 import { db } from "@/firebase";
-import { doc } from "firebase/firestore";
+import { collection, doc, Timestamp } from "firebase/firestore";
 import QRCode from "react-qr-code";
 import { motion } from "framer-motion";
-import { dbDeleteDoc } from "@/lib/dbFuntions/fbFuns";
+import { dbAddDoc, dbDeleteDoc } from "@/lib/dbFuntions/fbFuns";
 import { useStore } from "@/store/storeInfos";
 import Avvvatars from "avvvatars-react";
 import OrderToImage from "./OrderToImage";
@@ -116,6 +116,29 @@ function OrderView() {
     }
   };
 
+  const sendWhatsappMessage = () => {
+    if (!currentOrder) return;
+    const message = `
+Dear *${
+      currentOrder.customer.firstName
+    }* , Thanks for your order , we would like to confirm that order with you.
+
+*Order Details:*
+${currentOrder.items
+  .map((item) => `• ${item.title} x ${item.quantity} = ${item.totalPrice} Dh`)
+  .join("\n")}
+
+Order Total: *${currentOrder.totalPrice + " Dh"}*
+Shipping: *${currentOrder.shippingInfo.cost ? currentOrder.shippingInfo.cost + " Dh" : "Free Delivery"}*
+
+*Thank you for choosing us! We'll notify you once your order ships.* 
+`;
+    const encodedMessage = encodeURIComponent(message); // Replace newlines with spaces
+    const phoneNumber = "212770440046"; // Ensure the format is correct
+    const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+    window.open(whatsappURL, "_blank");
+  };
+
   return currentOrder
     ? store && (
         <motion.div className="h-full">
@@ -147,6 +170,28 @@ function OrderView() {
                 </CardDescription>
               </div>
               <div className="ml-auto flex items-center gap-1">
+                <Button
+                  onClick={() => {
+                    if (!storeId) return;
+
+                    dbAddDoc(
+                      collection(db, "whatsapp-messages"),
+                      {
+                        phoneNumber: 212771337929,
+                        message: `*New Order ✨🎉*
+*${currentOrder.customer.name}* from *${currentOrder.cityAi?.city}* has placed an order.
+with a total of *${currentOrder.totalPrice} Dh*`,
+                        status: "pending",
+                        createdAt: Timestamp.now(),
+                        storeId: storeId,
+                      },
+                      storeId,
+                      "",
+                    );
+                  }}
+                >
+                  Test Message
+                </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button size="icon" variant="outline" className="h-8 w-8">
@@ -155,13 +200,7 @@ function OrderView() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-[200px]">
-                    <DropdownMenuItem
-                      onClick={() => {
-                        window.open(
-                          `https://wa.me/212${currentOrder?.customer?.phoneNumber}`,
-                        );
-                      }}
-                    >
+                    <DropdownMenuItem onClick={sendWhatsappMessage}>
                       <Phone className="h-3.5 w-3.5 mr-2" /> Contact Whatsapp
                     </DropdownMenuItem>
                     <DropdownMenuItem

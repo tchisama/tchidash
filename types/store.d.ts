@@ -43,6 +43,7 @@ export type Store = {
   createdAt: Timestamp;
   updatedAt?: Timestamp;
   description?: string; // Optional store description
+  phoneNumber?: string; // Optional store phone number
   logoUrl?: string; // Optional logo for branding
   settings: StoreSettings; // Store-related settings
   productCount: number; // Total number of products

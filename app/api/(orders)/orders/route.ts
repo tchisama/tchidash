@@ -181,6 +181,24 @@ export async function POST(request: NextRequest) {
     storeId: order.storeId,
   };
 
+  // notification part
+  //
+  dbAddDoc(
+    collection(db, "whatsapp-messages"),
+    {
+      phoneNumber: 212771337929,
+      message: `*New Order ✨🎉*
+*${order.customer.name}* from *${order.customer.shippingAddress.city}* has placed an order.
+with a total of *${order.totalPrice} Dh*`,
+      status: "pending",
+      createdAt: Timestamp.now(),
+      storeId: storeId,
+    },
+    storeId,
+    "",
+  );
+
+  // Create a new customer or update existing customer
   try {
     // Check if customer already exists based on phone number or email
     const customerQuery = query(
