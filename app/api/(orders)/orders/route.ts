@@ -187,13 +187,14 @@ export async function POST(request: NextRequest) {
   //
   //
 
-  const getNumber = getDoc(doc(db, "stores", storeId)).then((doc) => {
+  const getNumber = await getDoc(doc(db, "stores", storeId)).then((doc) => {
     if (!doc.exists()) {
       console.log("No such document!");
       return 212771337929;
     }
     return doc.data()?.phoneNumber || 212771337929;
   });
+  console.log("getting the number", getNumber);
   dbAddDoc(
     collection(db, "whatsapp-messages"),
     {

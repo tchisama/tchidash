@@ -24,6 +24,7 @@ const nextConfig = {
   // add images
   images: {
     domains: ["localhost", "lh3.googleusercontent.com"],
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",

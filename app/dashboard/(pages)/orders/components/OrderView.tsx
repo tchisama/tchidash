@@ -171,7 +171,7 @@ Shipping: *${currentOrder.shippingInfo.cost ? currentOrder.shippingInfo.cost + "
               </div>
               <div className="ml-auto flex items-center gap-1">
                 <Button
-                  onClick={() => {
+                  onClick={async () => {
                     if (!storeId) return;
 
                     dbAddDoc(
