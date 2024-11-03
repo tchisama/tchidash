@@ -34,6 +34,13 @@ const integrations: Integration[] = [
     imageUrl:
       "https://firebasestorage.googleapis.com/v0/b/tchidash-fd7aa.appspot.com/o/294424033_375002151434645_2765565352434267578_n%201.png?alt=media&token=99502b5f-b5c9-4ba0-acf5-a810eb4e3a34",
   },
+  {
+    id: "whatsapp-notifications",
+    title: "WhatsApp notifications",
+    description: "receive notifications on WhatsApp on sertain events",
+    imageUrl:
+      "https://firebasestorage.googleapis.com/v0/b/tchidash-fd7aa.appspot.com/o/whatsapp-logo-whatsapp-logo-transparent-whatsapp-icon-transparent-free-free-png.webp?alt=media&token=38019c55-c90f-42ba-8d26-3bc025a758a4",
+  },
 ];
 
 export default function IntegrationsPage() {
@@ -90,6 +97,31 @@ const IntegrationCard = ({ integration }: { integration: Integration }) => {
               onClick={() => {
                 // Handle enabling/disabling integrations
                 if (!store.integrations) return;
+                if (
+                  !store.integrations.find((i) => i.name === integration.id)
+                ) {
+                  const newUpdate = {
+                    ...store,
+                    integrations: [
+                      ...store.integrations,
+                      {
+                        name: integration.id,
+                        enabled: true,
+                      },
+                    ],
+                  } as Store;
+                  setStore(newUpdate);
+                  dbUpdateDoc(
+                    doc(db, "stores", store.id),
+                    {
+                      integrations: newUpdate.integrations,
+                    },
+                    store.id,
+                    "",
+                  );
+                  return;
+                }
+
                 const newUpdate = {
                   ...store,
                   integrations: store?.integrations.map((i) =>

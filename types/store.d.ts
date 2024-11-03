@@ -66,10 +66,20 @@ export type Employee = {
   };
 };
 
-type Integration = digylogIntegration;
+type Integration = digylogIntegration | whatsappNotificationIntegration;
 
 type digylogIntegration = {
   name: "digylog";
+  enabled: boolean;
+  phoneNumber: string;
+  password: string;
+  headers: {
+    authorization: string;
+  };
+};
+
+type whatsappNotificationIntegration = {
+  name: "whatsapp";
   enabled: boolean;
   phoneNumber: string;
   password: string;
