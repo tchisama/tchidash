@@ -177,9 +177,18 @@ Shipping: *${currentOrder.shippingInfo.cost ? currentOrder.shippingInfo.cost + "
                     dbAddDoc(
                       collection(db, "whatsapp-messages"),
                       {
-                        phoneNumber: 212771337929,
+                        from: "0770440046",
+                        to: store.phoneNumber,
                         message: `*New Order ✨🎉*
-*${currentOrder.customer.name}* from *${currentOrder.cityAi?.city}* has placed an order.
+*${currentOrder.customer.name
+                          .split(" ")
+                          .filter((n) => n != " ")
+                          .join(
+                            "_",
+                          )}* from *${currentOrder.customer.shippingAddress.city
+                          .split(" ")
+                          .filter((n) => n != " ")
+                          .join("_")}* .
 with a total of *${currentOrder.totalPrice} Dh*`,
                         status: "pending",
                         createdAt: Timestamp.now(),

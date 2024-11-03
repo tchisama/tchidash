@@ -8,6 +8,7 @@ import {
   doc,
   increment,
   setDoc,
+  getDoc,
 } from "firebase/firestore";
 import { dbAddDoc, dbGetDocs, dbUpdateDoc } from "@/lib/dbFuntions/fbFuns";
 import { db } from "@/firebase"; // Adjust this import based on your Firebase setup
@@ -183,12 +184,28 @@ export async function POST(request: NextRequest) {
 
   // notification part
   //
+  //
+  //
+
+  const getNumber = getDoc(doc(db, "stores", storeId)).then((doc) => {
+    if (!doc.exists()) {
+      console.log("No such document!");
+      return 212771337929;
+    }
+    return doc.data()?.phoneNumber || 212771337929;
+  });
   dbAddDoc(
     collection(db, "whatsapp-messages"),
     {
-      phoneNumber: 212771337929,
+      to: getNumber,
       message: `*New Order ✨🎉*
-*${order.customer.name}* from *${order.customer.shippingAddress.city}* has placed an order.
+*${order.customer.name
+        .split(" ")
+        .filter((n) => n != " ")
+        .join("_")}* from *${order.customer.shippingAddress.city
+        .split(" ")
+        .filter((n) => n != " ")
+        .join("_")}* .
 with a total of *${order.totalPrice} Dh*`,
       status: "pending",
       createdAt: Timestamp.now(),
