@@ -11,17 +11,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { whatsappUser } from "@/types/store";
+import { useStore } from "@/store/storeInfos";
 
-interface User {
-  id: number;
-  name: string;
-  whatsappNumber: string;
-  events: {
-    newOrder: boolean;
-    dailyReports: boolean;
-    pendingOrdersReminders: boolean;
-  };
-}
+type User = whatsappUser;
 
 interface UserDialogProps {
   isOpen: boolean;
@@ -43,6 +36,7 @@ export function UserDialog({
     dailyReports: false,
     pendingOrdersReminders: false,
   });
+  const { storeId } = useStore();
 
   useEffect(() => {
     if (initialData) {
@@ -66,12 +60,15 @@ export function UserDialog({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!storeId) return;
     const userData = {
       name,
       whatsappNumber,
+      active: true,
       events: selectedEvents,
+      storeId,
     };
-    onSubmit(initialData ? { ...userData, id: initialData.id } : userData);
+    onSubmit(initialData ? { ...initialData, ...userData } : userData);
     onOpenChange(false);
   };
 

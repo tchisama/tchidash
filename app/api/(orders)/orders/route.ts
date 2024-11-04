@@ -187,34 +187,40 @@ export async function POST(request: NextRequest) {
   //
   //
 
-  const getNumber = await getDoc(doc(db, "stores", storeId)).then((doc) => {
-    if (!doc.exists()) {
-      console.log("No such document!");
-      return 212771337929;
-    }
-    return doc.data()?.phoneNumber || 212771337929;
-  });
-  console.log("getting the number", getNumber);
-  dbAddDoc(
-    collection(db, "whatsapp-messages"),
-    {
-      to: getNumber,
-      message: `*New Order ✨🎉*
-*${order.customer.name
-        .split(" ")
-        .filter((n) => n != " ")
-        .join("_")}* from *${order.customer.shippingAddress.city
-        .split(" ")
-        .filter((n) => n != " ")
-        .join("_")}* .
-with a total of *${order.totalPrice} Dh*`,
-      status: "pending",
-      createdAt: Timestamp.now(),
-      storeId: storeId,
+  const whatsappEnable = await getDoc(doc(db, "stores", order.storeId)).then(
+    (doc) => {
+      return doc
+        .data()
+        ?.integrations?.find(
+          (integration: { name: string }) =>
+            integration.name === "whatsapp-notifications",
+        )?.enabled;
     },
-    storeId,
-    "",
   );
+  console.log("whatsappEnable", whatsappEnable);
+  console.log("store", order.storeId);
+  if (whatsappEnable) {
+    dbAddDoc(
+      collection(db, "whatsapp-messages"),
+      {
+        message: `*New Order ✨🎉*
+*${order.customer.name
+          .split(" ")
+          .filter((n) => n != " ")
+          .join("_")}* from *${order.customer.shippingAddress.city
+          .split(" ")
+          .filter((n) => n != " ")
+          .join("_")}* .
+with a total of *${order.totalPrice} Dh*`,
+        status: "pending",
+        type: "newOrder",
+        createdAt: Timestamp.now(),
+        storeId: order.storeId,
+      },
+      storeId,
+      "",
+    );
+  }
 
   // Create a new customer or update existing customer
   try {

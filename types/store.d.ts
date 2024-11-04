@@ -81,9 +81,17 @@ type digylogIntegration = {
 type whatsappNotificationIntegration = {
   name: "whatsapp";
   enabled: boolean;
-  phoneNumber: string;
-  password: string;
-  headers: {
-    authorization: string;
+};
+
+export type whatsappUser = {
+  id: string;
+  name: string;
+  whatsappNumber: string;
+  active: boolean;
+  storeId: string;
+  events: {
+    newOrder: boolean;
+    dailyReports: boolean;
+    pendingOrdersReminders: boolean;
   };
 };

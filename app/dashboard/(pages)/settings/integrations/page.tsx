@@ -36,8 +36,15 @@ const integrations: Integration[] = [
   },
   {
     id: "whatsapp-notifications",
-    title: "WhatsApp notifications",
+    title: "WhatsApp Notifications",
     description: "receive notifications on WhatsApp on sertain events",
+    imageUrl:
+      "https://firebasestorage.googleapis.com/v0/b/tchidash-fd7aa.appspot.com/o/whatsapp-logo-whatsapp-logo-transparent-whatsapp-icon-transparent-free-free-png.webp?alt=media&token=38019c55-c90f-42ba-8d26-3bc025a758a4",
+  },
+  {
+    id: "whatsapp-sender",
+    title: "WhatsApp Sender",
+    description: "Send messages to customers on WhatsApp",
     imageUrl:
       "https://firebasestorage.googleapis.com/v0/b/tchidash-fd7aa.appspot.com/o/whatsapp-logo-whatsapp-logo-transparent-whatsapp-icon-transparent-free-free-png.webp?alt=media&token=38019c55-c90f-42ba-8d26-3bc025a758a4",
   },

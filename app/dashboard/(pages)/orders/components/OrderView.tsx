@@ -50,7 +50,7 @@ import {
 import Image from "next/image";
 import CustomerShield from "./CustomerShield";
 import { db } from "@/firebase";
-import { collection, doc, Timestamp } from "firebase/firestore";
+import { collection, doc, getDoc, Timestamp } from "firebase/firestore";
 import QRCode from "react-qr-code";
 import { motion } from "framer-motion";
 import { dbAddDoc, dbDeleteDoc } from "@/lib/dbFuntions/fbFuns";
@@ -62,6 +62,7 @@ import axios from "axios";
 import { Badge } from "@/components/ui/badge";
 import DigylogDialog from "./DigylogDialog";
 import { useDialogs } from "@/store/dialogs";
+import { IconBrandWhatsapp } from "@tabler/icons-react";
 function OrderView() {
   const { currentOrder, setCurrentOrder } = useOrderStore();
   const { storeId, store } = useStore();
@@ -116,28 +117,28 @@ function OrderView() {
     }
   };
 
-  const sendWhatsappMessage = () => {
-    if (!currentOrder) return;
-    const message = `
-Dear *${
-      currentOrder.customer.firstName
-    }* , Thanks for your order , we would like to confirm that order with you.
-
-*Order Details:*
-${currentOrder.items
-  .map((item) => `• ${item.title} x ${item.quantity} = ${item.totalPrice} Dh`)
-  .join("\n")}
-
-Order Total: *${currentOrder.totalPrice + " Dh"}*
-Shipping: *${currentOrder.shippingInfo.cost ? currentOrder.shippingInfo.cost + " Dh" : "Free Delivery"}*
-
-*Thank you for choosing us! We'll notify you once your order ships.* 
-`;
-    const encodedMessage = encodeURIComponent(message); // Replace newlines with spaces
-    const phoneNumber = "212770440046"; // Ensure the format is correct
-    const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
-    window.open(whatsappURL, "_blank");
-  };
+  //   const sendWhatsappMessage = () => {
+  //     if (!currentOrder) return;
+  //     const message = `
+  // Dear *${
+  //       currentOrder.customer.firstName
+  //     }* , Thanks for your order , we would like to confirm that order with you.
+  //
+  // *Order Details:*
+  // ${currentOrder.items
+  //   .map((item) => `• ${item.title} x ${item.quantity} = ${item.totalPrice} Dh`)
+  //   .join("\n")}
+  //
+  // Order Total: *${currentOrder.totalPrice + " Dh"}*
+  // Shipping: *${currentOrder.shippingInfo.cost ? currentOrder.shippingInfo.cost + " Dh" : "Free Delivery"}*
+  //
+  // *Thank you for choosing us! We'll notify you once your order ships.*
+  // `;
+  //     const encodedMessage = encodeURIComponent(message); // Replace newlines with spaces
+  //     const phoneNumber = "212770440046"; // Ensure the format is correct
+  //     const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+  //     window.open(whatsappURL, "_blank");
+  //   };
 
   return currentOrder
     ? store && (
@@ -174,29 +175,40 @@ Shipping: *${currentOrder.shippingInfo.cost ? currentOrder.shippingInfo.cost + "
                   onClick={async () => {
                     if (!storeId) return;
 
-                    dbAddDoc(
-                      collection(db, "whatsapp-messages"),
-                      {
-                        from: "0770440046",
-                        to: store.phoneNumber,
-                        message: `*New Order ✨🎉*
+                    const whatsappEnable = await getDoc(
+                      doc(db, "stores", storeId),
+                    ).then((doc) => {
+                      return doc
+                        .data()
+                        ?.integrations?.find(
+                          (integration: { name: string }) =>
+                            integration.name === "whatsapp-notifications",
+                        )?.enabled;
+                    });
+                    if (whatsappEnable) {
+                      dbAddDoc(
+                        collection(db, "whatsapp-messages"),
+                        {
+                          message: `*New Order ✨🎉*
 *${currentOrder.customer.name
-                          .split(" ")
-                          .filter((n) => n != " ")
-                          .join(
-                            "_",
-                          )}* from *${currentOrder.customer.shippingAddress.city
-                          .split(" ")
-                          .filter((n) => n != " ")
-                          .join("_")}* .
+                            .split(" ")
+                            .filter((n) => n != " ")
+                            .join(
+                              "_",
+                            )}* from *${currentOrder.customer.shippingAddress.city
+                            .split(" ")
+                            .filter((n) => n != " ")
+                            .join("_")}* .
 with a total of *${currentOrder.totalPrice} Dh*`,
-                        status: "pending",
-                        createdAt: Timestamp.now(),
-                        storeId: storeId,
-                      },
-                      storeId,
-                      "",
-                    );
+                          status: "pending",
+                          type: "newOrder",
+                          createdAt: Timestamp.now(),
+                          storeId: storeId,
+                        },
+                        storeId,
+                        "",
+                      );
+                    }
                   }}
                 >
                   Test Message
@@ -209,9 +221,31 @@ with a total of *${currentOrder.totalPrice} Dh*`,
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-[200px]">
-                    <DropdownMenuItem onClick={sendWhatsappMessage}>
-                      <Phone className="h-3.5 w-3.5 mr-2" /> Contact Whatsapp
+                    <DropdownMenuItem
+                      onClick={() => {
+                        if (!storeId) return;
+                        dbAddDoc(
+                          collection(db, "whatsapp-sender-messages"),
+                          {
+                            message: `Hello ${currentOrder.customer.name}, we want to confirm your order with you`,
+                            storeId,
+                            status: "pending",
+                            type: "orderConfirmation",
+                            createdAt: Timestamp.now(),
+                            orderId: currentOrder.id,
+                            to: currentOrder.customer.phoneNumber,
+                          },
+                          storeId,
+                          "",
+                        );
+                      }}
+                    >
+                      <IconBrandWhatsapp className="h-3.5 w-3.5 mr-2" />
+                      Confirm Order
                     </DropdownMenuItem>
+                    {/* <DropdownMenuItem onClick={sendWhatsappMessage}> */}
+                    {/*   <Phone className="h-3.5 w-3.5 mr-2" /> Contact Whatsapp */}
+                    {/* </DropdownMenuItem> */}
                     <DropdownMenuItem
                       onClick={() => {
                         window.open(

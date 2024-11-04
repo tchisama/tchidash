@@ -47,6 +47,7 @@ function Navbar() {
   const pathName = usePathname();
   return (
     <div className="h-full">
+      <h1 className="text-3xl mb-8 font-semibold">Settings</h1>
       <nav
         className="grid gap-4 sticky top-32 text-sm text-muted-foreground"
         x-chunk="dashboard-04-chunk-0"
