@@ -248,15 +248,15 @@ export function OrdersTable({
               </TableCell>
               <TableCell className="">
                 <div className="relative h-10 w-20">
-                  {order.items.slice(0, 3).map((item, i) => {
+                  {order.items.slice(0, 2).map((item, i) => {
                     return (
                       <div
                         key={item.id}
                         className={cn(
                           "mask absolute top-0 w-10 aspect-auto",
-                          i === 0 && "left-0",
-                          i === 1 && "left-6",
-                          i === 2 && "left-12",
+                          i === 0 && "left-0 ",
+                          i === 1 && "left-8 ",
+                          i === 2 && "left-16 ",
                         )}
                       >
                         <Image
@@ -264,24 +264,29 @@ export function OrdersTable({
                           height={50}
                           src={item.imageUrl ?? ""}
                           alt="Avatar Tailwind CSS Component"
-                          className="w-10 rounded-xl bg-slate-100 border-[2px] aspect-square  shadow-lg object-cover"
+                          className="w-10 rounded-[15px] bg-slate-100 border border-[#3334] aspect-square  object-cover"
                         />
                       </div>
                     );
                   })}
-                  {order.items.length > 3 && (
-                    <div className="mask absolute top-0 left-[70px] w-10 aspect-square left-18">
-                      <div className="w-10 h-10 bg-slate-100 relative rounded-xl border-[2px] flex items-center justify-center">
+                  {order.items.length > 2 && (
+                    <div className="mask absolute top-0 w-10 aspect-square left-16">
+                      <div className="w-10 h-10 bg-slate-100 relative rounded-[15px] flex items-center justify-center">
                         <Image
                           width={50}
                           height={50}
-                          src={order.items[3].imageUrl ?? ""}
+                          src={order.items[2].imageUrl ?? ""}
                           alt="Avatar Tailwind CSS Component"
-                          className="w-10 filter opacity-20 rounded-xl bg-slate-100  aspect-square  shadow-lg object-cover"
+                          className={cn("w-10 border-[#3334] border-[1px] filter opacity-20 rounded-[15px] bg-slate-100  aspect-square   object-cover",
+                            order.items.length - 3 === 0 && "opacity-100",
+                          )}
                         />
+                        {
+                        order.items.length - 3 > 0 &&
                         <span className="text-xs font-bold z-10 text-muted-foreground absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                          +{order.items.length - 3}
+                          +{order.items.length - 2}
                         </span>
+                        }
                       </div>
                     </div>
                   )}

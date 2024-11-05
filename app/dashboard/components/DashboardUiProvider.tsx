@@ -36,7 +36,7 @@ export default function DashboardUiProvider({
   const router = useRouter();
   const { cleanAll } = useClean();
   const { actions } = useNavbar();
-  const { setStoreId } = useStore();
+  const { setStoreId ,store} = useStore();
   return (
     <div className="flex min-h-screen w-full bg-slate-100 dark:bg-slate-900">
       {/*
@@ -60,15 +60,24 @@ export default function DashboardUiProvider({
             <DropdownMenuTrigger asChild>
               <Button
                 variant="outline"
-                size="icon"
-                className="overflow-hidden rounded-full"
+                className="overflow-hidden font-medium py-4 px-4 text-sm flex gap-2 "
               >
+                <span className="font-medium text-xs">
+                {
+                  session?.user?.name ??
+                store?.name
+                }
+                </span>
                 <Image
-                  src={session?.user?.image ?? ""}
+                  src={
+                    store?.logoUrl ??
+                    session?.user?.image ??
+                    ""
+                  }
                   width={36}
                   height={36}
                   alt="Avatar"
-                  className="overflow-hidden rounded-full"
+                  className="overflow-hidden p-1 rounded"
                 />
               </Button>
             </DropdownMenuTrigger>

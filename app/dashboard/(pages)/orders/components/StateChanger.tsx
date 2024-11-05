@@ -36,7 +36,7 @@ export const orderStatusValuesWithIcon = [
   {
     name: "pending",
     icon: <CircleDotDashed className="h-4 w-4" />,
-    color: "#534b52",
+    color: "#a3b18a",
     effectStock: false,
   },
   {
@@ -48,19 +48,19 @@ export const orderStatusValuesWithIcon = [
   {
     name: "packed",
     icon: <PackageCheck className="h-4 w-4" />,
-    color: "#3a86ff",
+    color: "#5c374c",
     effectStock: true,
   },
   {
     name: "shipped",
     icon: <Truck className="h-4 w-4" />,
-    color: "#3a86ff",
+    color: "#5a189a",
     effectStock: true,
   },
   {
     name: "delivered",
     icon: <MapPinCheckInside className="h-4 w-4" />,
-    color: "#43aa8b",
+    color: "#386641",
     effectStock: true,
   },
   {
@@ -78,7 +78,7 @@ export const orderStatusValuesWithIcon = [
   {
     name: "fake",
     icon: <UserRoundX className="h-4 w-4" />,
-    color: "#000000",
+    color: "#6d6a75",
     effectStock: false,
   },
 ];
@@ -111,10 +111,11 @@ export function StateChanger({
         <DropdownMenuTrigger disabled={actionLoading} asChild>
           <Button
             style={{
+
               background:
                 orderStatusValuesWithIcon.find(
                   (status) => status.name === state,
-                )?.color + "20",
+                )?.color + "50",
               borderColor:
                 orderStatusValuesWithIcon.find(
                   (status) => status.name === state,
@@ -140,7 +141,7 @@ export function StateChanger({
               <DropdownMenuItem
                 key={status.name}
                 style={{
-                  background: status.color + "20",
+                  background: status.color + "50",
                   borderColor: status.color + "30",
                   color: "#000a",
                 }}
