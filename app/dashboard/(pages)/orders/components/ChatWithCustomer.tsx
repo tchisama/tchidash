@@ -46,7 +46,7 @@ function AssistantComponent() {
           </div>
         </div>
       </CardHeader>
-      <CardContent className="px-4 bg-slate-100 py-6 space-y-4 flex-1">
+      <CardContent className="px-4 overflow-y-auto bg-slate-100 py-6 space-y-4 flex-1">
         <Message text="Hello, how can I assist you today?" isUser={false} />
         <Message
           text="I'd like to get some insights on our sales performance and customer trends."
