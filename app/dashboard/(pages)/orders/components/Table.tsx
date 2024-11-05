@@ -341,7 +341,7 @@ export function OrdersTable({
                   )}
                 </div>
               </TableCell>
-              <TableCell className="text-right">
+              <TableCell className="text-right font-bold">
                 {order.totalPrice} Dh
               </TableCell>
             </TableRow>

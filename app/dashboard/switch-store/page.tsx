@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Loader2, PlusCircle, Store } from "lucide-react";
+import { Loader2, PlusCircle,  StoreIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { and, collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/firebase";
@@ -20,12 +20,9 @@ import { redirect, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useStore } from "@/store/storeInfos";
 import useClean from "@/hooks/useClean";
+import { Store } from "@/types/store";
+import Image from "next/image";
 
-interface Store {
-  id: string;
-  name: string;
-  description: string;
-}
 
 export default function StoreSwitchCard() {
   const [selectedStore, setSelectedStore] = useState<string>("");
@@ -116,10 +113,20 @@ export default function StoreSwitchCard() {
                     htmlFor={store.id}
                     className="flex items-center cursor-pointer"
                   >
-                    <Store
-                      strokeWidth={1.3}
-                      className="h-7 w-7 mr-2 text-muted-foreground"
-                    />
+                    {
+                      store?.logoUrl ?
+                      <Image
+                        src={store.logoUrl ?? ''}
+                        alt={store.name}
+                        width={60}
+                        height={60}
+                        className="w-12 p-2 bg-white mr-3 aspect-square object-contain border rounded-md "
+                      />:
+                      <StoreIcon
+                        strokeWidth={1.3}
+                        className=" mr-3 text-muted-foreground w-[50px] p-3 bg-white border rounded-md h-[50px]"
+                      />
+                    }
                     <div>
                       <div className="font-medium">{store.name}</div>
                       <div className="text-sm text-muted-foreground">
@@ -150,7 +157,7 @@ export default function StoreSwitchCard() {
                       htmlFor={store.id}
                       className="flex items-center cursor-pointer"
                     >
-                      <Store
+                      <StoreIcon
                         strokeWidth={1.3}
                         className="h-7 w-7 mr-2 text-muted-foreground"
                       />

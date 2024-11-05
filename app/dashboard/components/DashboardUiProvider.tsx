@@ -60,14 +60,19 @@ export default function DashboardUiProvider({
             <DropdownMenuTrigger asChild>
               <Button
                 variant="outline"
-                className="overflow-hidden font-medium py-4 px-4 text-sm flex gap-2 "
+                className="overflow-hidden font-medium h-11 py-4 pr-1 text-sm flex gap-2 "
               >
+                <div className="flex flex-col  items-start ">
+                  <span className="mb-[-4px] text-[11px] font-normal opacity-80">
+                    {store?.name}
+                  </span>
                 <span className="font-medium text-xs">
                 {
-                  session?.user?.name ??
-                store?.name
+                  session?.user?.name 
                 }
                 </span>
+
+                </div>
                 <Image
                   src={
                     store?.logoUrl ??
@@ -77,7 +82,7 @@ export default function DashboardUiProvider({
                   width={36}
                   height={36}
                   alt="Avatar"
-                  className="overflow-hidden p-1 rounded"
+                  className="overflow-hidden  rounded-md border"
                 />
               </Button>
             </DropdownMenuTrigger>

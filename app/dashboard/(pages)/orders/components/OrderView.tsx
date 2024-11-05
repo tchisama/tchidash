@@ -400,12 +400,17 @@ function OrderView() {
                     <>
                       <div className="">
                         <div>
+                          {
+                            currentOrder?.shippingInfo?.shippingProvider &&
+                            <>
                           <div className="flex gap-2 justify-between">
                             <span className="text-muted-foreground">
                               Provider
                             </span>
                             <span className="">
-                              {currentOrder?.shippingInfo?.shippingProvider}
+                              {currentOrder?.shippingInfo?.shippingProvider 
+                              ?? "not assigned"
+                              }
                             </span>
                           </div>
                           <div className="flex gap-2 justify-between">
@@ -413,7 +418,8 @@ function OrderView() {
                               Tracking
                             </span>
                             <span className="">
-                              {currentOrder?.shippingInfo?.trackingNumber}
+                              {currentOrder?.shippingInfo?.trackingNumber
+                                ?? "not assigned"}
                             </span>
                           </div>
                           <div className="flex gap-2 justify-between">
@@ -426,6 +432,8 @@ function OrderView() {
                                 : "no data yet"}
                             </span>
                           </div>
+                            </>
+                          }
                           <div className="flex mt-2 gap-2 justify-between">
                             <span className="text-muted-foreground">
                               Current Status
