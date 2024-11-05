@@ -64,6 +64,7 @@ import DigylogDialog from "./DigylogDialog";
 import { useDialogs } from "@/store/dialogs";
 import { IconBrandWhatsapp } from "@tabler/icons-react";
 import { ChatWithCustomer } from "./ChatWithCustomer";
+import { generateEmbedding } from "@/lib/ai/openai/embedding";
 function OrderView() {
   const { currentOrder, setCurrentOrder } = useOrderStore();
   const { storeId, store } = useStore();
@@ -172,48 +173,41 @@ function OrderView() {
                 </CardDescription>
               </div>
               <div className="ml-auto flex items-center gap-1">
-                {/*                 <Button */}
-                {/*                   onClick={async () => { */}
-                {/*                     if (!storeId) return; */}
-                {/**/}
-                {/*                     const whatsappEnable = await getDoc( */}
-                {/*                       doc(db, "stores", storeId), */}
-                {/*                     ).then((doc) => { */}
-                {/*                       return doc */}
-                {/*                         .data() */}
-                {/*                         ?.integrations?.find( */}
-                {/*                           (integration: { name: string }) => */}
-                {/*                             integration.name === "whatsapp-notifications", */}
-                {/*                         )?.enabled; */}
-                {/*                     }); */}
-                {/*                     if (whatsappEnable) { */}
-                {/*                       dbAddDoc( */}
-                {/*                         collection(db, "whatsapp-messages"), */}
-                {/*                         { */}
-                {/*                           message: `*New Order ✨🎉* */}
-                {/* *${currentOrder.customer.name */}
-                {/*                             .split(" ") */}
-                {/*                             .filter((n) => n != " ") */}
-                {/*                             .join( */}
-                {/*                               "_", */}
-                {/*                             )}* from *${currentOrder.customer.shippingAddress.city */}
-                {/*                             .split(" ") */}
-                {/*                             .filter((n) => n != " ") */}
-                {/*                             .join("_")}* . */}
-                {/* with a total of *${currentOrder.totalPrice} Dh*`, */}
-                {/*                           status: "pending", */}
-                {/*                           type: "newOrder", */}
-                {/*                           createdAt: Timestamp.now(), */}
-                {/*                           storeId: storeId, */}
-                {/*                         }, */}
-                {/*                         storeId, */}
-                {/*                         "", */}
-                {/*                       ); */}
-                {/*                     } */}
-                {/*                   }} */}
-                {/*                 > */}
-                {/*                   Test Message */}
-                {/*                 </Button> */}
+                <Button
+                  onClick={async () => {
+                    if (!storeId) return;
+                    const embedding = await generateEmbedding({
+                      text: `
+Order ID: ${currentOrder.id}
+Customer Name: ${currentOrder.customer.name}
+Customer Phone: ${currentOrder.customer.phoneNumber}
+Customer Email: ${currentOrder.customer.email ?? "no email"}
+Customer Address: ${currentOrder.customer.shippingAddress.address}, ${currentOrder.customer.shippingAddress.city} 
+Order Total: ${currentOrder.totalPrice} Dh
+Order Status: ${currentOrder.orderStatus}
+Shipping Cost: ${currentOrder.shippingInfo.cost ?? "Free"}
+Order Items: ${currentOrder.items.map((item) => ` - ${item.title} x ${item.quantity} = ${item.totalPrice} Dh`).join("\n")}
+Order Note : ${currentOrder.note?.content ?? "No note"}
+`,
+                    });
+
+                    const a = {
+                      id: currentOrder.id,
+                      values: embedding,
+                      metadata: {
+                        storeId: storeId,
+                      },
+                    };
+                    axios
+                      .post("/api/ai/pinecone", a)
+                      .then((res) => {
+                        console.log(res.data);
+                      })
+                      .catch((e) => console.error(e));
+                  }}
+                >
+                  Victor It
+                </Button>
                 <ChatWithCustomer />
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -400,40 +394,38 @@ function OrderView() {
                     <>
                       <div className="">
                         <div>
-                          {
-                            currentOrder?.shippingInfo?.shippingProvider &&
+                          {currentOrder?.shippingInfo?.shippingProvider && (
                             <>
-                          <div className="flex gap-2 justify-between">
-                            <span className="text-muted-foreground">
-                              Provider
-                            </span>
-                            <span className="">
-                              {currentOrder?.shippingInfo?.shippingProvider 
-                              ?? "not assigned"
-                              }
-                            </span>
-                          </div>
-                          <div className="flex gap-2 justify-between">
-                            <span className="text-muted-foreground">
-                              Tracking
-                            </span>
-                            <span className="">
-                              {currentOrder?.shippingInfo?.trackingNumber
-                                ?? "not assigned"}
-                            </span>
-                          </div>
-                          <div className="flex gap-2 justify-between">
-                            <span className="text-muted-foreground">
-                              Shipping Cost
-                            </span>
-                            <span className="">
-                              {digylogData
-                                ? digylogData.delivery_cost + " Dh"
-                                : "no data yet"}
-                            </span>
-                          </div>
+                              <div className="flex gap-2 justify-between">
+                                <span className="text-muted-foreground">
+                                  Provider
+                                </span>
+                                <span className="">
+                                  {currentOrder?.shippingInfo
+                                    ?.shippingProvider ?? "not assigned"}
+                                </span>
+                              </div>
+                              <div className="flex gap-2 justify-between">
+                                <span className="text-muted-foreground">
+                                  Tracking
+                                </span>
+                                <span className="">
+                                  {currentOrder?.shippingInfo?.trackingNumber ??
+                                    "not assigned"}
+                                </span>
+                              </div>
+                              <div className="flex gap-2 justify-between">
+                                <span className="text-muted-foreground">
+                                  Shipping Cost
+                                </span>
+                                <span className="">
+                                  {digylogData
+                                    ? digylogData.delivery_cost + " Dh"
+                                    : "no data yet"}
+                                </span>
+                              </div>
                             </>
-                          }
+                          )}
                           <div className="flex mt-2 gap-2 justify-between">
                             <span className="text-muted-foreground">
                               Current Status
