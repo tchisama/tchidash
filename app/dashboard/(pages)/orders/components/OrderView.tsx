@@ -50,7 +50,7 @@ import {
 import Image from "next/image";
 import CustomerShield from "./CustomerShield";
 import { db } from "@/firebase";
-import { collection, doc, getDoc, Timestamp } from "firebase/firestore";
+import { collection, doc, Timestamp } from "firebase/firestore";
 import QRCode from "react-qr-code";
 import { motion } from "framer-motion";
 import { dbAddDoc, dbDeleteDoc } from "@/lib/dbFuntions/fbFuns";
@@ -63,6 +63,7 @@ import { Badge } from "@/components/ui/badge";
 import DigylogDialog from "./DigylogDialog";
 import { useDialogs } from "@/store/dialogs";
 import { IconBrandWhatsapp } from "@tabler/icons-react";
+import { ChatWithCustomer } from "./ChatWithCustomer";
 function OrderView() {
   const { currentOrder, setCurrentOrder } = useOrderStore();
   const { storeId, store } = useStore();
@@ -171,48 +172,49 @@ function OrderView() {
                 </CardDescription>
               </div>
               <div className="ml-auto flex items-center gap-1">
-                <Button
-                  onClick={async () => {
-                    if (!storeId) return;
-
-                    const whatsappEnable = await getDoc(
-                      doc(db, "stores", storeId),
-                    ).then((doc) => {
-                      return doc
-                        .data()
-                        ?.integrations?.find(
-                          (integration: { name: string }) =>
-                            integration.name === "whatsapp-notifications",
-                        )?.enabled;
-                    });
-                    if (whatsappEnable) {
-                      dbAddDoc(
-                        collection(db, "whatsapp-messages"),
-                        {
-                          message: `*New Order ✨🎉*
-*${currentOrder.customer.name
-                            .split(" ")
-                            .filter((n) => n != " ")
-                            .join(
-                              "_",
-                            )}* from *${currentOrder.customer.shippingAddress.city
-                            .split(" ")
-                            .filter((n) => n != " ")
-                            .join("_")}* .
-with a total of *${currentOrder.totalPrice} Dh*`,
-                          status: "pending",
-                          type: "newOrder",
-                          createdAt: Timestamp.now(),
-                          storeId: storeId,
-                        },
-                        storeId,
-                        "",
-                      );
-                    }
-                  }}
-                >
-                  Test Message
-                </Button>
+                {/*                 <Button */}
+                {/*                   onClick={async () => { */}
+                {/*                     if (!storeId) return; */}
+                {/**/}
+                {/*                     const whatsappEnable = await getDoc( */}
+                {/*                       doc(db, "stores", storeId), */}
+                {/*                     ).then((doc) => { */}
+                {/*                       return doc */}
+                {/*                         .data() */}
+                {/*                         ?.integrations?.find( */}
+                {/*                           (integration: { name: string }) => */}
+                {/*                             integration.name === "whatsapp-notifications", */}
+                {/*                         )?.enabled; */}
+                {/*                     }); */}
+                {/*                     if (whatsappEnable) { */}
+                {/*                       dbAddDoc( */}
+                {/*                         collection(db, "whatsapp-messages"), */}
+                {/*                         { */}
+                {/*                           message: `*New Order ✨🎉* */}
+                {/* *${currentOrder.customer.name */}
+                {/*                             .split(" ") */}
+                {/*                             .filter((n) => n != " ") */}
+                {/*                             .join( */}
+                {/*                               "_", */}
+                {/*                             )}* from *${currentOrder.customer.shippingAddress.city */}
+                {/*                             .split(" ") */}
+                {/*                             .filter((n) => n != " ") */}
+                {/*                             .join("_")}* . */}
+                {/* with a total of *${currentOrder.totalPrice} Dh*`, */}
+                {/*                           status: "pending", */}
+                {/*                           type: "newOrder", */}
+                {/*                           createdAt: Timestamp.now(), */}
+                {/*                           storeId: storeId, */}
+                {/*                         }, */}
+                {/*                         storeId, */}
+                {/*                         "", */}
+                {/*                       ); */}
+                {/*                     } */}
+                {/*                   }} */}
+                {/*                 > */}
+                {/*                   Test Message */}
+                {/*                 </Button> */}
+                <ChatWithCustomer />
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button size="icon" variant="outline" className="h-8 w-8">
