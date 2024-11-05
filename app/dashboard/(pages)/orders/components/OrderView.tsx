@@ -188,6 +188,7 @@ Order Status: ${currentOrder.orderStatus}
 Shipping Cost: ${currentOrder.shippingInfo.cost ?? "Free"}
 Order Items: ${currentOrder.items.map((item) => ` - ${item.title} x ${item.quantity} = ${item.totalPrice} Dh`).join("\n")}
 Order Note : ${currentOrder.note?.content ?? "No note"}
+Created At: ${currentOrder.createdAt.toDate().toLocaleDateString()} at ${currentOrder.createdAt.toDate().toLocaleTimeString()}
 `,
                     });
 
@@ -196,6 +197,13 @@ Order Note : ${currentOrder.note?.content ?? "No note"}
                       values: embedding,
                       metadata: {
                         storeId: storeId,
+                        createdAt: new Date(
+                          currentOrder.createdAt.toDate().toLocaleDateString() +
+                            " " +
+                            currentOrder.createdAt
+                              .toDate()
+                              .toLocaleTimeString(),
+                        ),
                       },
                     };
                     axios

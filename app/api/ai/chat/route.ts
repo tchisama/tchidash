@@ -13,8 +13,19 @@ export async function POST(request: Request) {
   const result = await streamText({
     model: openai("gpt-3.5-turbo"),
     messages: messages,
-    maxSteps: 5,
+    maxSteps: 6,
     tools: {
+      getTimeAndDate: {
+        description: "Get the current time and date now",
+        parameters: z.object({}),
+        execute: async () => {
+          const date = new Date();
+          return {
+            timeAndDate:
+              date.toLocaleTimeString() + " on " + date.toDateString(),
+          };
+        },
+      },
       getUserName: {
         description: "Get the current user's name",
         parameters: z.object({}),
@@ -24,37 +35,40 @@ export async function POST(request: Request) {
       },
       getOrdersFromVictorDB: {
         description:
-          "Get the orders from Victor's database, the result is just the closest match , you need to double check it",
+          "Get the orders from Victor's database, the result is just the closest match , you need to double check it" +
+          "you will be returned with orders in this format :" +
+          "Order ID: xx \n Customer Name: xx \n Customer Phone: xx \n Customer Email: xx \n Customer Address: xx \n Order Total: xx \n Order Status: xx \n Shipping Cost: xx \n Order Items: xx \n Order Note : xx \n Created At: xx",
         parameters: z.object({
-          prompt: z.string().describe("The prompt to use for the query"),
+          prompt: z
+            .string()
+            .describe(
+              "The prompt to use for the query , the search is not smart enough to calculate stuff you need to do it before creating the prompt",
+            ),
         }),
         execute: async ({ prompt }) => {
           const getEmbededPrompt = await generateEmbedding({ text: prompt });
-          console.log(prompt);
+          console.log("PROMPT", prompt);
           const queryResults = await dbIndex.namespace("orders").query({
-            topK: 5,
+            topK: 3,
             vector: getEmbededPrompt,
-            includeValues: true,
+            // filter by storeId
+            filter: {
+              storeId: { $eq: storeId },
+            },
+            includeMetadata: true,
           });
+          const SIMILARITY_THRESHOLD = 0.2;
+          console.log("Query results", queryResults.matches);
+          const filteredResults = queryResults.matches.filter((match) => {
+            if (!match?.score) return false;
+            return match.score > SIMILARITY_THRESHOLD;
+          });
+          console.log("Query results", queryResults.matches.length);
           if (queryResults.matches.length === 0) {
             return { orders: [] };
           }
-          // const orders = queryResults.matches.map(async (order) => {
-          //   console.log(order.id);
-          //   const orderData = await getDoc(doc(db, "orders", order.id)).then(
-          //     (doc) => {
-          //       if (doc.exists()) {
-          //         return { ...doc.data(), id: doc.id };
-          //       } else {
-          //         return null;
-          //       }
-          //     },
-          //   );
-          //   return orderData;
-          // });
           const orders = await Promise.all(
-            queryResults.matches.map(async (order) => {
-              console.log(order.id);
+            filteredResults.map(async (order) => {
               const orderData = await getDoc(doc(db, "orders", order.id)).then(
                 (doc) => {
                   if (doc.exists()) {
@@ -80,6 +94,7 @@ Order Items: ${doc
                         )
                         .join("\n")}
 Order Note : ${doc.data().note?.content ?? "No note"}
+Created At: ${doc.data().createdAt.toDate().toLocaleDateString()} at ${doc.data().createdAt.toDate().toLocaleTimeString()}
 `,
                     };
                   } else {
@@ -91,7 +106,6 @@ Order Note : ${doc.data().note?.content ?? "No note"}
             }),
           );
 
-          console.log(orders);
           return { orders };
         },
       },
