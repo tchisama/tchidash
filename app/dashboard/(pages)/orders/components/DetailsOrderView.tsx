@@ -64,7 +64,7 @@ function DetailsOrderView() {
     store &&
     currentOrder &&
 
-            <CardContent className="p-4 bg-white text-sm flex-1 overflow-auto">
+            <>
               <div className="grid gap-2">
                 <ul className="grid gap-2">
                   <li className="flex items-center justify-between">
@@ -369,9 +369,7 @@ function DetailsOrderView() {
                   </div>
                 </div>
               )}
-            </CardContent>
-
-  
+            </>
   )
 }
 

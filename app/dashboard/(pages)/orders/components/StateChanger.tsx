@@ -22,6 +22,10 @@ import {
 import { Order } from "@/types/order";
 import { useOrderStore } from "@/store/orders";
 import axios from "axios";
+import { dbAddDoc } from "@/lib/dbFuntions/fbFuns";
+import { collection, Timestamp } from "firebase/firestore";
+import { db } from "@/firebase";
+import { useSession } from "next-auth/react";
 
 export type OrderStatus =
   | "pending"
@@ -91,6 +95,7 @@ export function StateChanger({
   order: Order;
 }) {
   const [state, setState] = React.useState<OrderStatus>();
+  const {data:session} = useSession()
   const {
     orders,
     setOrders,
@@ -160,6 +165,25 @@ export function StateChanger({
                       },
                     );
                     console.log("Order status updated:", response.data);
+
+      if(!order.storeId) return
+      dbAddDoc(
+        collection(db, "notes"),
+        {
+          changed:`${status.name}`,
+          creator:session?.user?.email,
+          createdAt: Timestamp.now(),
+          details:{
+            for:"order",
+            orderId:order?.id
+          }
+        },
+        order.storeId,
+        ""
+      )
+
+
+
                   } catch (error) {
                     console.error("Error updating order status:", error);
 

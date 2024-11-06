@@ -16,6 +16,7 @@ import {
 
 import {
   Card,
+  CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
@@ -24,7 +25,9 @@ import {
 import { Button } from "@/components/ui/button";
 import {
   Bike,
+  Box,
   Copy,
+  FileText,
   MoreVertical,
   Phone,
   ScrollIcon,
@@ -46,6 +49,7 @@ import { IconBrandWhatsapp } from "@tabler/icons-react";
 import { ChatWithCustomer } from "./ChatWithCustomer";
 import { generateEmbedding } from "@/lib/ai/openai/embedding";
 import DetailsOrderView from "./DetailsOrderView";
+import OrderNotes from "./OrderNotes";
 function OrderView() {
   const { currentOrder, setCurrentOrder } = useOrderStore();
   const { storeId, store } = useStore();
@@ -94,7 +98,8 @@ function OrderView() {
         <motion.div className="h-full">
           <DigylogDialog />
           <OrderToImage />
-          <Card className=" duration-300 sticky  max-h-[calc(100vh-10rem)]  top-20 flex flex-col" x-chunk="dashboard-05-chunk-4">
+          <Tabs defaultValue="details" className=" sticky top-20 h-[85vh] " >
+          <Card className=" flex h-full flex-col" x-chunk="dashboard-05-chunk-4">
             <CardHeader className="flex flex-row items-start bg-muted/50">
               <div className="grid gap-0.5">
                 <CardTitle className="group flex items-center gap-2 text-lg">
@@ -121,6 +126,7 @@ function OrderView() {
               </div>
               <div className="ml-auto flex items-center gap-1">
                 <Button
+                variant={"ghost"}
                   onClick={async () => {
                     if (!storeId) return;
                     const embedding = await generateEmbedding({
@@ -163,7 +169,6 @@ Created At: ${currentOrder.createdAt.toDate().toLocaleDateString()} at ${current
                 >
                   Victor It
                 </Button>
-                <ChatWithCustomer />
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button size="icon" variant="outline" className="h-8 w-8">
@@ -270,25 +275,25 @@ Created At: ${currentOrder.createdAt.toDate().toLocaleDateString()} at ${current
                 </Button>
               </div>
             </CardHeader>
-            <Tabs defaultValue="details" className="bg-slate-50">
-  <TabsList className="bg-slate-50 p-2 px-3  gap-1">
-    <TabsTrigger value="details" className="border">Details</TabsTrigger>
-    <TabsTrigger value="notes" className="border">Notes</TabsTrigger>
-    <TabsTrigger value="whatsapp" className="border">Whatsapp</TabsTrigger>
+  <TabsList className="bg-white gap-2 py-4 h-12">
+    <TabsTrigger value="details" className="border"><Box className="h-3.5 mr-2 w-3.5" /> Details</TabsTrigger>
+    <TabsTrigger value="notes" className="border">
+      <FileText className="h-3.5 mr-2 w-3.5" />
+      Notes</TabsTrigger>
+    <TabsTrigger value="whatsapp" className="border">
+      <IconBrandWhatsapp className="h-3.5 mr-2 w-3.5" />
+      Whatsapp</TabsTrigger>
   </TabsList>
-  <TabsContent value="details">
-
-
-
+            <CardContent className="flex-1 overflow-auto bg-white">
+  <TabsContent value="details" className="flex  flex-col overflow-auto flex-1">
     <DetailsOrderView />
-
-
-
-
   </TabsContent>
-  <TabsContent value="notes"></TabsContent>
-  <TabsContent value="whatsapp"></TabsContent>
-</Tabs>
+  <TabsContent value="notes" className="flex h-full flex-col flex-1">
+    <OrderNotes />
+  </TabsContent>
+  <TabsContent value="whatsapp">
+  </TabsContent>
+            </CardContent>
             <CardFooter className="flex flex-row items-center border-t bg-muted/50 px-6 py-3">
               <div className="text-xs text-muted-foreground">
                 Updated{" "}
@@ -299,6 +304,7 @@ Created At: ${currentOrder.createdAt.toDate().toLocaleDateString()} at ${current
               </div>
             </CardFooter>
           </Card>
+</Tabs>
         </motion.div>
       )
     : null;
