@@ -1,15 +1,8 @@
-import React from 'react'
-import {
-  Card,
-  CardHeader,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import React from "react";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SendIcon } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
-
 
 function OrderNotes() {
   return (
@@ -52,8 +45,7 @@ function OrderNotes() {
         </form>
       </CardFooter>
     </Card>
-
-  )
+  );
 }
 function Message({
   text,
@@ -74,6 +66,5 @@ function Message({
   );
 }
 
+export default OrderNotes;
 
-
-export default OrderNotes
