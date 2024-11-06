@@ -1,10 +1,8 @@
 import { streamText } from "ai";
 import { openai } from "@ai-sdk/openai";
 import { z } from "zod";
-import { dbIndex } from "@/lib/db/pinecone";
-import { generateEmbedding } from "@/lib/ai/openai/embedding";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "@/firebase";
+import { getOrdersFromVictorDB } from "./tools/getOrdersFromVictorDB";
+
 
 export async function POST(request: Request) {
   const { messages, storeId, userEmail, userName } = await request.json();
@@ -12,8 +10,8 @@ export async function POST(request: Request) {
 
   const result = await streamText({
     model: openai("gpt-3.5-turbo"),
-    messages: messages,
-    maxSteps: 6,
+    messages: messages.slice(-6),
+    maxSteps: 5,
     tools: {
       getTimeAndDate: {
         description: "Get the current time and date now",
@@ -26,91 +24,51 @@ export async function POST(request: Request) {
           };
         },
       },
+      displayOrder:{
+        description: "return the order details , display ui",
+        parameters: z.object({
+          orderId : z.string().describe("The id of the order"),
+          name: z.string().describe("The name of the user"),
+          phone: z.string().describe("The phone number of the user"),
+          address: z.string().describe("The address of the user"),
+          city: z.string().describe("The city of the user"),
+          total: z.string().describe("The total of the order"),
+          status: z.string().describe("The status of the order"),
+        }),
+        execute: async function ({ 
+          orderId, name, phone, address, city, total, status, createdAt
+         }) {
+          return {order:{
+            orderId,
+            name,
+            phone,
+            address,
+            city,
+            total,
+            status,
+            createdAt
+          }}
+        }
+      },
       getUserName: {
-        description: "Get the current user's name",
+        description: "Get the current store user name",
         parameters: z.object({}),
         execute: async () => {
           return { userName };
         },
       },
-      getOrdersFromVictorDB: {
-        description:
-          "Get the orders from Victor's database, the result is just the closest match , you need to double check it" +
-          "you will be returned with orders in this format :" +
-          "Order ID: xx \n Customer Name: xx \n Customer Phone: xx \n Customer Email: xx \n Customer Address: xx \n Order Total: xx \n Order Status: xx \n Shipping Cost: xx \n Order Items: xx \n Order Note : xx \n Created At: xx",
-        parameters: z.object({
-          prompt: z
-            .string()
-            .describe(
-              "The prompt to use for the query , the search is not smart enough to calculate stuff you need to do it before creating the prompt",
-            ),
-        }),
-        execute: async ({ prompt }) => {
-          const getEmbededPrompt = await generateEmbedding({ text: prompt });
-          console.log("PROMPT", prompt);
-          const queryResults = await dbIndex.namespace("orders").query({
-            topK: 3,
-            vector: getEmbededPrompt,
-            // filter by storeId
-            filter: {
-              storeId: { $eq: storeId },
-            },
-            includeMetadata: true,
-          });
-          const SIMILARITY_THRESHOLD = 0.2;
-          console.log("Query results", queryResults.matches);
-          const filteredResults = queryResults.matches.filter((match) => {
-            if (!match?.score) return false;
-            return match.score > SIMILARITY_THRESHOLD;
-          });
-          console.log("Query results", queryResults.matches.length);
-          if (queryResults.matches.length === 0) {
-            return { orders: [] };
-          }
-          const orders = await Promise.all(
-            filteredResults.map(async (order) => {
-              const orderData = await getDoc(doc(db, "orders", order.id)).then(
-                (doc) => {
-                  if (doc.exists()) {
-                    return {
-                      order: `
-Order ID: ${doc.id}
-Customer Name: ${doc.data().customer.name}
-Customer Phone: ${doc.data().customer.phoneNumber}
-Customer Email: ${doc.data().customer.email ?? "no email"}
-Customer Address: ${doc.data().customer.shippingAddress.address}, ${doc.data().customer.shippingAddress.city} 
-Order Total: ${doc.data().totalPrice} Dh
-Order Status: ${doc.data().orderStatus}
-Shipping Cost: ${doc.data().shippingInfo.cost ?? "Free"}
-Order Items: ${doc
-                        .data()
-                        .items.map(
-                          (item: {
-                            title: string;
-                            quantity: number;
-                            totalPrice: number;
-                          }) =>
-                            ` - ${item.title} x ${item.quantity} = ${item.totalPrice} Dh`,
-                        )
-                        .join("\n")}
-Order Note : ${doc.data().note?.content ?? "No note"}
-Created At: ${doc.data().createdAt.toDate().toLocaleDateString()} at ${doc.data().createdAt.toDate().toLocaleTimeString()}
-`,
-                    };
-                  } else {
-                    return null;
-                  }
-                },
-              );
-              return orderData;
-            }),
-          );
-
-          return { orders };
-        },
-      },
+      getOrdersFromVictorDB: getOrdersFromVictorDB({ storeId }),
     },
-    system: `
+    system
+  });
+  return result.toAIStreamResponse();
+}
+
+
+
+
+
+const system = `
 You are TchiDash's professional e-commerce assistant, tailored for Morocco’s market.
 
 Key Focus:
@@ -132,7 +90,7 @@ Scope:
 
 
 Always align advice with Moroccan practices and global e-commerce standards.
-`,
-  });
-  return result.toAIStreamResponse();
-}
+
+
+never return order details in rows use the display order , you can return rows only if client ask for specific order details
+`

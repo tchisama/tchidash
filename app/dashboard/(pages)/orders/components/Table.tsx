@@ -246,7 +246,7 @@ export function OrdersTable({
                   />
                 </div>
               </TableCell>
-              <TableCell className="">
+              <TableCell className="w-[130px]">
                 <div className="relative h-10 w-20">
                   {order.items.slice(0, 2).map((item, i) => {
                     return (
@@ -271,13 +271,13 @@ export function OrdersTable({
                   })}
                   {order.items.length > 2 && (
                     <div className="mask absolute top-0 w-10 aspect-square left-16">
-                      <div className="w-10 h-10 bg-slate-100 relative rounded-[15px] flex items-center justify-center">
+                      <div className="w-10 h-10 border-[#3334] border bg-slate-100 relative rounded-[15px] flex items-center justify-center">
                         <Image
                           width={50}
                           height={50}
                           src={order.items[2].imageUrl ?? ""}
                           alt="Avatar Tailwind CSS Component"
-                          className={cn("w-10 border-[#3334] border-[1px] filter opacity-20 rounded-[15px] bg-slate-100  aspect-square   object-cover",
+                          className={cn("w-10  filter opacity-20 rounded-[15px] bg-slate-100  aspect-square   object-cover",
                             order.items.length - 3 === 0 && "opacity-100",
                           )}
                         />

@@ -20,7 +20,6 @@ import BreadcrumbCom from "./Breadcrumb";
 import { useNavbar } from "@/store/navbar";
 import { useRouter } from "next/navigation";
 import useClean from "@/hooks/useClean";
-import { DashboardCommand } from "./Command";
 import BottomBar from "./BottomBar";
 import { useStore } from "@/store/storeInfos";
 
@@ -54,7 +53,7 @@ export default function DashboardUiProvider({
                 {actions.map((action) => action)}
               </div>
             )}
-            <DashboardCommand />
+            {/* <DashboardCommand /> */}
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
