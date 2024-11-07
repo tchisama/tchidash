@@ -3,7 +3,6 @@ import { openai } from "@ai-sdk/openai";
 import { z } from "zod";
 import { getOrdersFromVictorDB } from "./tools/getOrdersFromVictorDB";
 
-
 export async function POST(request: Request) {
   const { messages, storeId, userEmail, userName } = await request.json();
   console.log(storeId, userEmail, userName);
@@ -24,10 +23,10 @@ export async function POST(request: Request) {
           };
         },
       },
-      displayOrder:{
+      displayOrder: {
         description: "return the order details , display ui",
         parameters: z.object({
-          orderId : z.string().describe("The id of the order"),
+          orderId: z.string().describe("The id of the order"),
           name: z.string().describe("The name of the user"),
           phone: z.string().describe("The phone number of the user"),
           address: z.string().describe("The address of the user"),
@@ -35,20 +34,29 @@ export async function POST(request: Request) {
           total: z.string().describe("The total of the order"),
           status: z.string().describe("The status of the order"),
         }),
-        execute: async function ({ 
-          orderId, name, phone, address, city, total, status, createdAt
-         }) {
-          return {order:{
-            orderId,
-            name,
-            phone,
-            address,
-            city,
-            total,
-            status,
-            createdAt
-          }}
-        }
+        execute: async function ({
+          orderId,
+          name,
+          phone,
+          address,
+          city,
+          total,
+          status,
+          createdAt,
+        }) {
+          return {
+            order: {
+              orderId,
+              name,
+              phone,
+              address,
+              city,
+              total,
+              status,
+              createdAt,
+            },
+          };
+        },
       },
       getUserName: {
         description: "Get the current store user name",
@@ -59,14 +67,10 @@ export async function POST(request: Request) {
       },
       getOrdersFromVictorDB: getOrdersFromVictorDB({ storeId }),
     },
-    system
+    system,
   });
   return result.toAIStreamResponse();
 }
-
-
-
-
 
 const system = `
 You are TchiDash's professional e-commerce assistant, tailored for Morocco’s market.
@@ -93,4 +97,5 @@ Always align advice with Moroccan practices and global e-commerce standards.
 
 
 never return order details in rows use the display order , you can return rows only if client ask for specific order details
-`
+`;
+
