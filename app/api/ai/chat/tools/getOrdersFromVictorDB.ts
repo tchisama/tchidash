@@ -20,7 +20,7 @@ export const getOrdersFromVictorDB
           dateRange:z.object({
             startDate:z.string().describe("starting date-time in format ISO 8601"),
             endDate:z.string().describe("ending date-time in format ISO 8601")
-          }).optional().describe("The date range to filter the orders")
+          }).optional().describe("The date range to filter the orders ,IMPORTANT : use this only if you know exact dates ortherwise leave it empty, default is all times")
         }),
         execute: async ({ prompt ,dateRange}:{prompt:string,
           dateRange:{

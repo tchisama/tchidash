@@ -86,6 +86,13 @@ function OrderNotes() {
         {notes?.map((note) => {
           return <Message key={note.id} note={note} />;
         })}
+        {
+          notes?.length === 0 && (
+            <p className="flex-1 opacity-40 h-full flex items-center justify-center">
+              
+              No History</p>
+          )
+        }
       </CardContent>
       <CardFooter className="w-full px-0 pb-0">
         <form

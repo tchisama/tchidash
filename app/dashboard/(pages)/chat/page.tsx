@@ -10,6 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import OrderComponent from "./components/OrderComponent";
 import { useEffect } from "react";
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm'
 
 export default function Component() {
   const { storeId } = useStore();
@@ -50,9 +51,16 @@ export default function Component() {
                   >
                     <ReactMarkdown
                       // style images
+                      remarkPlugins={[remarkGfm]}
                       components={{
                         img: ({ ...props }) => (
                           <img {...props} className="bg-slate-50 my-1 mr-2 w-[50px] border border-[#3333] rounded-xl" />
+                        ),
+                        table: ({ ...props }) => (
+                          <table
+                            {...props}
+                            className="table-auto  my-1 mr-2 w-full p-1 border-[#3333] rounded-xl"
+                          />
                         ),
                         hr: () => <hr className="my-3" />,
                       }}
@@ -96,14 +104,13 @@ export default function Component() {
           ))}
         </ScrollArea>
       </div>
-      <div className="p-2 bg-white left-1/2 shadow-xl -translate-x-1/2 max-w-3xl rounded-xl bottom-[100px] fixed w-full">
+      <div className="p-2 border bg-white left-1/2 shadow-xl -translate-x-1/2 max-w-3xl rounded-2xl bottom-[100px] fixed w-full">
         <form onSubmit={handleSubmit} className="flex space-x-2">
           <Textarea
             placeholder="Type your message..."
             value={input}
-            className="bg-slate-50 focus:outline outline-primary shadow-none"
+            className="bg-slate-50 duration-100 focus:border-[2px] border-primary/20 shadow-none"
             onChange={handleInputChange}
-            onKeyPress={(e) => e.key === "Enter" && handleSubmit()}
           />
           <Button type="submit" onClick={handleSubmit}>
             <Send className="h-4 w-4" />

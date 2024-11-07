@@ -258,7 +258,7 @@ function DetailsOrderView() {
                 >
                   <span className="text-muted-foreground flex gap-2">
                     <HoverCard>
-                      <HoverCardTrigger className="flex gap-2 items-center cursor-pointer">
+                      <HoverCardTrigger className="flex text-sm gap-2 items-center cursor-pointer">
                         <Image
                           className="w-8 bg-slate-50 h-8 object-cover border rounded-sm "
                           src={item.imageUrl ?? ""}
@@ -269,7 +269,7 @@ function DetailsOrderView() {
                         {item.title} x{" "}
                         <span className="font-semibold">{item.quantity}</span>
                       </HoverCardTrigger>
-                      <HoverCardContent>
+                      <HoverCardContent className="p-2 w-[300px]">
                         <div className="flex gap-4">
                           <Image
                             className="w-24 h-24 object-cover border rounded-md "
