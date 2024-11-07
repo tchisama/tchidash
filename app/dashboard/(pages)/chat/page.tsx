@@ -29,7 +29,7 @@ export default function Component() {
   }, [messages]);
 
   return (
-    <div className="flex flex-col flex-1  max-w-5xl mx-auto">
+    <div className="flex flex-col flex-1  max-w-6xl mx-auto">
       <div className="flex-1 ">
         <ScrollArea className="h-full  pb-16 p-8">
           {messages.map((message, id) => (
@@ -43,7 +43,7 @@ export default function Component() {
                   }`}
                 >
                   <div
-                    className={`inline-block max-w-2xl   rounded-lg ${
+                    className={`inline-block max-w-4xl   rounded-lg ${
                       message.role !== "user"
                         ? "bg-white border p-4 "
                         : "bg-primary text-white px-4 py-2"
@@ -56,10 +56,16 @@ export default function Component() {
                         img: ({ ...props }) => (
                           <img {...props} className="bg-slate-50 my-1 mr-2 w-[50px] border border-[#3333] rounded-xl" />
                         ),
+                        td: ({ ...props }) => (
+                          <td
+                            {...props}
+                            className="p-1 border-t pr-8 max-w-[200px]  rounded-xl"
+                          />
+                        ),
                         table: ({ ...props }) => (
                           <table
                             {...props}
-                            className="table-auto  my-1 mr-2 w-full p-1 border-[#3333] rounded-xl"
+                            className="table-auto min-w-[700px] my-1 mr-2 w-full p-1 border-[#3333] rounded-xl"
                           />
                         ),
                         hr: () => <hr className="my-3" />,

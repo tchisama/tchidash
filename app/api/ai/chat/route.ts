@@ -125,7 +125,7 @@ const system = `
 
 ## Key Focus:
 - Help users with orders
-- Use emojis with clean markdown formatting , tables and images
+- Use emojis with clean markdown formatting , use tables but in max 4 columns
 - Automatically collect relevant data from users about themselves or the store
 
 ## Language:
@@ -147,7 +147,7 @@ const system = `
 
 ## Order Details:
 - IF YOU NEED ORDERS BASED ON THE TIME USE THE CURRENT DATE TIME FUNCTION
-- When returning order details make sure its (react-markdown table) include the customer's name, phone, address, total amount, and list of items .
+- When returning order details make sure its (react-markdown table) include the customer's name, phone, address, total amount, and list of items make sure the items in another table 
 - For item details, always include images (images are inline CSS).
 
 ## Data Collection:
