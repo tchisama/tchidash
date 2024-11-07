@@ -8,8 +8,7 @@ export const getOrdersFromVictorDB
  =({storeId}:{
   storeId:string
 })=>({         description:
-          "Get the orders from Victor's database, the result is just the closest match , you need to double check it" +
-          "you will be returned with orders in this orders :" +
+          "Get the orders from Victor's database, the result is just the closest match , you need to double check it and return only the correct" +
           "if the last result is one order please use the tool return the order details , display ui "
           ,
         parameters: z.object({
@@ -18,21 +17,40 @@ export const getOrdersFromVictorDB
             .describe(
               "The prompt to use for the query , the search is not smart enough to calculate stuff you need to do it before creating the prompt",
             ),
+          dateRange:z.object({
+            startDate:z.string().describe("starting date-time in format ISO 8601"),
+            endDate:z.string().describe("ending date-time in format ISO 8601")
+          }).optional().describe("The date range to filter the orders")
         }),
-        execute: async ({ prompt }:{prompt:string}) => {
+        execute: async ({ prompt ,dateRange}:{prompt:string,
+          dateRange:{
+            startDate:string;
+            endDate:string
+          }
+        }) => {
           const getEmbededPrompt = await generateEmbedding({ text: prompt });
           console.log("PROMPT", prompt);
+          console.log("DATE RANGE", dateRange);
+
+          const filter:{
+            [key: string]: unknown
+          }={
+            storeId: { $eq: storeId },
+          };
+          if (dateRange) {
+            filter.createdAt = {
+              $gte: new Date(dateRange.startDate).getTime(),
+              $lte: new Date(dateRange.endDate).getTime()
+            };
+          }
           const queryResults = await dbIndex.namespace("orders").query({
             topK: 3,
             vector: getEmbededPrompt,
             // filter by storeId
-            filter: {
-              storeId: { $eq: storeId },
-            },
+            filter,
             includeMetadata: true,
           });
-          const SIMILARITY_THRESHOLD = 0.2;
-          console.log("Query results", queryResults.matches);
+          const SIMILARITY_THRESHOLD = 0.1;
           const filteredResults = queryResults.matches.filter((match:{
             score?: number;
           }) => {
@@ -51,29 +69,8 @@ export const getOrdersFromVictorDB
                 (doc) => {
                   if (doc.exists()) {
                     return {
-                      order: `
-Order ID: ${order.id}
-Customer Name: ${doc.data().customer.name}
-Customer Phone: ${doc.data().customer.phoneNumber}
-Customer Email: ${doc.data().customer.email ?? "no email"}
-Customer Address: ${doc.data().customer.shippingAddress.address}, ${doc.data().customer.shippingAddress.city} 
-Order Total: ${doc.data().totalPrice} Dh
-Order Status: ${doc.data().orderStatus}
-Shipping Cost: ${doc.data().shippingInfo.cost ?? "Free"}
-Order Items: ${doc
-                        .data()
-                        .items.map(
-                          (item: {
-                            title: string;
-                            quantity: number;
-                            totalPrice: number;
-                          }) =>
-                            ` - ${item.title} x ${item.quantity} = ${item.totalPrice} Dh`,
-                        )
-                        .join("\n")}
-Order Note : ${doc.data().note?.content ?? "No note"}
-Created At: ${doc.data().createdAt.toDate().toLocaleDateString()} at ${doc.data().createdAt.toDate().toLocaleTimeString()}
-`,
+                      ... doc.data(),
+                      id: doc.id,
                     };
                   } else {
                     return null;

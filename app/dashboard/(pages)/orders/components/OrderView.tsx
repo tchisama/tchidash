@@ -130,14 +130,8 @@ Created At: ${currentOrder.createdAt.toDate().toLocaleDateString()} at ${current
                         metadata: {
                           storeId: storeId,
                           createdAt: new Date(
-                            currentOrder.createdAt
-                              .toDate()
-                              .toLocaleDateString() +
-                              " " +
-                              currentOrder.createdAt
-                                .toDate()
-                                .toLocaleTimeString(),
-                          ),
+                            currentOrder.createdAt.toDate()
+                          ).getTime()
                         },
                       };
                       axios

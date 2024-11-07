@@ -70,6 +70,11 @@ function Protected({ children }: { children: React.ReactNode }) {
       //setLoading(false);
       return setDontHaveAccess(false);
     }
+    if(pathname.split("/")[2] === "none-layout" && pathname.split("/")[3] === "tickets"){
+      if(employee.access["orders"]){
+        return setDontHaveAccess(false);
+      }
+    }
     if (employee.access[pathname.split("/")[2]]) {
       //setLoading(false);
       return setDontHaveAccess(false);

@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     maxSteps: 5,
     tools: {
       getTimeAndDate: {
-        description: "Get the current time and date now",
+        description: "Get the current time and date now, always use this if its related to time or date",
         parameters: z.object({}),
         execute: async () => {
           const date = new Date();
@@ -24,32 +24,17 @@ export async function POST(request: Request) {
           };
         },
       },
-      displayOrder:{
-        description: "return the order details , display ui",
-        parameters: z.object({
-          orderId : z.string().describe("The id of the order"),
-          name: z.string().describe("The name of the user"),
-          phone: z.string().describe("The phone number of the user"),
-          address: z.string().describe("The address of the user"),
-          city: z.string().describe("The city of the user"),
-          total: z.string().describe("The total of the order"),
-          status: z.string().describe("The status of the order"),
-        }),
-        execute: async function ({ 
-          orderId, name, phone, address, city, total, status, createdAt
-         }) {
-          return {order:{
-            orderId,
-            name,
-            phone,
-            address,
-            city,
-            total,
-            status,
-            createdAt
-          }}
-        }
-      },
+      dataCollectionTool : {
+  description: 'Collects relevant data from the conversation',
+  parameters: z.object({
+    data: z.string(),
+  }),
+  execute: async ({data}) => {
+    // Return a response to the user
+    console.log("Data", data);
+    return 'I\'ve noted the information you provided and will include it in your dashboard. '+data;
+  }
+},
       getUserName: {
         description: "Get the current store user name",
         parameters: z.object({}),
@@ -72,8 +57,7 @@ const system = `
 You are TchiDash's professional e-commerce assistant, tailored for Morocco’s market.
 
 Key Focus:
-- Help users with store management, technical support, and market insights.
-- Advise on inventory, order processing, and customer service.
+- Help users with orders,
 
 Language:
 1. Begin by asking the user’s language preference:
@@ -91,6 +75,49 @@ Scope:
 
 Always align advice with Moroccan practices and global e-commerce standards.
 
-
-never return order details in rows use the display order , you can return rows only if client ask for specific order details
+when return the order details in first time , return name , and phone , and address and amount and items , anless the user want more details
+and about items always return images and put them in the first line then the name like : [img - name - quantity]
+use # ## ### for better display , and <hr>
 `
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      // displayOrder:{
+      //   description: "return the order details , display ui",
+      //   parameters: z.object({
+      //     orderId : z.string().describe("The id of the order"),
+      //     name: z.string().describe("The name of the user"),
+      //     phone: z.string().describe("The phone number of the user"),
+      //     address: z.string().describe("The address of the user"),
+      //     city: z.string().describe("The city of the user"),
+      //     total: z.string().describe("The total of the order"),
+      //     status: z.string().describe("The status of the order"),
+      //   }),
+      //   execute: async function ({ 
+      //     orderId, name, phone, address, city, total, status, createdAt
+      //    }) {
+      //     return {order:{
+      //       orderId,
+      //       name,
+      //       phone,
+      //       address,
+      //       city,
+      //       total,
+      //       status,
+      //       createdAt
+      //     }}
+      //   }
+      // },

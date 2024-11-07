@@ -9,6 +9,7 @@ import { useStore } from "@/store/storeInfos";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import OrderComponent from "./components/OrderComponent";
 import { useEffect } from "react";
+import ReactMarkdown from 'react-markdown';
 
 export default function Component() {
   const { storeId } = useStore();
@@ -36,20 +37,29 @@ export default function Component() {
                 <div
                   className={`mb-4  px-4 ${
                     message.role !== "user"
-                      ? "text-left  drop-shadow-md "
+                      ? "text-left  "
                       : "text-right"
                   }`}
                 >
                   <div
-                    className={`inline-block max-w-xl px-4 p-2 rounded-lg ${
+                    className={`inline-block max-w-2xl   rounded-lg ${
                       message.role !== "user"
-                        ? "bg-black/90  text-primary-foreground"
-                        : "bg-white border text-secondary-foreground"
+                        ? "bg-white border p-4 "
+                        : "bg-primary text-white px-4 py-2"
                     }`}
-                    dangerouslySetInnerHTML={{
-                      __html: message.content.replace(/\n/g, "<br/>"),
-                    }}
-                  ></div>
+                  >
+                    <ReactMarkdown
+                      // style images
+                      components={{
+                        img: ({ ...props }) => (
+                          <img {...props} className="bg-slate-50 my-1 mr-2 w-[50px] border border-[#3333] rounded-xl" />
+                        ),
+                        hr: () => <hr className="my-3" />,
+                      }}
+                    >
+                    {message.content}
+                    </ReactMarkdown>
+                  </div>
                 </div>
               )}
               <div className="p-4">
