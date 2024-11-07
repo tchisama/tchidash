@@ -9,6 +9,8 @@ import { useStore } from "@/store/storeInfos";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import OrderComponent from "./components/OrderComponent";
 import { useEffect } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 export default function Component() {
   const { storeId } = useStore();
@@ -27,7 +29,7 @@ export default function Component() {
   }, [messages]);
 
   return (
-    <div className="flex flex-col flex-1  max-w-5xl mx-auto">
+    <div className="flex flex-col flex-1  max-w-6xl mx-auto">
       <div className="flex-1 ">
         <ScrollArea className="h-full  pb-16 p-8">
           {messages.map((message, id) => (
@@ -35,21 +37,50 @@ export default function Component() {
               {message.content && (
                 <div
                   className={`mb-4  px-4 ${
-                    message.role !== "user"
-                      ? "text-left  drop-shadow-md "
-                      : "text-right"
+                    message.role !== "user" ? "text-left  " : "text-right"
                   }`}
                 >
                   <div
-                    className={`inline-block max-w-xl px-4 p-2 rounded-lg ${
+                    className={`inline-block max-w-5xl   rounded-lg ${
                       message.role !== "user"
-                        ? "bg-black/90  text-primary-foreground"
-                        : "bg-white border text-secondary-foreground"
+                        ? "bg-white border p-4 "
+                        : "bg-primary text-white px-4 py-2"
                     }`}
-                    dangerouslySetInnerHTML={{
-                      __html: message.content.replace(/\n/g, "<br/>"),
-                    }}
-                  ></div>
+                  >
+                    <ReactMarkdown
+                      // style images
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        img: ({ ...props }) => (
+                          <img
+                            {...props}
+                            className="bg-slate-50 my-1 mr-2 w-[50px] border border-[#3333] rounded-xl"
+                          />
+                        ),
+                        td: ({ ...props }) => (
+                          <td
+                            {...props}
+                            className="p-1 border pr-8 pl-3   max-w-[250px]  rounded-xl"
+                          />
+                        ),
+                        th: ({ ...props }) => (
+                          <th
+                            {...props}
+                            className="p-1 border pr-8 pl-3 bg-slate-50  max-w-[250px]  rounded-xl"
+                          />
+                        ),
+                        table: ({ ...props }) => (
+                          <table
+                            {...props}
+                            className="table-auto min-w-[700px] mb-4 my-1 mr-2 w-full p-1 border-[#3333] "
+                          />
+                        ),
+                        hr: () => <hr className="my-3" />,
+                      }}
+                    >
+                      {message.content}
+                    </ReactMarkdown>
+                  </div>
                 </div>
               )}
               <div className="p-4">
@@ -86,14 +117,13 @@ export default function Component() {
           ))}
         </ScrollArea>
       </div>
-      <div className="p-2 bg-white left-1/2 shadow-xl -translate-x-1/2 max-w-3xl rounded-xl bottom-[100px] fixed w-full">
+      <div className="p-2 border bg-white left-1/2 shadow-xl -translate-x-1/2 max-w-3xl rounded-2xl bottom-[100px] fixed w-full">
         <form onSubmit={handleSubmit} className="flex space-x-2">
           <Textarea
             placeholder="Type your message..."
             value={input}
-            className="bg-slate-50 focus:outline outline-primary shadow-none"
+            className="bg-slate-50 duration-100 focus:border-[2px] border-primary/20 shadow-none"
             onChange={handleInputChange}
-            onKeyPress={(e) => e.key === "Enter" && handleSubmit()}
           />
           <Button type="submit" onClick={handleSubmit}>
             <Send className="h-4 w-4" />
@@ -104,4 +134,3 @@ export default function Component() {
     </div>
   );
 }
-
