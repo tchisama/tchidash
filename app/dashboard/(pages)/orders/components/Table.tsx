@@ -81,7 +81,7 @@ export function OrdersTable({
 
       if (!storeId) return null;
       const queryBuilder = query(collection(db, "orders"), and(...wheres));
-      const response = await getPage(queryBuilder, currentPage, pageSize);
+      const response = await getPage(queryBuilder, currentPage, pageSize,storeId);
       trackUserUsage({
         userEmail: "",
         storeId: storeId,

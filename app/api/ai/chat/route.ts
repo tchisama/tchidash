@@ -159,7 +159,8 @@ const system = `
 1. get Language
 2. if none, can choose any of the following languages:
    - English (en)
-   - Arabic (ar)
+   - Arabic (ar) 
+   - Darija (darija) // its moroccan arabic with english litters and numbers
    - French (fr)
 3. Save the selected language in the db
 4. Continue in their chosen language.

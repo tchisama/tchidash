@@ -117,7 +117,7 @@ export default function Component() {
           ))}
         </ScrollArea>
       </div>
-      <div className="p-2 border bg-white left-1/2 shadow-xl -translate-x-1/2 max-w-3xl rounded-2xl bottom-[100px] fixed w-full">
+      <div className="p-2 border bg-white left-1/2 shadow-xl -translate-x-1/2 max-w-3xl rounded-2xl bottom-[20px] fixed w-full">
         <form onSubmit={handleSubmit} className="flex space-x-2">
           <Textarea
             placeholder="Type your message..."

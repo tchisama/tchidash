@@ -62,7 +62,7 @@ export default function Page() {
         <Analytic />
         <div className="">
           <div className="ml-auto mb-2 flex items-center gap-2">
-            <div className="">
+            <div className="flex gap-2">
               <Popover>
                 <PopoverTrigger asChild>
                   <Button className="" variant={"outline"}>
@@ -101,29 +101,36 @@ export default function Page() {
                   ))}
                 </PopoverContent>
               </Popover>
+              <Select
+                onValueChange={(value) => setPageSize(Number(value))}
+                defaultValue={pageSize.toString()}
+              >
+                <SelectTrigger className="bg-white">
+                  <SelectValue placeholder="Page Size" /> 
+                </SelectTrigger>
+                <SelectContent className="mt-2 max-w-xs bg-white">
+                  <SelectItem value="25">25</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="flex ml-auto flex-col gap-2 min-w-[100px]">
-              <div className="flex gap-2 w-[220px]">
-                <Select
-                  onValueChange={(value) => setPageSize(Number(value))}
-                  defaultValue={pageSize.toString()}
-                >
-                  <SelectTrigger className="bg-white">
-                    <SelectValue placeholder="Theme" />
-                  </SelectTrigger>
-                  <SelectContent className="mt-2 max-w-xs bg-white">
-                    <SelectItem value="25">25</SelectItem>
-                    <SelectItem value="50">50</SelectItem>
-                    <SelectItem value="100">100</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="flex gap-2 ">
+                {selectedOrder && selectedOrder.length > 0 && (
+                  <Link href="/dashboard/none-layout/tickets">
+                    <Button className="text-sm flex gap-2">
+                      <TicketsIcon className="h-4 w-4" />
+                      Tickets
+                    </Button>
+                  </Link>
+                )}
                 <Link className="" href="/dashboard/orders/new">
                   <Button
-                    variant="outline"
                     className=" gap-1 w-[130px] text-sm"
                   >
-                    <PlusCircle className="h-3.5 w-3.5" />
+                    <PlusCircle className="h-4 w-4" />
                     <span className="sr-only sm:not-sr-only">New Order</span>
                   </Button>
                 </Link>
@@ -131,22 +138,8 @@ export default function Page() {
             </div>
           </div>
           <Card x-chunk="dashboard-05-chunk-3">
-            <CardHeader className="px-7 flex flex-row items-start justify-between">
-              <div>
-                <CardTitle>Orders</CardTitle>
-                <CardDescription>
-                  Recent orders from your store.
-                </CardDescription>
-              </div>
-              <div>
-                {selectedOrder && selectedOrder.length > 0 && (
-                  <Link href="/dashboard/none-layout/tickets">
-                    <Button variant="outline" className="text-sm flex gap-2">
-                      Tickets <TicketsIcon className="h-4 w-4" />
-                    </Button>
-                  </Link>
-                )}
-              </div>
+            <CardHeader className="">
+              <CardTitle className="text-xl font-medium">Orders</CardTitle>
             </CardHeader>
             <CardContent>
               <OrdersTable

@@ -13,15 +13,11 @@ function formatDataSize(length: number, decimals = 2) {
 const dhToUsd = 10;
 
 export function costFromUsageDownload(usage: number) {
-  //the usage is in bytes
-  // return usage by dh
-  return Number(usage * (3 / 1024 / 1024 / 1024) * dhToUsd);
+  return Number(usage * (10 / 1024 / 1024 / 1024) * dhToUsd);
 }
 
 export function costFromUsageUpload(usage: number) {
-  //the usage is in bytes
-  // return usage by dh
-  return Number(usage * (6 / 1024 / 1024 / 1024) * dhToUsd);
+  return Number(usage * (20 / 1024 / 1024 / 1024) * dhToUsd);
 }
 
 export default formatDataSize;

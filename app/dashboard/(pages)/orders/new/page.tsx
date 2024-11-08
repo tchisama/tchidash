@@ -162,8 +162,8 @@ export default function CreateOrder() {
   };
   return (
     order && (
-      <div className="space-y-6  mx-auto p-6 bg-white rounded-lg shadow">
-        <div className="flex gap-4">
+      <div className="space-y-6    p-6 bg-white rounded-lg shadow">
+        <div className="flex gap-4 max-w-7xl">
           <div className="space-y-4 flex-1 max-w-3xl">
             <h2 className="text-lg font-bold">Customer Information</h2>
             <div className="grid grid-cols-2 gap-4">

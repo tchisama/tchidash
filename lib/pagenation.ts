@@ -9,6 +9,7 @@ import {
   QueryConstraint,
   DocumentData
 } from 'firebase/firestore';
+import { dbGetDocs } from './dbFuntions/fbFuns';
 
 interface PaginationResult {
   documents: DocumentData[];
@@ -18,11 +19,13 @@ interface PaginationResult {
   totalCount: number;
 }
 
+
 export async function getPage(
   baseQuery: Query<DocumentData>,
   pageNumber: number,
   pageSize: number,
-  orderByField: string = 'createdAt'
+  storeId: string,
+  orderByField: string = 'createdAt',
 ): Promise<PaginationResult> {
   // Get total count of documents
   const snapshot = await getCountFromServer(baseQuery);
@@ -57,13 +60,14 @@ export async function getPage(
 
   // Execute the query
   const finalQuery = query(baseQuery, ...queryConstraints);
-  const querySnapshot = await getDocs(finalQuery);
+  const querySnapshot = await dbGetDocs(finalQuery,storeId,"");
 
   // Convert the query snapshot to an array of documents
   const documents = querySnapshot.docs.map(doc => ({
     ...doc.data(),
     id: doc.id
   }));
+
   return {
     documents,
     currentPage: pageNumber,

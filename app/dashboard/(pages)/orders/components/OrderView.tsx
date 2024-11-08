@@ -99,7 +99,8 @@ function OrderView() {
                     </Button>
                   </CardTitle>
                   <CardDescription className="text-xs ">
-                    {currentOrder?.createdAt
+                    {
+                    currentOrder?.createdAt
                       .toDate()
                       .toLocaleDateString()
                       .replaceAll("/", ",")}{" "}

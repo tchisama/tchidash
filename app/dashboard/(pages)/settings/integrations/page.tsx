@@ -48,6 +48,12 @@ const integrations: Integration[] = [
     imageUrl:
       "https://firebasestorage.googleapis.com/v0/b/tchidash-fd7aa.appspot.com/o/whatsapp-logo-whatsapp-logo-transparent-whatsapp-icon-transparent-free-free-png.webp?alt=media&token=38019c55-c90f-42ba-8d26-3bc025a758a4",
   },
+  {
+    id:"ai-assistant",
+    title: "AI Assistant",
+    description: "Chat with our AI assistant to get answers to your questions",
+    imageUrl:"https://firebasestorage.googleapis.com/v0/b/tchidash-fd7aa.appspot.com/o/generate-ai-artificial-intelligence-logo-600nw-2492648973.webp?alt=media&token=5c8559fc-9ad5-48f5-9c2f-67d4a56aba58"
+  }
 ];
 
 export default function IntegrationsPage() {

@@ -6,7 +6,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { ArrowRightIcon, QrCodeIcon, StarsIcon } from "lucide-react";
+import { ArrowRightIcon, Phone, QrCodeIcon, StarsIcon } from "lucide-react";
 import QRCode from "react-qr-code";
 import { useOrderStore } from "@/store/orders";
 import { StateChanger } from "./StateChanger";
@@ -23,9 +23,12 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import Image from "next/image";
+import { dbUpdateDoc } from "@/lib/dbFuntions/fbFuns";
+import { doc, increment } from "firebase/firestore";
+import { db } from "@/firebase";
 
 function DetailsOrderView() {
-  const { currentOrder } = useOrderStore();
+  const { currentOrder,setCurrentOrderData } = useOrderStore();
   const { store, storeId } = useStore();
 
   const { data: digylogData } = useQuery({
@@ -71,9 +74,8 @@ function DetailsOrderView() {
             <li className="flex items-center justify-between">
               <Popover>
                 <PopoverTrigger className="border-none w-fit p-0">
-                  <Button size="sm" variant="outline" className="flex gap-2 ">
+                  <Button size="icon" variant="outline" className="flex gap-2 ">
                     <QrCodeIcon className="h-5 w-5 " />
-                    QR Code
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-[250px] h-[250px] p-4">
@@ -84,11 +86,34 @@ function DetailsOrderView() {
                   />
                 </PopoverContent>
               </Popover>
-
+              <div className="flex gap-2">
+                {
+                  currentOrder.orderStatus == "cancelled" &&
+                  <Button 
+                  onClick={() => {
+                    if (!currentOrder) return;
+                    if (!storeId) return;
+                    dbUpdateDoc(doc(db, "orders", currentOrder.id), {
+                      numberOfCalls: increment(1),
+                    }, storeId, "");
+                    setCurrentOrderData({
+                      ...currentOrder,
+                      numberOfCalls: (currentOrder.numberOfCalls||0) + 1,
+                    });
+                  }}
+                  size={"sm"} variant={"outline"}>
+                    <Phone className="mr-2 h-4 w-4" />
+                    {
+                      currentOrder?.numberOfCalls ?? 0
+                    }
+                  </Button>
+                }
               <StateChanger
+                showNumberOfCalls={false}
                 state={currentOrder.orderStatus}
                 order={currentOrder}
               />
+              </div>
             </li>
           </ul>
 
@@ -217,16 +242,30 @@ function DetailsOrderView() {
               <div className="flex w-full">
                 <address className="flex-1 grid gap-0.5 not-italic text-muted-foreground">
                   <div className="flex items-center gap-2">
-                    <span>{currentOrder.customer.shippingAddress.city}</span>
-                    <ArrowRightIcon className="h-4 w-4" />
-                    <span className="text-primary/80 font-bold flex gap-1">
-                      {currentOrder.cityAi && currentOrder.cityAi.city}
-                      <StarsIcon className="h-4 w-4" />
-                    </span>
-                    <span className="">| </span>
-                    <span>
-                      {currentOrder.cityAi && currentOrder.cityAi.region}
-                    </span>
+                    <HoverCard>
+                      <HoverCardTrigger className="flex items-center gap-2">
+                        <span>{currentOrder.customer.shippingAddress.city}</span>
+                    {
+                      currentOrder.cityAi &&
+                      currentOrder.cityAi.city.toLowerCase().trim() != 
+                      currentOrder.customer.shippingAddress.city.toLowerCase().trim() &&
+                      <>
+                        <ArrowRightIcon className="h-4 w-4" />
+                        <span className="text-primary/80 font-bold flex gap-1">
+                          {currentOrder.cityAi && currentOrder.cityAi.city}
+                          <StarsIcon className="h-4 w-4" />
+                        </span>
+                      </>
+                    }
+                      </HoverCardTrigger>
+                      <HoverCardContent className="flex flex-col w-fit ">
+                        <span className="text-primary/80 font-bold flex gap-1">
+                          {currentOrder.cityAi && currentOrder.cityAi.city}
+                          <StarsIcon className="h-4 w-4" />
+                        </span>
+                        <span className="text-sm opacity-80">{currentOrder.cityAi && currentOrder.cityAi.region}</span>
+                      </HoverCardContent>
+                    </HoverCard>
                   </div>
                   <span>{currentOrder.customer.shippingAddress.address}</span>
                 </address>

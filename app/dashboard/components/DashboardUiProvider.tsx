@@ -37,12 +37,12 @@ export default function DashboardUiProvider({
   const { actions } = useNavbar();
   const { setStoreId ,store} = useStore();
   return (
-    <div className="flex min-h-screen w-full bg-slate-100 dark:bg-slate-900">
+    <div className="flex min-h-screen w-full bg-slate-50 dark:bg-slate-900">
       {/*
       <SideBar />
        * */}
       <div className="flex-col relative flex-1 sm:gap-4 sm:py-4 ">
-        <header className="sticky  top-0 z-30 flex h-14 items-center gap-4 border-b  px-4 sm:py-3  sm:h-auto sm:border-0 sm:bg-muted sm:px-6">
+        <header className="fixed w-full duration-300 drop-shadow-[0_20px_10px_rgba(16,24,40,0.03)] bg-slate-50/70 backdrop-blur-xl top-0 z-30 flex h-10 items-center gap-4  px-4 sm:py-2  sm:h-auto sm:border-0  ">
           <div className="flex-1 ">
             <PhoneBar />
             <BreadcrumbCom />
@@ -126,7 +126,7 @@ export default function DashboardUiProvider({
           </div>
         </header>
 
-        <main className="p-6 py-2 pb-[200px] pt-10 min-h-[80vh]">
+        <main className="p-6  py-2 pb-[200px] pt-24 min-h-[80vh]">
           {children}
         </main>
       </div>

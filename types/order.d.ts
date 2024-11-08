@@ -100,6 +100,7 @@ export type Order = {
   paymentMethod: PaymentMethod;
   paymentInfo?: PaymentInfo;
   orderStatus: OrderStatus;
+  numberOfCalls?: number;
   createdAt: Timestamp;
   updatedAt?: Timestamp;
   storeId: string;

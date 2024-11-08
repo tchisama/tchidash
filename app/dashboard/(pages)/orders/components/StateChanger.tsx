@@ -102,9 +102,11 @@ export type OrderStatus =
 export function StateChanger({
   state: st,
   order,
+  showNumberOfCalls = true,
 }: {
   state: OrderStatus;
   order: Order;
+  showNumberOfCalls?: boolean;
 }) {
   const { storeId } = useStore();
   const [state, setState] = React.useState<OrderStatus>();
@@ -114,6 +116,7 @@ export function StateChanger({
     setOrders,
     currentOrder,
     setCurrentOrder,
+    setCurrentOrderData,
     actionLoading,
     setActionLoading,
   } = useOrderStore();
@@ -169,6 +172,13 @@ export function StateChanger({
                 ?.icon
             }
             {state}
+            {
+              state == "cancelled" && showNumberOfCalls && order?.numberOfCalls  &&
+              <div className="bg-white/30 border border-red-600/30 w-6 h-5  rounded-full flex justify-center items-center">{
+              order?.numberOfCalls  ?? 0
+                }
+              </div>
+            }
             {user && (
               <Avatar className="w-6 h-6 border border-[#3335] ">
                 <AvatarImage src={user?.image ?? ""} alt={user?.name ?? ""} />
@@ -209,6 +219,10 @@ export function StateChanger({
                       },
                     );
                     console.log("Order status updated:", response.data);
+                    setCurrentOrderData({
+                      ...order,
+                      orderStatus: status.name as OrderStatus,
+                    } as Order);
 
                     if (!order.storeId) return;
                     dbAddDoc(
