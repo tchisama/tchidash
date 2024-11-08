@@ -72,7 +72,7 @@ export default function Component() {
                         table: ({ ...props }) => (
                           <table
                             {...props}
-                            className="table-auto min-w-[700px] mb-4 my-1 mr-2 w-full p-1 border-[#3333] "
+                            className="table-auto min-w-[700px] mb-4 my-2 mr-2 w-full p-1 border-[#3333] "
                           />
                         ),
                         hr: () => <hr className="my-3" />,

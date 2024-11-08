@@ -7,6 +7,7 @@ export type OrderStatus =
   | "packed"
   | "shipped"
   | "delivered"
+  | "scheduled"
   | "cancelled"
   | "returned";
 

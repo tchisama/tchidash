@@ -171,7 +171,7 @@ function Message({ note }: { note: Note }) {
                     (status) => status.name === note?.changed,
                   )?.color,
                 }}
-                className="font-bold uppercase flex gap-2 items-center"
+                className="font-bold uppercase flex gap-2"
               >
                 {
                   orderStatusValuesWithIcon.find(

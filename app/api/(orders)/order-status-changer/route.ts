@@ -4,43 +4,13 @@ import { db } from "@/firebase";
 import { dbGetDoc, dbSetDoc, dbUpdateDoc } from "@/lib/dbFuntions/fbFuns";
 import { v4 } from "uuid";
 import { OrderStatus } from "@/types/order";
+import { orderStatusValues } from "@/lib/datajson/states";
 
 interface OrderUpdateRequest {
   orderId: string;
   newStatus: OrderStatus;
   storeId: string;
 }
-
-export const orderStatusValuesWithIcon = [
-  {
-    name: "pending",
-    effectStock: false,
-  },
-  {
-    name: "confirmed",
-    effectStock: true,
-  },
-  {
-    name: "packed",
-    effectStock: true,
-  },
-  {
-    name: "shipped",
-    effectStock: true,
-  },
-  {
-    name: "delivered",
-    effectStock: true,
-  },
-  {
-    name: "cancelled",
-    effectStock: false,
-  },
-  {
-    name: "returned",
-    effectStock: false,
-  },
-];
 
 export async function POST(req: Request) {
   try {
@@ -93,11 +63,11 @@ export async function POST(req: Request) {
       "",
     );
 
-    const statusEffect = orderStatusValuesWithIcon.find(
+    const statusEffect = orderStatusValues.find(
       (status) => status.name === newStatus,
     )?.effectStock;
 
-    const statusEffectOld = orderStatusValuesWithIcon.find(
+    const statusEffectOld = orderStatusValues.find(
       (status) => status.name === oldStatus,
     )?.effectStock;
 

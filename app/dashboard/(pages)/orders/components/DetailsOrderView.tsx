@@ -103,6 +103,8 @@ function DetailsOrderView() {
             </div>
             <dl className=" gap-4 flex  ">
               <Avvvatars
+                borderSize={2}
+                border
                 style={"shape"}
                 value={currentOrder.customer.phoneNumber ?? ""}
               />
@@ -358,4 +360,3 @@ function DetailsOrderView() {
 }
 
 export default DetailsOrderView;
-

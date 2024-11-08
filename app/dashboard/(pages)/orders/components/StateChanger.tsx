@@ -9,32 +9,28 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { Order } from "@/types/order";
+import { useOrderStore } from "@/store/orders";
+import axios from "axios";
+import { dbAddDoc, dbGetDocs } from "@/lib/dbFuntions/fbFuns";
+import { collection, query, Timestamp, where } from "firebase/firestore";
+import { db } from "@/firebase";
+import { useSession } from "next-auth/react";
+import { AvatarFallback, AvatarImage, Avatar } from "@/components/ui/avatar";
+import { useQuery } from "@tanstack/react-query";
+import { useStore } from "@/store/storeInfos";
+import { cn } from "@/lib/utils";
 import {
   CircleDotDashed,
+  Clock,
   MapPinCheckInside,
   PackageCheck,
-  PackageX,
+  PhoneOff,
   Truck,
   Undo,
   UserRoundCheck,
   UserRoundX,
 } from "lucide-react";
-import { Order } from "@/types/order";
-import { useOrderStore } from "@/store/orders";
-import axios from "axios";
-import { dbAddDoc } from "@/lib/dbFuntions/fbFuns";
-import { collection, Timestamp } from "firebase/firestore";
-import { db } from "@/firebase";
-import { useSession } from "next-auth/react";
-
-export type OrderStatus =
-  | "pending"
-  | "confirmed"
-  | "packed"
-  | "shipped"
-  | "delivered"
-  | "cancelled"
-  | "returned";
 
 export const orderStatusValuesWithIcon = [
   {
@@ -68,9 +64,15 @@ export const orderStatusValuesWithIcon = [
     effectStock: true,
   },
   {
-    name: "cancelled",
-    icon: <PackageX className="h-4 w-4" />,
+    name: "scheduled",
+    icon: <Clock className="h-4 w-4" />,
     color: "#f8961e",
+    effectStock: true,
+  },
+  {
+    name: "cancelled",
+    icon: <PhoneOff className="h-4 w-4" />,
+    color: "#fb5607",
     effectStock: false,
   },
   {
@@ -87,6 +89,15 @@ export const orderStatusValuesWithIcon = [
   },
 ];
 
+export type OrderStatus =
+  | "pending"
+  | "confirmed"
+  | "packed"
+  | "shipped"
+  | "delivered"
+  | "cancelled"
+  | "returned";
+
 export function StateChanger({
   state: st,
   order,
@@ -94,8 +105,9 @@ export function StateChanger({
   state: OrderStatus;
   order: Order;
 }) {
+  const { storeId } = useStore();
   const [state, setState] = React.useState<OrderStatus>();
-  const {data:session} = useSession()
+  const { data: session } = useSession();
   const {
     orders,
     setOrders,
@@ -109,6 +121,27 @@ export function StateChanger({
       setState(st);
     }
   }, [st]);
+  const { data: user } = useQuery({
+    queryKey: ["notes", storeId, order.id, state],
+    queryFn: async () => {
+      if (!storeId) return;
+      const q = query(
+        collection(db, "notes"),
+        where("details.for", "==", "order"),
+        where("details.orderId", "==", order.id),
+        where("changed", "==", order.orderStatus),
+      );
+      const note = await dbGetDocs(q, storeId, "");
+      const noteData = note.docs.map((doc) => doc.data())[0];
+      if (!noteData) return;
+      const q2 = query(
+        collection(db, "users"),
+        where("email", "==", noteData.creator),
+      );
+      const user = await dbGetDocs(q2, storeId, "");
+      return user.docs.map((doc) => doc.data())[0];
+    },
+  });
 
   return (
     st && (
@@ -116,7 +149,6 @@ export function StateChanger({
         <DropdownMenuTrigger disabled={actionLoading} asChild>
           <Button
             style={{
-
               background:
                 orderStatusValuesWithIcon.find(
                   (status) => status.name === state,
@@ -129,13 +161,24 @@ export function StateChanger({
             }}
             size="sm"
             variant={"outline"}
-            className="flex gap-2"
+            className={cn("flex gap-2  rounded-full", user && "pr-1")}
           >
             {
               orderStatusValuesWithIcon.find((status) => status.name === state)
                 ?.icon
             }
             {state}
+            {user && (
+              <Avatar className="w-6 h-6 border border-[#3335] ">
+                <AvatarImage src={user?.image ?? ""} alt={user?.name ?? ""} />
+                <AvatarFallback>
+                  {user?.name
+                    ?.split(" ")
+                    .map((n: string) => n[0])
+                    .join("")}
+                </AvatarFallback>
+              </Avatar>
+            )}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" side="right">
@@ -166,24 +209,21 @@ export function StateChanger({
                     );
                     console.log("Order status updated:", response.data);
 
-      if(!order.storeId) return
-      dbAddDoc(
-        collection(db, "notes"),
-        {
-          changed:`${status.name}`,
-          creator:session?.user?.email,
-          createdAt: Timestamp.now(),
-          details:{
-            for:"order",
-            orderId:order?.id
-          }
-        },
-        order.storeId,
-        ""
-      )
-
-
-
+                    if (!order.storeId) return;
+                    dbAddDoc(
+                      collection(db, "notes"),
+                      {
+                        changed: `${status.name}`,
+                        creator: session?.user?.email,
+                        createdAt: Timestamp.now(),
+                        details: {
+                          for: "order",
+                          orderId: order?.id,
+                        },
+                      },
+                      order.storeId,
+                      "",
+                    );
                   } catch (error) {
                     console.error("Error updating order status:", error);
 
