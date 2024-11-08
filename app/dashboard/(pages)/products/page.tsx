@@ -1,9 +1,6 @@
 "use client";
-
 import React, { useEffect } from "react";
-
 import { useRouter } from "next/navigation";
-
 import { File, ListFilter, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,14 +26,21 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { and, collection, query, Timestamp, where } from "firebase/firestore";
+import {
+  addDoc,
+  and,
+  collection,
+  query,
+  Timestamp,
+  where,
+} from "firebase/firestore";
 import { useProducts } from "@/store/products";
 import { useQuery } from "@tanstack/react-query";
 import { db } from "@/firebase";
 import { Product } from "@/types/product";
 import { useStore } from "@/store/storeInfos";
 import { ProductLine } from "./components/ProductLine";
-import { dbAddDoc, dbGetDocs } from "@/lib/dbFuntions/fbFuns";
+import { dbGetDocs } from "@/lib/dbFuntions/fbFuns";
 // Sample product data
 
 export default function Page() {
@@ -79,6 +83,7 @@ export default function Page() {
 
   const addProduct = () => {
     const productName = "new product " + Math.random().toString().slice(3, 9);
+    alert(productName);
     const newProduct = {
       title: productName,
       status: "draft",
@@ -100,13 +105,15 @@ export default function Page() {
       variantsAreOneProduct: false,
     };
     if (!storeId) return;
-    dbAddDoc(collection(db, "products"), newProduct, storeId, "").then(
-      (docRef) => {
+    addDoc(collection(db, "products"), newProduct)
+      .then((docRef) => {
         setCurrentProduct({ ...newProduct, id: docRef.id } as Product);
         setProducts([...products, { ...newProduct, id: docRef.id } as Product]);
         router.push(`/dashboard/products/${productName.replaceAll(" ", "_")}`);
-      },
-    );
+      })
+      .catch((error) => {
+        alert("Error adding document: " + error.message);
+      });
   };
 
   return (

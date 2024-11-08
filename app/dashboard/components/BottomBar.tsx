@@ -12,7 +12,6 @@ import Customers from "@/public/images/svgs/icons/customers.svg";
 import Folder from "@/public/images/svgs/icons/folder.svg";
 import Stars from "@/public/images/svgs/icons/stars.svg";
 import Box from "@/public/images/svgs/icons/box.svg";
-import Planet from "@/public/images/svgs/icons/planet.svg";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 

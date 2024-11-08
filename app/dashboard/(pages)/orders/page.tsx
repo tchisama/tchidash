@@ -2,13 +2,7 @@
 import { Check, Filter, PlusCircle, TicketsIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { OrdersTable } from "./components/Table";
 import Link from "next/link";
 import OrderView from "./components/OrderView";
@@ -106,7 +100,7 @@ export default function Page() {
                 defaultValue={pageSize.toString()}
               >
                 <SelectTrigger className="bg-white">
-                  <SelectValue placeholder="Page Size" /> 
+                  <SelectValue placeholder="Page Size" />
                 </SelectTrigger>
                 <SelectContent className="mt-2 max-w-xs bg-white">
                   <SelectItem value="25">25</SelectItem>
@@ -127,9 +121,7 @@ export default function Page() {
                   </Link>
                 )}
                 <Link className="" href="/dashboard/orders/new">
-                  <Button
-                    className=" gap-1 w-[130px] text-sm"
-                  >
+                  <Button className=" gap-1 w-[130px] text-sm">
                     <PlusCircle className="h-4 w-4" />
                     <span className="sr-only sm:not-sr-only">New Order</span>
                   </Button>

@@ -55,7 +55,7 @@ function OrderView() {
   const { currentOrder, setCurrentOrder } = useOrderStore();
   const { storeId, store } = useStore();
   const { setDigylogOpen, setOrderToImageOpen } = useDialogs();
-  const router =useRouter();
+  const router = useRouter();
 
   const deleteOrder = async (orderId: string) => {
     if (!currentOrder) return;
@@ -77,7 +77,7 @@ function OrderView() {
         <motion.div className="h-full">
           <DigylogDialog />
           <OrderToImage />
-          <Tabs defaultValue="details" className=" sticky top-20 h-[80vh] ">
+          <Tabs defaultValue="details" className=" sticky top-32 h-[83vh] ">
             <Card
               className=" flex h-full flex-col"
               x-chunk="dashboard-05-chunk-4"
@@ -99,8 +99,7 @@ function OrderView() {
                     </Button>
                   </CardTitle>
                   <CardDescription className="text-xs ">
-                    {
-                    currentOrder?.createdAt
+                    {currentOrder?.createdAt
                       .toDate()
                       .toLocaleDateString()
                       .replaceAll("/", ",")}{" "}
@@ -134,8 +133,8 @@ Created At: ${currentOrder.createdAt.toDate().toLocaleDateString()} at ${current
                         metadata: {
                           storeId: storeId,
                           createdAt: new Date(
-                            currentOrder.createdAt.toDate()
-                          ).getTime()
+                            currentOrder.createdAt.toDate(),
+                          ).getTime(),
                         },
                       };
                       axios
@@ -178,9 +177,11 @@ Created At: ${currentOrder.createdAt.toDate().toLocaleDateString()} at ${current
                         <IconBrandWhatsapp className="h-3.5 w-3.5 mr-2" />
                         Confirm Order
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={()=>{
-                        router.push(`/dashboard/orders/edit`)
-                      }}>
+                      <DropdownMenuItem
+                        onClick={() => {
+                          router.push(`/dashboard/orders/edit`);
+                        }}
+                      >
                         <Edit className="h-3.5 w-3.5 mr-2" />
                         Edit Order
                       </DropdownMenuItem>
@@ -285,7 +286,9 @@ Created At: ${currentOrder.createdAt.toDate().toLocaleDateString()} at ${current
                   Updated{" "}
                   {currentOrder &&
                     currentOrder?.updatedAt &&
-                    currentOrder?.updatedAt?.toDate()?.toLocaleDateString()}{" "}
+                    currentOrder?.updatedAt
+                      ?.toDate()
+                      ?.toLocaleDateString()}{" "}
                   at{" "}
                 </div>
               </CardFooter>

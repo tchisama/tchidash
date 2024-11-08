@@ -35,7 +35,7 @@ export default function DashboardUiProvider({
   const router = useRouter();
   const { cleanAll } = useClean();
   const { actions } = useNavbar();
-  const { setStoreId ,store} = useStore();
+  const { setStoreId, store } = useStore();
   return (
     <div className="flex min-h-screen w-full bg-slate-50 dark:bg-slate-900">
       {/*
@@ -59,76 +59,71 @@ export default function DashboardUiProvider({
             {/* <DashboardCommand /> */}
           </div>
           <div className="flex-1 flex justify-end">
-          <DropdownMenu >
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                className="overflow-hidden font-medium h-11 py-4 pr-1 text-sm flex gap-2 "
-              >
-                <div className="flex flex-col  items-start ">
-                  <span className="mb-[-4px] text-[11px] font-normal opacity-80">
-                    {store?.name}
-                  </span>
-                <span className="font-medium text-xs">
-                {
-                  session?.user?.name 
-                }
-                </span>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="overflow-hidden font-medium h-11 py-4 pr-1 text-sm flex gap-2 "
+                >
+                  <div className="flex flex-col  items-start ">
+                    <span className="mb-[-4px] text-[11px] font-normal opacity-80">
+                      {store?.name}
+                    </span>
+                    <span className="font-medium text-xs">
+                      {session?.user?.name}
+                    </span>
+                  </div>
+                  <Image
+                    src={store?.logoUrl ?? session?.user?.image ?? ""}
+                    width={36}
+                    height={36}
+                    alt="Avatar"
+                    className="overflow-hidden  rounded-md border"
+                  />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-[200px]">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
 
-                </div>
-                <Image
-                  src={
-                    store?.logoUrl ??
-                    session?.user?.image ??
-                    ""
-                  }
-                  width={36}
-                  height={36}
-                  alt="Avatar"
-                  className="overflow-hidden  rounded-md border"
-                />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="min-w-[200px]">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => {
+                    cleanAll();
+                    router.push("/dashboard/switch-store");
+                  }}
+                >
+                  <Image src={Store} alt="Settings" className="mr-2 h-4 w-4" />
+                  Switch Store
+                </DropdownMenuItem>
 
-              <DropdownMenuItem
-                onClick={() => {
-                  cleanAll();
-                  router.push("/dashboard/switch-store");
-                }}
-              >
-                <Image src={Store} alt="Settings" className="mr-2 h-4 w-4" />
-                Switch Store
-              </DropdownMenuItem>
-
-              <DropdownMenuItem>
-                <Image src={Settings} alt="Settings" className="mr-2 h-4 w-4" />
-                Settings
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Image src={Help} alt="Help" className="mr-2 h-4 w-4" />
-                Support
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => {
-                  setStoreId("");
-                  signOut();
-                }}
-              >
-                <Image src={Logout} alt="Logout" className="mr-2 h-4 w-4" />
-                Logout
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                <DropdownMenuItem>
+                  <Image
+                    src={Settings}
+                    alt="Settings"
+                    className="mr-2 h-4 w-4"
+                  />
+                  Settings
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Image src={Help} alt="Help" className="mr-2 h-4 w-4" />
+                  Support
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => {
+                    setStoreId("");
+                    signOut();
+                  }}
+                >
+                  <Image src={Logout} alt="Logout" className="mr-2 h-4 w-4" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </header>
 
-        <main className="p-6  py-2 pb-[200px] pt-24 min-h-[80vh]">
-          {children}
-        </main>
+        <main className="p-6  py-2  pt-24 min-h-[80vh]">{children}</main>
       </div>
     </div>
   );
