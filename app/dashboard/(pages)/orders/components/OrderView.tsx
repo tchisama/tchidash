@@ -27,6 +27,7 @@ import {
   Bike,
   Box,
   Copy,
+  Edit,
   FileText,
   MoreVertical,
   Phone,
@@ -49,10 +50,12 @@ import { IconBrandWhatsapp } from "@tabler/icons-react";
 import { generateEmbedding } from "@/lib/ai/openai/embedding";
 import DetailsOrderView from "./DetailsOrderView";
 import OrderNotes from "./OrderNotes";
+import { useRouter } from "next/navigation";
 function OrderView() {
   const { currentOrder, setCurrentOrder } = useOrderStore();
   const { storeId, store } = useStore();
   const { setDigylogOpen, setOrderToImageOpen } = useDialogs();
+  const router =useRouter();
 
   const deleteOrder = async (orderId: string) => {
     if (!currentOrder) return;
@@ -174,9 +177,12 @@ Created At: ${currentOrder.createdAt.toDate().toLocaleDateString()} at ${current
                         <IconBrandWhatsapp className="h-3.5 w-3.5 mr-2" />
                         Confirm Order
                       </DropdownMenuItem>
-                      {/* <DropdownMenuItem onClick={sendWhatsappMessage}> */}
-                      {/*   <Phone className="h-3.5 w-3.5 mr-2" /> Contact Whatsapp */}
-                      {/* </DropdownMenuItem> */}
+                      <DropdownMenuItem onClick={()=>{
+                        router.push(`/dashboard/orders/edit`)
+                      }}>
+                        <Edit className="h-3.5 w-3.5 mr-2" />
+                        Edit Order
+                      </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => {
                           window.open(
@@ -277,8 +283,8 @@ Created At: ${currentOrder.createdAt.toDate().toLocaleDateString()} at ${current
                 <div className="text-xs text-muted-foreground">
                   Updated{" "}
                   {currentOrder &&
-                    currentOrder.updatedAt &&
-                    currentOrder.updatedAt.toDate().toLocaleDateString()}{" "}
+                    currentOrder?.updatedAt &&
+                    currentOrder?.updatedAt?.toDate()?.toLocaleDateString()}{" "}
                   at{" "}
                 </div>
               </CardFooter>

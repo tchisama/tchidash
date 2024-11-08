@@ -21,11 +21,11 @@ import { useQuery } from "@tanstack/react-query";
 import { useStore } from "@/store/storeInfos";
 import { cn } from "@/lib/utils";
 import {
-  CircleDotDashed,
   Clock,
   MapPinCheckInside,
   PackageCheck,
   PhoneOff,
+  Stars,
   Truck,
   Undo,
   UserRoundCheck,
@@ -35,7 +35,7 @@ import {
 export const orderStatusValuesWithIcon = [
   {
     name: "pending",
-    icon: <CircleDotDashed className="h-4 w-4" />,
+    icon: <Stars className="h-4 w-4" />,
     color: "#a3b18a",
     effectStock: false,
   },
@@ -94,6 +94,7 @@ export type OrderStatus =
   | "confirmed"
   | "packed"
   | "shipped"
+  | "scheduled"
   | "delivered"
   | "cancelled"
   | "returned";

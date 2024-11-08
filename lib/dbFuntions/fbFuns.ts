@@ -26,7 +26,7 @@ async function dbSetDoc<AppModelType, DbModelType extends DocumentData>(
   storeId: string,
   userEmail: string,
 ) {
-  await setDoc(reference, data);
+  const docRef = await setDoc(reference, data);
   trackUserUsage({
     userEmail: userEmail,
     storeId: storeId,
@@ -35,6 +35,7 @@ async function dbSetDoc<AppModelType, DbModelType extends DocumentData>(
     clctn: reference.parent.id,
     endpoint: reference.id,
   });
+  return docRef;
 }
 
 async function dbAddDoc<AppModelType, DbModelType extends DocumentData>(
@@ -113,7 +114,7 @@ async function dbUpdateDoc<AppModelType, DbModelType extends DocumentData>(
   storeId: string,
   userEmail: string,
 ) {
-  await updateDoc(reference, data);
+  const docRef = await updateDoc(reference, data)
   trackUserUsage({
     userEmail: userEmail,
     storeId: storeId,
@@ -122,6 +123,7 @@ async function dbUpdateDoc<AppModelType, DbModelType extends DocumentData>(
     clctn: reference.parent.id,
     endpoint: reference.id,
   });
+  return docRef;
 }
 
 async function dbGetAggregateFromServer<
