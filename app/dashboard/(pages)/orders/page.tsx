@@ -42,6 +42,7 @@ export default function Page() {
       "packed",
       "shipped",
       "delivered",
+      "scheduled",
       "cancelled",
       "returned",
       "fake",
@@ -85,7 +86,7 @@ export default function Page() {
                         });
                       }}
                       style={{
-                        background: status.color + "20",
+                        background: status.color + "50",
                         borderColor: status.color + "30",
                         color: "#000a",
                       }}

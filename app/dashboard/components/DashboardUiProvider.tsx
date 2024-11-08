@@ -47,6 +47,9 @@ export default function DashboardUiProvider({
             <PhoneBar />
             <BreadcrumbCom />
           </div>
+          <div className="flex justify-center items-center flex-1">
+            <BottomBar />
+          </div>
           <div className="flex    justify-center gap-4">
             {actions && actions.length > 0 && (
               <div className="flex gap-2">
@@ -55,7 +58,8 @@ export default function DashboardUiProvider({
             )}
             {/* <DashboardCommand /> */}
           </div>
-          <DropdownMenu>
+          <div className="flex-1 flex justify-end">
+          <DropdownMenu >
             <DropdownMenuTrigger asChild>
               <Button
                 variant="outline"
@@ -119,11 +123,11 @@ export default function DashboardUiProvider({
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          </div>
         </header>
 
         <main className="p-6 py-2 pb-[200px] pt-10 min-h-[80vh]">
           {children}
-          <BottomBar />
         </main>
       </div>
     </div>

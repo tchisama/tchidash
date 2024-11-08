@@ -152,7 +152,7 @@ function BottomBar() {
   }, [data, session, setEmployee]);
 
   return (
-    <div className="fixed  z-[10] w-fit left-1/2 bottom-4 transform -translate-x-1/2">
+    <div className="">
       <FloatingDock
         items={
           isLoading
