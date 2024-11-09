@@ -96,6 +96,7 @@ const ProductDetailsCard = () => {
                 />
                 <div className="flex gap-2 items-center">
                   <Checkbox
+                    key={currentProduct.id}
                     id="hasInfiniteStock"
                     checked={currentProduct?.hasInfiniteStock}
                     onCheckedChange={(value) =>

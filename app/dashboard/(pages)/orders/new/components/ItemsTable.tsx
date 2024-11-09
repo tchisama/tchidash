@@ -88,7 +88,7 @@ function ItemsTable() {
 
 const ItemRow = ({ item }: { item: OrderItem }) => {
   const { newOrder, setNewOrder } = useOrderStore();
-  const { storeId, store } = useStore();
+  const { storeId } = useStore();
   const { data: products } = useQuery({
     queryKey: ["products", storeId],
     queryFn: () => {
@@ -218,7 +218,7 @@ const ItemRow = ({ item }: { item: OrderItem }) => {
         {/* Total Price */}
         <TableCell className="">
           <div className="font-medium">
-            {getTotalPriceFromItem(item)} {store?.settings.currency.symbol}
+            {getTotalPriceFromItem(item)} Dh
           </div>
         </TableCell>
         <TableCell className="text-right">
