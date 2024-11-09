@@ -51,6 +51,7 @@ import { generateEmbedding } from "@/lib/ai/openai/embedding";
 import DetailsOrderView from "./DetailsOrderView";
 import OrderNotes from "./OrderNotes";
 import { useRouter } from "next/navigation";
+import WhatsappCard from "./Whatsapp";
 function OrderView() {
   const { currentOrder, setCurrentOrder } = useOrderStore();
   const { storeId, store } = useStore();
@@ -279,7 +280,9 @@ Created At: ${currentOrder.createdAt.toDate().toLocaleDateString()} at ${current
                 <TabsContent value="notes" className="h-[calc(100%-10px)]">
                   <OrderNotes />
                 </TabsContent>
-                <TabsContent value="whatsapp"></TabsContent>
+                <TabsContent value="whatsapp" className="h-[calc(100%-10px)]">
+                  <WhatsappCard />
+                </TabsContent>
               </CardContent>
               <CardFooter className="flex flex-row items-center border-t bg-muted/50 px-6 py-3">
                 <div className="text-xs text-muted-foreground">
