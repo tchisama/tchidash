@@ -23,8 +23,8 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import Image from "next/image";
-import { dbUpdateDoc } from "@/lib/dbFuntions/fbFuns";
-import { doc, increment } from "firebase/firestore";
+import {  dbUpdateDoc } from "@/lib/dbFuntions/fbFuns";
+import {  doc, increment } from "firebase/firestore";
 import { db } from "@/firebase";
 
 function DetailsOrderView() {
