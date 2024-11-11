@@ -3,6 +3,10 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SendIcon } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
+import { useQuery } from "@tanstack/react-query";
+import { useOrderStore } from "@/store/orders";
+import { doc, onSnapshot } from "firebase/firestore";
+import { db } from "@/firebase";
 
 function WhatsappCard() {
   const [content, setContent] = React.useState("");
@@ -11,6 +15,25 @@ function WhatsappCard() {
     console.log(content);
     setContent("");
   };
+  const { currentOrder } = useOrderStore();
+
+  const { data: messages } = useQuery({
+    queryKey: ["messages", "whatsapp", currentOrder?.id],
+    queryFn: async () => {
+      if (!currentOrder) return;
+      const getMessages = onSnapshot(
+        doc(db, "whatsapp-get-chat", currentOrder?.id),
+        (doc) => {
+          if (doc.exists) {
+            if (doc.data()) {
+              return doc.data().messages;
+            }
+          }
+        },
+      );
+    },
+  });
+
   return (
     <Card className="flex m-0 shadow-none p-0 relative border-none  flex-col h-full ">
       <CardContent className=" p-0 overflow-y-auto border-t  py-6 space-y-4 flex-1">
