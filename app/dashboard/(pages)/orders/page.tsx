@@ -25,6 +25,7 @@ import {
 import { orderStatusValuesWithIcon } from "./components/StateChanger";
 import { Label } from "@/components/ui/label";
 import Analytic from "./components/analytic";
+import { Input } from "@/components/ui/input";
 
 export default function Page() {
   const { currentOrder, selectedOrder } = useOrderStore();
@@ -108,6 +109,17 @@ export default function Page() {
                   <SelectItem value="100">100</SelectItem>
                 </SelectContent>
               </Select>
+              <Input
+                placeholder="Search"
+                value={filter.search}
+                className="min-w-[200px] bg-white"
+                onChange={(e) => {
+                  setFilter({
+                    ...filter,
+                    search: e.target.value,
+                  });
+                }}
+              />
             </div>
 
             <div className="flex ml-auto flex-col gap-2 min-w-[100px]">

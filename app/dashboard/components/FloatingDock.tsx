@@ -195,7 +195,7 @@ function IconContainer({
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
         className={cn(
-          "aspect-square rounded-full bg-white border dark:bg-neutral-800 flex items-center justify-center relative",
+          "aspect-square rounded-2xl bg-white border dark:bg-neutral-800 flex items-center justify-center relative",
           active ? "border-primary/40 bg-primary/10 border-2" : "",
         )}
       >
