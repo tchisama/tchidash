@@ -39,9 +39,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { trackUserUsage } from "@/lib/queries/usage";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import NoteViewer from "./NoteViewer";
 import { Edit2 } from "lucide-react";
+import { Popover , PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 
 export function OrdersTable({
   filter,
@@ -326,8 +326,12 @@ export function OrdersTable({
                 </div>
               </TableCell>
               <TableCell className="">
-                <HoverCard>
-                  <HoverCardTrigger>
+                <Popover>
+                  <PopoverTrigger
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                  >
                     {
                       order.note?.content
                         ? <div
@@ -337,15 +341,16 @@ export function OrdersTable({
                           {order.note?.content.length > 40 && "..."}
                         </div>
                         :<Button
+                        size={"icon"}
                         variant={"ghost"}
                         className="hover:border-slate-200 border border-slate-50/0 text-slate-400"
                         ><Edit2 className="h-4 w-4" /></Button>
                     }
-                  </HoverCardTrigger>
-                  <HoverCardContent className="w-80">
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[400px]">
                     <NoteViewer order={order} />
-                  </HoverCardContent>
-                </HoverCard>
+                  </PopoverContent>
+                </Popover>
               </TableCell>
               <TableCell className="">
                 <div className="text-sm">

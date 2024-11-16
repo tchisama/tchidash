@@ -3,7 +3,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { db } from '@/firebase'
 import { Order } from '@/types/order'
 import { doc, updateDoc } from 'firebase/firestore'
-import { Edit2, Save } from 'lucide-react'
+import { CircleSlash, Edit2, Save } from 'lucide-react'
 import React, { useEffect } from 'react'
 
 type Props = {
@@ -34,7 +34,7 @@ function NoteViewer({order}: Props) {
         onClick={e=>e.stopPropagation()}
         readOnly={!edit}
         value={note?.content}
-        className='min-h-[200px] '
+        className='min-h-[200px] bg-slate-50'
         onChange={
           (e) => {
             if(!note) return
@@ -46,12 +46,14 @@ function NoteViewer({order}: Props) {
         }
       />
       :
-      <p className='text-sm'>{note?.content || "no note here"}</p>
+      <p className='text-sm bg-slate-50 border rounded-xl flex items-center p-2'>{note?.content || <><CircleSlash className='h-4 w-4 mr-2' /> No Note</>}</p>
       }
       {
         edit ?
+        <div className='mt-2 flex gap-2'>
+
       <Button
-      className='mt-2'
+      className=' ml-auto'
       size={"sm"}
         onClick={
           e=>{
@@ -61,6 +63,19 @@ function NoteViewer({order}: Props) {
         }
       >
         <Save className='h-4 w-4 mr-2' /> Save</Button>
+        <Button
+        className=' '
+        size={"sm"}
+        variant={"outline"}
+        onClick={
+          e=>{
+            e.stopPropagation()
+            setEdit(false)
+          }
+        }
+      >
+        Cancel</Button>
+        </div>
         :
         <Button
         onClick={e=>{
@@ -68,7 +83,7 @@ function NoteViewer({order}: Props) {
           setEdit(true)
           }
           }
-        className='mt-2'
+        className='mt-2 ml-auto'
         size={"sm"}
         variant={"outline"}
         >
