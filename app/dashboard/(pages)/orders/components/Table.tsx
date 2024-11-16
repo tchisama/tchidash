@@ -38,6 +38,10 @@ import { StateChanger } from "./StateChanger";
 import { Skeleton } from "@/components/ui/skeleton";
 import { trackUserUsage } from "@/lib/queries/usage";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import NoteViewer from "./NoteViewer";
+import { Edit2 } from "lucide-react";
 
 export function OrdersTable({
   filter,
@@ -212,6 +216,7 @@ export function OrdersTable({
             <TableHead>Customer</TableHead>
             <TableHead className="">Status</TableHead>
             <TableHead className="">Address</TableHead>
+            <TableHead className="">Note</TableHead>
             <TableHead className="">Date</TableHead>
             <TableHead className="text-right">Amount</TableHead>
           </TableRow>
@@ -319,6 +324,28 @@ export function OrdersTable({
                   {order.customer.shippingAddress.address.slice(0, 40)}
                   {order.customer.shippingAddress.address.length > 40 && "..."}
                 </div>
+              </TableCell>
+              <TableCell className="">
+                <HoverCard>
+                  <HoverCardTrigger>
+                    {
+                      order.note?.content
+                        ? <div
+                           className="w-fit text-xs"
+                        >
+                          {order.note?.content.slice(0, 40)}
+                          {order.note?.content.length > 40 && "..."}
+                        </div>
+                        :<Button
+                        variant={"ghost"}
+                        className="hover:border-slate-200 border border-slate-50/0 text-slate-400"
+                        ><Edit2 className="h-4 w-4" /></Button>
+                    }
+                  </HoverCardTrigger>
+                  <HoverCardContent className="w-80">
+                    <NoteViewer order={order} />
+                  </HoverCardContent>
+                </HoverCard>
               </TableCell>
               <TableCell className="">
                 <div className="text-sm">
