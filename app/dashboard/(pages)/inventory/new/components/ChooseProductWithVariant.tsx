@@ -61,40 +61,56 @@ function ChooseProductWithVariant({ item }: { item: InventoryItemMove }) {
     }
   }, [selectedProduct, setSelectedVariant]);
 
-  useEffect(() => {
-    if (selectedProduct && selectedVariant) {
+useEffect(() => {
+  if (selectedProduct) {
+    if (selectedVariant) {
+      // Case: When there is a variant
       setPurchaseOrderItems(
         purchaseOrderItmes.map((itm: InventoryItemMove) => {
           if (itm.id === item.id) {
+            const variant = selectedProduct.variants?.find(
+              (variant) => variant.id === selectedVariant,
+            );
             return {
               ...itm,
-              productId: selectedProduct?.id,
+              productId: selectedProduct.id,
               variantId: selectedVariant,
               vendorId: currentPurchaseOrder?.vendorId || "",
-              unitPrice: selectedProduct?.price,
-              title: selectedVariant
-                ? selectedProduct?.title +
-                  " (" +
-                  selectedProduct?.variants?.find(
-                    (variant) => variant.id === selectedVariant,
-                  )?.title +
-                  ")"
-                : selectedProduct?.title,
-              imageUrl:
-                (selectedVariant
-                  ? selectedProduct?.variants?.find(
-                      (variant) => variant.id === selectedVariant,
-                    )?.image ||
-                    (selectedProduct?.images && selectedProduct.images[0])
-                  : selectedProduct?.images && selectedProduct.images[0]) || "",
+              unitPrice: selectedProduct.price,
+              title: `${selectedProduct.title} (${variant?.title})`,
+              imageUrl: variant?.image || selectedProduct.images?.[0],
             };
           } else {
             return itm;
           }
         }),
       );
+    } else {
+      // Case: When there is only the product without variants
+      setPurchaseOrderItems(
+        purchaseOrderItmes.map((itm: InventoryItemMove) => {
+          if (itm.id === item.id) {
+            return {
+              ...itm,
+              productId: selectedProduct.id,
+              variantId: null,
+              vendorId: currentPurchaseOrder?.vendorId || "",
+              unitPrice: selectedProduct.price,
+              title: selectedProduct.title,
+              imageUrl: selectedProduct.images?.[0],
+            };
+          } else {
+            return itm;
+          }
+        }) as InventoryItemMove[],
+      );
     }
-  }, [selectedProduct, selectedVariant, setPurchaseOrderItems]);
+  }
+}, [selectedProduct, selectedVariant, setPurchaseOrderItems]);
+
+  useEffect(() => {
+    console.log(purchaseOrderItmes);
+  }, [purchaseOrderItmes]);
   return (
     <AlertDialog>
       <AlertDialogTrigger className="min-w-[300px] items-center text-left flex gap-2">
@@ -122,6 +138,7 @@ function ChooseProductWithVariant({ item }: { item: InventoryItemMove }) {
               products={products}
               selectedProduct={selectedProduct}
               setSelectedProduct={setSelectedProduct}
+              setSelectedVariant={setSelectedVariant}
             />
             {selectedProduct &&
               selectedProduct.variants &&
@@ -145,10 +162,12 @@ const SelectProduct = ({
   products,
   selectedProduct,
   setSelectedProduct,
+  setSelectedVariant,
 }: {
   products: Product[] | undefined;
   selectedProduct: Product | null;
   setSelectedProduct: React.Dispatch<React.SetStateAction<Product | null>>;
+  setSelectedVariant: React.Dispatch<React.SetStateAction<string | null>>;
 }) => {
   return (
     <Select
@@ -168,7 +187,13 @@ const SelectProduct = ({
           <SelectItem
             key={product.id}
             value={product.id}
-            onClick={() => setSelectedProduct(product)}
+            onClick={() => {
+              setSelectedProduct(product)
+              // if the product dont have variants set the img to img product and all other datails
+              if (!product.variants || product.variants.length === 0) {
+                setSelectedVariant(null);
+              }
+            }}
           >
             <div className="flex gap-2 items-center">
               <Image

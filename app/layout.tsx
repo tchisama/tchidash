@@ -31,11 +31,14 @@ export default function RootLayout({
   return (
     <AuthProvider>
       <html lang="en">
-        <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        <body className={`light text-black/80 ${geistSans.variable} ${geistMono.variable}`}>
           <ThemeProvider
             attribute="class"
             defaultTheme="light"
             enableSystem
+            value={{
+              light: "light",
+            }}
             disableTransitionOnChange
           >
             <TooltipProvider>

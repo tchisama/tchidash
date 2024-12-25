@@ -62,6 +62,9 @@ function ItemsTable() {
 
     setPurchaseOrderItems([newItem, ...purchaseOrderItmes]);
   };
+  useEffect(() => {
+    console.log(purchaseOrderItmes);
+  }, [purchaseOrderItmes]);
 
   return (
     <div className="flex flex-col items-end">

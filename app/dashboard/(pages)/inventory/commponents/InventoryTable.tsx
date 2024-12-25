@@ -19,9 +19,11 @@ import { cn } from "@/lib/utils";
 import { useStore } from "@/store/storeInfos";
 import { PurchaseOrder } from "@/types/inventory";
 import { useQuery } from "@tanstack/react-query";
-import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDocs, orderBy, query, where } from "firebase/firestore";
 import Image from "next/image";
 import { StateChanger } from "./StateChanger";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
 
 export function InventoryMovementTable() {
   const { storeId, store } = useStore();
@@ -117,6 +119,22 @@ export function InventoryMovementTable() {
                   </TableCell>
                   <TableCell>
                     {movement.createdAt.toDate().toLocaleString()}
+                  </TableCell>
+                  <TableCell className="flex gap-2">
+                    <Button variant="outline">View</Button>
+                    <Button variant="destructive" 
+                      onClick={() => {
+                        if(confirm("Are you sure you want to delete this item?")) {
+                          if(movement.id) {
+                            deleteDoc(
+                              doc(db, "purchaseOrders", movement.id)
+                            );
+                          }
+                        }
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" /> Delete
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
