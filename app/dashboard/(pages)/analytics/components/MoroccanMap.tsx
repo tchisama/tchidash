@@ -81,10 +81,10 @@ const MoroccoMap = () => {
             {regions && regions.find((p) => p.id === selectedRegion)?.title}
           </h1>
 
-          <h3 className="text-9xl font-bold absolute bottom-4 right-6 text-primary">
+          <h3 className="text-8xl font-bold absolute bottom-4 right-6 text-primary">
             {data && data.length.toString()}
           </h3>
-          <Card className="absolute top-20 text-sm left-3 text-muted-foreground p-2 px-4">
+          <Card className="absolute z-40 max-h-[300px] overflow-y-auto top-20 text-sm left-3 text-muted-foreground p-2 px-4">
             <CardHeader className="p-0 pb-3 pt-2">
               <CardTitle>Cities</CardTitle>
             </CardHeader>
@@ -104,7 +104,7 @@ const MoroccoMap = () => {
             xmlns="http://www.w3.org/2000/svg"
             width="600"
             height="450"
-            className=" w-full drop-shadow-[0px_20px_10px_#3331] p-3 rounded-2xl"
+            className=" w-full translate-x-[60px] drop-shadow-[0px_20px_10px_#3331] p-3 rounded-2xl"
             viewBox="0 0 612.51373 654.53473"
           >
             {
