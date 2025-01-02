@@ -15,6 +15,7 @@ fi
 TARGET_YEAR=2023
 
 
+
 # Generate random commits
 for ((i = 1; i <= NUM_COMMITS; i++)); do
     # Generate a random date in the year 2024
