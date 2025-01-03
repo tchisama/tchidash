@@ -12,7 +12,7 @@ if [ ! -f "$FILE" ]; then
 fi
 
 # Target year for commits
-TARGET_YEAR=2024
+TARGET_YEAR=2023
 
 # Generate random commits
 for ((i = 1; i <= NUM_COMMITS; i++)); do
