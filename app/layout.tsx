@@ -5,7 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import AuthProvider from "./AuthProvider";
 import Providers from "./Providers";
 import { Toaster } from "@/components/ui/toaster";
-import { ThemeProvider } from "./dashboard/components/ThemeProvider";
+import { ThemeProvider } from "./(dashboard)/components/ThemeProvider";
 import {Outfit} from "next/font/google";
 
 const geistSans = localFont({
