@@ -81,20 +81,19 @@ const ProductVariantsCard = ({}: { saveProduct: () => void }) => {
     })) as Variant[];
   };
 
-  const correctVariantId = () => {
-    if (currentProduct) {
-      const variants = currentProduct.variants as Variant[];
-      const newVariants = variants.map((variant, index) => {
-        return {
-          ...variant,
-          id: `${currentProduct.id}-variant-${index}`,
-        };
-      });
-      setCurrentProduct({
-        ...currentProduct,
-        variants: newVariants,
-      });
-    }
+  const correctVariantImages = () => {
+    // // set the first image in variant.images as the main image
+    // const variants = productVariants.map((variant) => {
+    //   return {
+    //     ...variant,
+    //     images: [variant.image],
+    //   };
+    // });
+    // setProductVariants(variants);
+    // setCurrentProduct({
+    //   ...currentProduct,
+    //   variants: variants,
+    // });
   };
 
   // Using useMemo to avoid unnecessary updates
@@ -144,10 +143,10 @@ const ProductVariantsCard = ({}: { saveProduct: () => void }) => {
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                  correctVariantId();
+                  correctVariantImages();
                 }}
               >
-                Correct Variant ID
+                Correct Variant images
               </Button>
               <Button
                 variant="outline"
@@ -262,34 +261,28 @@ const ProductVariantsCard = ({}: { saveProduct: () => void }) => {
                             // if the id is the same as the variant id or if its selected
                             v.id === variant.id ||
                             selectedVariants.includes(v.id)
-                              ? { ...v, image: url }
+                              ? { ...v, images: [...(v?.images ?? []), url] }
                               : v,
                           ),
                         );
                       }}
                     >
                       <Image
-                        src={
-                          //variant.image ? `${variant.image}?${Math.random()}` : ""
-                          variant.image ?? ""
-                        }
+                        src={variant?.images ? variant?.images[0] : ""}
                         alt={""}
                         width={60}
                         height={60}
-                        className="rounded-md w-14 object-contain h-14 p-1 bg-slate-50 border"
+                        className="rounded-md w-14 object-cover h-14 p-1 bg-slate-50 border"
                       />
                     </FilesystemExplorer>
                   ) : (
                     //</UploadImageProvider>
                     <Image
-                      src={
-                        //variant.image ? `${variant.image}?${Math.random()}` : ""
-                        variant.image ?? ""
-                      }
+                      src={variant?.images ? variant?.images[0] : ""}
                       alt={""}
                       width={60}
                       height={60}
-                      className="rounded-md w-14 object-contain h-14 p-1 bg-slate-50 border"
+                      className="rounded-md w-14 object-cover p-[1px] h-14 bg-slate-50 border"
                     />
                   )}
                 </TableCell>

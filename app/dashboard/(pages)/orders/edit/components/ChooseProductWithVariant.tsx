@@ -98,13 +98,7 @@ function ChooseProductWithVariant({ item }: { item: OrderItem }) {
                 )?.title +
                 ")"
               : selectedProduct?.title,
-            imageUrl:
-              (selectedVariant
-                ? selectedProduct?.variants?.find(
-                    (variant) => variant.id === selectedVariant,
-                  )?.image ||
-                  (selectedProduct?.images && selectedProduct.images[0])
-                : selectedProduct?.images && selectedProduct.images[0]) || "",
+            imageUrl: getImage(),
           };
         } else {
           return itm;
@@ -113,6 +107,32 @@ function ChooseProductWithVariant({ item }: { item: OrderItem }) {
     } as Order);
     console.log(newOrder?.items);
   }, [selectedVariant, selectedProduct, setNewOrder, item.id]);
+
+  const getImage = () => {
+    if (selectedVariant) {
+      const variant = selectedProduct?.variants?.find(
+        (variant) => variant.id === selectedVariant,
+      );
+      if (variant) {
+        if (variant.images && variant.images.length > 0) {
+          return variant.images[0];
+        } else {
+          return selectedProduct?.images && selectedProduct.images.length > 0
+            ? selectedProduct.images[0]
+            : "";
+        }
+      } else {
+        return selectedProduct?.images && selectedProduct.images.length > 0
+          ? selectedProduct.images[0]
+          : "";
+      }
+    } else {
+      return selectedProduct?.images && selectedProduct.images.length > 0
+        ? selectedProduct.images[0]
+        : "";
+    }
+  };
+
   return (
     <AlertDialog>
       <AlertDialogTrigger className="min-w-[300px] items-center text-left flex gap-2">
@@ -191,11 +211,11 @@ const SelectProduct = ({
             <div className="flex gap-2 items-center">
               <Image
                 src={
-                  (product.images &&
+                  product.images &&
                   product.images.length > 0 &&
                   product.images[0]
                     ? product.images[0]
-                    : product.variants?.find((v) => v.image)?.image) || ""
+                    : ""
                 }
                 alt=""
                 width={30}
@@ -238,7 +258,7 @@ const SelectProductVariant = ({
           >
             <div className="flex gap-2 items-center">
               <Image
-                src={variant.image || ""}
+                src={variant?.images ? variant.images[0] : ""}
                 alt=""
                 width={30}
                 height={30}

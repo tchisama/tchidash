@@ -22,6 +22,7 @@ export interface Variant {
   taxable: boolean;
   barcode?: string;
   image: string;
+  images?: string[];
   variantValues: VariantValue[]; // Array of option and value pairs
   totalSales?: number;
 }

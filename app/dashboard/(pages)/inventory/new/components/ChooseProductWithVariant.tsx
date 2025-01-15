@@ -61,52 +61,54 @@ function ChooseProductWithVariant({ item }: { item: InventoryItemMove }) {
     }
   }, [selectedProduct, setSelectedVariant]);
 
-useEffect(() => {
-  if (selectedProduct) {
-    if (selectedVariant) {
-      // Case: When there is a variant
-      setPurchaseOrderItems(
-        purchaseOrderItmes.map((itm: InventoryItemMove) => {
-          if (itm.id === item.id) {
-            const variant = selectedProduct.variants?.find(
-              (variant) => variant.id === selectedVariant,
-            );
-            return {
-              ...itm,
-              productId: selectedProduct.id,
-              variantId: selectedVariant,
-              vendorId: currentPurchaseOrder?.vendorId || "",
-              unitPrice: selectedProduct.price,
-              title: `${selectedProduct.title} (${variant?.title})`,
-              imageUrl: variant?.image || selectedProduct.images?.[0],
-            };
-          } else {
-            return itm;
-          }
-        }),
-      );
-    } else {
-      // Case: When there is only the product without variants
-      setPurchaseOrderItems(
-        purchaseOrderItmes.map((itm: InventoryItemMove) => {
-          if (itm.id === item.id) {
-            return {
-              ...itm,
-              productId: selectedProduct.id,
-              variantId: null,
-              vendorId: currentPurchaseOrder?.vendorId || "",
-              unitPrice: selectedProduct.price,
-              title: selectedProduct.title,
-              imageUrl: selectedProduct.images?.[0],
-            };
-          } else {
-            return itm;
-          }
-        }) as InventoryItemMove[],
-      );
+  useEffect(() => {
+    if (selectedProduct) {
+      if (selectedVariant) {
+        // Case: When there is a variant
+        setPurchaseOrderItems(
+          purchaseOrderItmes.map((itm: InventoryItemMove) => {
+            if (itm.id === item.id) {
+              const variant = selectedProduct.variants?.find(
+                (variant) => variant.id === selectedVariant,
+              );
+              return {
+                ...itm,
+                productId: selectedProduct.id,
+                variantId: selectedVariant,
+                vendorId: currentPurchaseOrder?.vendorId || "",
+                unitPrice: selectedProduct.price,
+                title: `${selectedProduct.title} (${variant?.title})`,
+                imageUrl:
+                  (variant?.images && variant?.images[0]) ||
+                  selectedProduct.images?.[0],
+              };
+            } else {
+              return itm;
+            }
+          }),
+        );
+      } else {
+        // Case: When there is only the product without variants
+        setPurchaseOrderItems(
+          purchaseOrderItmes.map((itm: InventoryItemMove) => {
+            if (itm.id === item.id) {
+              return {
+                ...itm,
+                productId: selectedProduct.id,
+                variantId: null,
+                vendorId: currentPurchaseOrder?.vendorId || "",
+                unitPrice: selectedProduct.price,
+                title: selectedProduct.title,
+                imageUrl: selectedProduct.images?.[0] ?? "",
+              };
+            } else {
+              return itm;
+            }
+          }) as InventoryItemMove[],
+        );
+      }
     }
-  }
-}, [selectedProduct, selectedVariant, setPurchaseOrderItems]);
+  }, [selectedProduct, selectedVariant, setPurchaseOrderItems]);
 
   useEffect(() => {
     console.log(purchaseOrderItmes);
@@ -188,7 +190,7 @@ const SelectProduct = ({
             key={product.id}
             value={product.id}
             onClick={() => {
-              setSelectedProduct(product)
+              setSelectedProduct(product);
               // if the product dont have variants set the img to img product and all other datails
               if (!product.variants || product.variants.length === 0) {
                 setSelectedVariant(null);
@@ -245,7 +247,7 @@ const SelectProductVariant = ({
           >
             <div className="flex gap-2 items-center">
               <Image
-                src={variant.image || ""}
+                src={variant?.images ? variant.images[0] : ""}
                 alt=""
                 width={30}
                 height={30}

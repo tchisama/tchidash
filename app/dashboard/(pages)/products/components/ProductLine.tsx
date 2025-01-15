@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/table";
 import Photo from "@/public/images/svgs/icons/photo.svg";
 import Link from "next/link";
-import { collection, doc } from "firebase/firestore";
+import { collection, doc, updateDoc } from "firebase/firestore";
 import { useProducts } from "@/store/products";
 import { db } from "@/firebase";
 import { Product, Variant } from "@/types/product";
@@ -82,7 +82,7 @@ const ProductLine = ({ product }: { product: Product }) => {
 
   const deleteProduct = () => {
     if (!storeId) return;
-    dbUpdateDoc(doc(db, "products", product.id), {
+    updateDoc(doc(db, "products", product.id), {
       ...product,
       status: "deleted",
     });
@@ -108,14 +108,11 @@ const ProductLine = ({ product }: { product: Product }) => {
           {Array.isArray(product.images) &&
           (product.images[0] || product.variants?.find((v) => v.image)) ? (
             <Image
-              src={
-                product.images[0] ??
-                product.variants?.find((v) => v.image)?.image
-              }
+              src={product.images[0] ?? ""}
               alt={product.title || "Product Image"}
               width={100}
               height={100}
-              className="w-14 aspect-square object-contain border rounded-md p-[2px] duration-300"
+              className="w-14 aspect-square object-cover border rounded-md p-[2px] duration-300"
             />
           ) : (
             <div className="w-14 aspect-square rounded-xl border bg-slate-50 flex justify-center items-center">
@@ -226,7 +223,7 @@ const ProductLine = ({ product }: { product: Product }) => {
       {showVariants && product.variants && product.variants?.length > 0 && (
         <TableRow>
           <TableCell colSpan={8}>
-            <div className="bg-slate-50 ml-4 border w-fit rounded-xl">
+            <div className="px-2 ml-4 w-full border rounded-xl">
               <h1 className="text-xl font-semibold p-3">Variants</h1>
               <Table className="w-fit min-w-[600px]">
                 <TableHeader>
@@ -283,13 +280,13 @@ const VariantLine = ({
   return (
     <TableRow>
       <TableCell>
-        {variant.image ? (
+        {variant.images ? (
           <Image
-            src={variant.image}
+            src={variant?.images ? variant.images[0] : ""}
             alt={variant.title || "Variant Image"}
             width={60}
             height={60}
-            className="w-12 aspect-square object-contain border rounded-md p-[2px]"
+            className="w-12 aspect-square object-cover border rounded-md p-[2px]"
           />
         ) : (
           <div className="w-12 aspect-square rounded-xl border bg-slate-50 flex justify-center items-center">

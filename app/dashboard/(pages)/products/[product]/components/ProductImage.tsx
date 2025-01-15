@@ -31,25 +31,6 @@ const ProductImagesCard = () => {
             <div className="grid grid-cols-3 gap-2 overflow-hidden ">
               <ImageView index={1} />
               <ImageView index={2} />
-              {
-                //<UploadImageProvider
-                //  folder="products"
-                //  name={
-                //    "product-" + currentProduct.id + "-image-" + Math.random()
-                //  }
-                //  callback={(url) => {
-                //    if (!currentProduct) return;
-                //    setCurrentProduct({
-                //      ...currentProduct,
-                //      images: [...(currentProduct.images ?? []), url],
-                //    } as Product);
-                //  }}
-                //>
-                //  <div className="w-full h-full flex justify-center items-center bg-slate-50 border border-dashed rounded-md">
-                //    <Upload className="h-4 w-4 text-muted-foreground" />
-                //  </div>
-                //</UploadImageProvider>
-              }
               <FilesystemExplorer
                 callback={(url) => {
                   if (!currentProduct) return;
@@ -77,14 +58,14 @@ const ImageView = ({ index }: { index: number }) => {
   const { currentProduct, setCurrentProduct } = useProducts();
 
   return (
-    <div className="aspect-square border relative overflow-hidden w-full group rounded-md flex items-center justify-center bg-slate-50">
+    <div className=" min-h-[150px] border relative overflow-hidden w-full group rounded-md flex items-center justify-center bg-slate-50">
       {currentProduct?.images && currentProduct?.images.length > index ? (
         <Image
           alt="Product image"
           height="84"
           src={currentProduct.images[index]}
           width={600}
-          className="w-full h-full object-contain border rounded-md p-2"
+          className="w-full h-full object-contain border rounded-md p-1"
         />
       ) : (
         <PlasholderImage />

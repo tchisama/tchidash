@@ -219,16 +219,10 @@ function Page({ params }: { params: { product: string } }) {
            */}
         </div>
         <div className="grid auto-rows-max items-start gap-4 lg:gap-8">
-          {currentProduct &&
-            currentProduct?.options &&
-            currentProduct.options.length == 0 && <ProductImagesCard />}
+          <ProductImagesCard />
           <ProductStatusCard />
           <ProductDiscount />
           <ProductDynamicVariantsImages />
-          {/*
-             *
-          <ProductDangerZone />
-             * */}
         </div>
       </div>
       <div className="flex items-center justify-center gap-2 md:hidden">
