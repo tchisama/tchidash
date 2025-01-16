@@ -22,17 +22,23 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { v4 } from "uuid";
-import { useSession } from "next-auth/react";
 import { dbGetDoc, dbUpdateDoc } from "@/lib/dbFuntions/fbFuns";
 import Avvvatars from "avvvatars-react";
-import { Role } from "@/lib/permissions/main";
+import { Role, ROLES_NAMES } from "@/lib/permissions/main";
 
-// Define roles and permissions
-const ROLES = ["super_admin", "admin", "order_manager"] as const;
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { DialogClose } from "@radix-ui/react-dialog";
+
 
 const Emplyies = () => {
   const { storeId } = useStore();
-  const { data: session } = useSession();
   const { data: store } = useQuery({
     queryKey: ["store", storeId],
     queryFn: async () => {
@@ -109,10 +115,7 @@ const Emplyies = () => {
   };
 
   return (
-    store &&
-    session &&
-    session.user &&
-    store.ownerEmail === session.user.email && (
+    store && (
       <Card x-chunk="dashboard-04-chunk-1">
         <CardHeader>
           <CardTitle>Employees</CardTitle>
@@ -160,7 +163,7 @@ const Emplyies = () => {
                   </div>
                 </PopoverTrigger>
                 <PopoverContent className="p-1 flex flex-col">
-                  {ROLES.map((role) => (
+                  {ROLES_NAMES.map((role) => (
                     <Button
                       onClick={() => {
                         setNewEmployee((prev) => ({
@@ -214,6 +217,7 @@ const Emplyies = () => {
   );
 };
 
+
 const UpdateEmployee = ({
   employee,
   store,
@@ -225,9 +229,8 @@ const UpdateEmployee = ({
 }) => {
   const { storeId } = useStore();
   const [updatedEmployee, setUpdatedEmployee] = useState<Employee>(employee);
-  const [showUpdateForm, setShowUpdateForm] = useState(false); // State to toggle update form
 
-  const handleRoleChange = (role:Role ) => {
+  const handleRoleChange = (role: Role) => {
     const newRoles = updatedEmployee.roles.includes(role)
       ? updatedEmployee.roles.filter((r) => r !== role) // Remove role
       : [...updatedEmployee.roles, role]; // Add role
@@ -236,9 +239,8 @@ const UpdateEmployee = ({
   };
 
   const handleSave = () => {
-    if (!storeId || !store) return;
+    if (!storeId || !store || !store.employees) return;
 
-    if(!store.employees) return;
     dbUpdateDoc(
       doc(db, "stores", storeId),
       {
@@ -249,27 +251,25 @@ const UpdateEmployee = ({
       storeId,
       "",
     );
-    setShowUpdateForm(false); // Hide the form after saving
   };
 
   return (
     <>
-      <Button variant="outline" onClick={() => setShowUpdateForm(true)}>
-        Update
-      </Button>
-      <Button variant="destructive" onClick={onDelete}>
-        Delete
-      </Button>
-
-      {/* Update Form (Conditionally Rendered) */}
-      {showUpdateForm && (
-        <div className="fixed inset-0 z-[999] bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg w-[400px]">
-            <h2 className="text-lg font-bold mb-4">Update Employee</h2>
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button variant="outline">Update</Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Update Employee</DialogTitle>
+            <DialogDescription>
+              Edit the employees details and roles.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
             <Input
               value={updatedEmployee.name}
               placeholder="Name"
-              className="mb-4"
               onChange={(e) =>
                 setUpdatedEmployee({ ...updatedEmployee, name: e.target.value })
               }
@@ -277,27 +277,24 @@ const UpdateEmployee = ({
             <Input
               value={updatedEmployee.email}
               placeholder="Email"
-              className="mb-4"
               onChange={(e) =>
                 setUpdatedEmployee({ ...updatedEmployee, email: e.target.value })
               }
             />
             <Popover>
-              <PopoverTrigger>
-                <div className="w-full flex justify-start mb-4">
-                  <Button variant="outline" className="space-y-1 space-x-1">
-                    {updatedEmployee.roles.length > 0
-                      ? updatedEmployee.roles.map((role) => (
-                          <Badge variant={"outline"} key={role}>
-                            {role}
-                          </Badge>
-                        ))
-                      : "Select Roles"}
-                  </Button>
-                </div>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="w-full justify-start">
+                  {updatedEmployee.roles.length > 0
+                    ? updatedEmployee.roles.map((role) => (
+                        <Badge variant={"outline"} key={role} className="mr-1">
+                          {role}
+                        </Badge>
+                      ))
+                    : "Select Roles"}
+                </Button>
               </PopoverTrigger>
               <PopoverContent className="p-1 flex flex-col">
-                {ROLES.map((role) => (
+                {ROLES_NAMES.map((role) => (
                   <Button
                     onClick={() => handleRoleChange(role)}
                     variant="ghost"
@@ -311,16 +308,21 @@ const UpdateEmployee = ({
               </PopoverContent>
             </Popover>
             <div className="flex gap-2">
-              <Button onClick={handleSave}>Save</Button>
-              <Button variant="outline" onClick={() => setShowUpdateForm(false)}>
-                Cancel
-              </Button>
+              <DialogClose>
+                <Button onClick={handleSave}>Save</Button>
+              </DialogClose>
+              <DialogClose>
+                <Button variant="outline">Cancel</Button>
+              </DialogClose>
             </div>
           </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
+      <Button variant="destructive" onClick={onDelete}>
+        Delete
+      </Button>
     </>
   );
 };
 
-export { Emplyies };
+export { UpdateEmployee, Emplyies };

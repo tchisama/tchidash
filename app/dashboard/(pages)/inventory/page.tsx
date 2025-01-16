@@ -10,7 +10,7 @@ function Page() {
   // Check if the user has view permission
   const hasViewPermission = usePermission();
 
-   if (!hasViewPermission("reviews", "view")) {
+   if (!hasViewPermission("inventory", "view")) {
     return <div>You dont have permission to view this page</div>;
   }
   return (
