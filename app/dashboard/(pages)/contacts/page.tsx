@@ -35,6 +35,7 @@ import { useStore } from "@/store/storeInfos";
 import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { dbGetDocs } from "@/lib/dbFuntions/fbFuns";
+import { usePermission } from "@/hooks/use-permission";
 export default function Page() {
   const { storeId } = useStore();
   const {
@@ -59,13 +60,28 @@ export default function Page() {
       );
       return data;
     },
+
   });
+
+  // Check if the user has view permission
+  const hasViewPermission = usePermission();
+
+   if (!hasViewPermission("messages", "view")) {
+    return <div>You dont have permission to view this page</div>;
+  }
+
+
   if (error) {
     return <div className="text-red-500">Error: {error.message}</div>;
   }
   if (isLoading) {
     return <div>Loading...</div>;
   }
+
+
+
+
+
   return (
     <div>
       <div className="flex justify-end">

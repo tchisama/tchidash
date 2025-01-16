@@ -5,7 +5,7 @@ import { Order } from "@/types/order";
 import { Product } from "@/types/product";
 import { Review } from "@/types/reviews";
 
-type Permissions = {
+export type Permissions = {
   orders: {
     dataType: Order;
     action: "view" | "create" | "update" | "delete";
@@ -35,6 +35,7 @@ type Permissions = {
 
 
 export type Role = "super_admin" | "admin" | "order_manager" ;
+
 type User = {
   id: string;
   roles: Role[];

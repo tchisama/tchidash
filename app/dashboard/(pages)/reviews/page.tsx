@@ -23,6 +23,7 @@ import { useQuery } from "@tanstack/react-query";
 import CreateReviewDialog from "./components/CreateReviewDialog";
 import { useStore } from "@/store/storeInfos";
 import { dbGetDocs } from "@/lib/dbFuntions/fbFuns";
+import { usePermission } from "@/hooks/use-permission";
 
 export default function Page() {
   const { storeId } = useStore();
@@ -49,6 +50,13 @@ export default function Page() {
       return data;
     },
   });
+
+  // Check if the user has view permission
+  const hasViewPermission = usePermission();
+
+   if (!hasViewPermission("reviews", "view")) {
+    return <div>You dont have permission to view this page</div>;
+  }
 
   if (error) {
     return <div className="text-red-500">Error: {error.message}</div>;

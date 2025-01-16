@@ -1,9 +1,18 @@
+"use client"
 import { Button } from "@/components/ui/button";
 import { InventoryMovementTable } from "./commponents/InventoryTable";
 import { PlusCircle } from "lucide-react";
 import Link from "next/link";
+import { usePermission } from "@/hooks/use-permission";
 
-function page() {
+function Page() {
+
+  // Check if the user has view permission
+  const hasViewPermission = usePermission();
+
+   if (!hasViewPermission("reviews", "view")) {
+    return <div>You dont have permission to view this page</div>;
+  }
   return (
     <div>
       <div className="flex justify-between mb-4">
@@ -20,4 +29,4 @@ function page() {
   );
 }
 
-export default page;
+export default Page;

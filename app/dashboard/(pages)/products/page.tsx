@@ -41,8 +41,7 @@ import { Product } from "@/types/product";
 import { useStore } from "@/store/storeInfos";
 import { ProductLine } from "./components/ProductLine";
 import { dbGetDocs } from "@/lib/dbFuntions/fbFuns";
-import { useSession } from "next-auth/react";
-import { hasPermission } from "@/lib/permissions/main";
+import { usePermission } from "@/hooks/use-permission";
 // Sample product data
 
 export default function Page() {
@@ -75,25 +74,12 @@ export default function Page() {
     }
   }, [data, setProducts, setCurrentProduct]);
 
+  // Check if the user has view permission
+  const hasViewPermission = usePermission();
 
-  const { store } = useStore();
-  const { data: session } = useSession();
-  const permission = hasPermission(
-    {
-      id: session?.user?.email ?? "",
-      roles: store?.employees?.find(
-        (employee) => employee.email === session?.user?.email
-      )?.roles || [],
-    },
-    "products",
-    "view"
-  )
-  if(!permission){
-    return (
-      "You don't have permission to view this page"
-    )
+   if (!hasViewPermission("products", "view")) {
+    return <div>You dont have permission to view this page</div>;
   }
-
 
 
   if (isLoading)

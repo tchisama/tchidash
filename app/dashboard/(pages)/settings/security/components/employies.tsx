@@ -25,6 +25,7 @@ import { v4 } from "uuid";
 import { useSession } from "next-auth/react";
 import { dbGetDoc, dbUpdateDoc } from "@/lib/dbFuntions/fbFuns";
 import Avvvatars from "avvvatars-react";
+import { Role } from "@/lib/permissions/main";
 
 // Define roles and permissions
 const ROLES = ["super_admin", "admin", "order_manager"] as const;
@@ -226,7 +227,7 @@ const UpdateEmployee = ({
   const [updatedEmployee, setUpdatedEmployee] = useState<Employee>(employee);
   const [showUpdateForm, setShowUpdateForm] = useState(false); // State to toggle update form
 
-  const handleRoleChange = (role: string) => {
+  const handleRoleChange = (role:Role ) => {
     const newRoles = updatedEmployee.roles.includes(role)
       ? updatedEmployee.roles.filter((r) => r !== role) // Remove role
       : [...updatedEmployee.roles, role]; // Add role

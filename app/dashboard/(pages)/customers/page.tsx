@@ -34,6 +34,7 @@ import Link from "next/link";
 import { Copy, Eye, MoreHorizontal, Phone } from "lucide-react";
 import { useStore } from "@/store/storeInfos";
 import { dbGetDocs } from "@/lib/dbFuntions/fbFuns";
+import { usePermission } from "@/hooks/use-permission";
 
 export default function CustomerPage() {
   const { storeId, store } = useStore();
@@ -63,6 +64,13 @@ export default function CustomerPage() {
       return data;
     },
   });
+
+  // Check if the user has view permission
+  const hasViewPermission = usePermission();
+
+   if (!hasViewPermission("customers", "view")) {
+    return <div>You dont have permission to view this page</div>;
+  }
 
   // Loading and error states
   if (isLoading) return <p>Loading...</p>;
