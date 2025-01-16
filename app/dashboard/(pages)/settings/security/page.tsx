@@ -5,8 +5,8 @@ import { Emplyies } from "./components/employies";
 function page() {
   return (
     <div className="flex flex-col gap-4">
-      <SecuritySettings />
       <Emplyies />
+      <SecuritySettings />
     </div>
   );
 }

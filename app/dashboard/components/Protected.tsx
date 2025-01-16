@@ -2,7 +2,6 @@
 import { db } from "@/firebase";
 import { fetchStore } from "@/lib/queries/store";
 import { useStore } from "@/store/storeInfos";
-import { Employee } from "@/types/store";
 import { useQuery } from "@tanstack/react-query";
 import { doc, getDoc, setDoc, Timestamp } from "firebase/firestore";
 import { useSession } from "next-auth/react";
@@ -18,7 +17,6 @@ function Protected({ children }: { children: React.ReactNode }) {
     },
   });
   const { storeId, loadStoreId, setStore } = useStore();
-  const [dontHaveAccess, setDontHaveAccess] = React.useState(false);
   //const [loading, setLoading] = React.useState(true);
 
   const { data: store } = useQuery({
@@ -44,51 +42,7 @@ function Protected({ children }: { children: React.ReactNode }) {
     if (session?.user == undefined) return;
     if (session?.user.email == undefined) return;
 
-    if (
-      pathname === "/dashboard/create-store" ||
-      pathname === "/dashboard/switch-store"
-    ) {
-      //setLoading(false);
-      return setDontHaveAccess(false);
-    }
-
-    let employee: Employee | null | "admin" = null;
-    const email = session?.user.email;
-    employee =
-      store.employees?.find((employee) => employee.email === email) ?? null;
-    if (store.ownerEmail === session?.user.email) {
-      employee = "admin";
-    }
-    //setLoading(false);
-    if (!employee) {
-      //redirect("/dashboard/switch-store");
-      //setLoading(false);
-      return setDontHaveAccess(true);
-    }
-    if (employee === "admin") {
-      // Do something
-      //setLoading(false);
-      return setDontHaveAccess(false);
-    }
-    if(pathname.split("/")[2] === "none-layout" && pathname.split("/")[3] === "tickets"){
-      if(employee.access["orders"]){
-        return setDontHaveAccess(false);
-      }
-    }
-    if (employee.access[pathname.split("/")[2]]) {
-      //setLoading(false);
-      return setDontHaveAccess(false);
-    } else {
-      //redirect("/dashboard/switch-store");
-      setDontHaveAccess(false);
-      if (Object.keys(employee.access).filter((key) => key).length === 0) {
-        //setLoading(false);
-        return redirect("/dashboard/switch-store");
-      }
-      //setLoading(false);
-      return redirect("/dashboard/" + Object.keys(employee.access)[0]);
-    }
-  }, [store, session, pathname, setDontHaveAccess]);
+  }, [store, session, pathname]);
 
   useEffect(() => {
     loadStoreId();
@@ -149,13 +103,6 @@ function Protected({ children }: { children: React.ReactNode }) {
   //    </div>
   //  );
   //}
-  if (dontHaveAccess) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        You are not authorized to access this page
-      </div>
-    );
-  }
 
   return <div>{children}</div>;
 }

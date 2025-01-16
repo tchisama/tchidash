@@ -1,5 +1,6 @@
 "use client";
-import React, { useEffect } from "react";
+import React from "react";
+// { useEffect } 
 
 import {
   Tooltip,
@@ -19,12 +20,12 @@ import Stars from "@/public/images/svgs/icons/stars.svg";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 
-import { db } from "@/firebase";
-import { useStore } from "@/store/storeInfos";
-import { Employee, Store } from "@/types/store";
-import { useQuery } from "@tanstack/react-query";
-import { doc, getDoc } from "firebase/firestore";
-import { useSession } from "next-auth/react";
+// import { db } from "@/firebase";
+// import { useStore } from "@/store/storeInfos";
+// import { Employee, Store } from "@/types/store";
+// import { useQuery } from "@tanstack/react-query";
+// import { doc, getDoc } from "firebase/firestore";
+// import { useSession } from "next-auth/react";
 
 const iconsClass =
   "h-5 w-5 group-hover:scale-[1.05] duration-200 hover:cursor-pointer";
@@ -104,40 +105,21 @@ export const navLinks = [
 function SideBar() {
   const pathname = usePathname();
 
-  const { storeId } = useStore();
-  const { data: session } = useSession();
-  const { data } = useQuery({
-    queryKey: ["store", storeId],
-    queryFn: async () => {
-      if (!storeId) return null;
-      const store: Store = await getDoc(doc(db, "stores", storeId)).then(
-        (doc) => {
-          return { ...doc.data(), id: doc.id } as Store;
-        },
-      );
-      return store;
-    },
-    refetchOnWindowFocus: false,
-  });
-  const [employee, setEmployee] = React.useState<Employee | null | "admin">(
-    null,
-  );
-  useEffect(() => {
-    if (!data) return;
-    if (!session) return;
-    if (!session.user) return;
-    if (!session.user.email) return;
-    if (data.ownerEmail == session?.user?.email) {
-      setEmployee("admin");
-      return;
-    }
-    if (!data.employees) return;
-    setEmployee(
-      data.employees.find(
-        (employee) => employee.email === session?.user?.email,
-      ) ?? null,
-    );
-  }, [data, session, setEmployee]);
+  // const { storeId } = useStore();
+  // const { data: session } = useSession();
+  // const { data } = useQuery({
+  //   queryKey: ["store", storeId],
+  //   queryFn: async () => {
+  //     if (!storeId) return null;
+  //     const store: Store = await getDoc(doc(db, "stores", storeId)).then(
+  //       (doc) => {
+  //         return { ...doc.data(), id: doc.id } as Store;
+  //       },
+  //     );
+  //     return store;
+  //   },
+  //   refetchOnWindowFocus: false,
+  // });
 
   return (
     <aside className=" px-1 sticky top-4 rounded-2xl h-[80vh] overflow-y-auto inset-y-0 left-0 z-10 hidden flex-col  m-2  sm:flex">
@@ -148,15 +130,6 @@ function SideBar() {
           <span className="sr-only">Acme Inc</span>
         </div>
         {navLinks
-          .filter((link) => {
-            if (employee === "admin") return true;
-            if (!employee) return false;
-            if (employee?.access?.[link?.label.toLowerCase()]) {
-              return true;
-            } else {
-              return false;
-            }
-          })
           .map(
             (link, index) =>
               !link.isSettings && (
@@ -188,15 +161,6 @@ function SideBar() {
       <nav className="mt-auto flex w-full  flex-col items-center gap-4 px-2 sm:py-5 sm:pb-3">
         {navLinks
           .filter((link) => link.isSettings)
-          .filter((link) => {
-            if (employee === "admin") return true;
-            if (!employee) return false;
-            if (employee?.access?.[link?.label.toLowerCase()]) {
-              return true;
-            } else {
-              return false;
-            }
-          })
           .map((link, index) => (
             <Tooltip key={index}>
               <TooltipTrigger asChild>

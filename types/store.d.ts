@@ -1,3 +1,4 @@
+import { Role } from "@/lib/permissions/main";
 import { Timestamp } from "firebase/firestore";
 
 // Type for store owner
@@ -61,9 +62,7 @@ export type Employee = {
   id: string;
   name: string;
   email: string;
-  access: {
-    [key: string]: boolean;
-  };
+  roles: Role[];
 };
 
 type Integration = digylogIntegration | whatsappNotificationIntegration;

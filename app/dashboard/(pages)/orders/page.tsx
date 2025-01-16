@@ -26,6 +26,9 @@ import { orderStatusValuesWithIcon } from "./components/StateChanger";
 import { Label } from "@/components/ui/label";
 import Analytic from "./components/analytic";
 import { Input } from "@/components/ui/input";
+import { useStore } from "@/store/storeInfos";
+import { useSession } from "next-auth/react";
+import { hasPermission } from "@/lib/permissions/main";
 
 export default function Page() {
   const { currentOrder, selectedOrder } = useOrderStore();
@@ -44,7 +47,27 @@ export default function Page() {
     ],
     search: "",
   });
-  // const [search, setSearch] = useState("");
+
+  const { store } = useStore();
+  const { data: session } = useSession();
+  const permission = hasPermission(
+    {
+      id: session?.user?.email ?? "",
+      roles: store?.employees?.find(
+        (employee) => employee.email === session?.user?.email
+      )?.roles || [],
+    },
+    "orders",
+    "view"
+  )
+  if(!permission){
+    return (
+      "You don't have permission to view this page"
+    )
+  }
+
+
+
   return (
     <main
       className={cn(

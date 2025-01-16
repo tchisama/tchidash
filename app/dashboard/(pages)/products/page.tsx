@@ -41,6 +41,8 @@ import { Product } from "@/types/product";
 import { useStore } from "@/store/storeInfos";
 import { ProductLine } from "./components/ProductLine";
 import { dbGetDocs } from "@/lib/dbFuntions/fbFuns";
+import { useSession } from "next-auth/react";
+import { hasPermission } from "@/lib/permissions/main";
 // Sample product data
 
 export default function Page() {
@@ -72,6 +74,27 @@ export default function Page() {
       console.log(data);
     }
   }, [data, setProducts, setCurrentProduct]);
+
+
+  const { store } = useStore();
+  const { data: session } = useSession();
+  const permission = hasPermission(
+    {
+      id: session?.user?.email ?? "",
+      roles: store?.employees?.find(
+        (employee) => employee.email === session?.user?.email
+      )?.roles || [],
+    },
+    "products",
+    "view"
+  )
+  if(!permission){
+    return (
+      "You don't have permission to view this page"
+    )
+  }
+
+
 
   if (isLoading)
     return (
@@ -115,6 +138,13 @@ export default function Page() {
         alert("Error adding document: " + error.message);
       });
   };
+
+
+
+
+
+
+
 
   return (
     data && (
