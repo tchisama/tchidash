@@ -19,6 +19,7 @@ import { useRouter } from "next/navigation";
 import { useStore } from "@/store/storeInfos";
 import { useSession } from "next-auth/react";
 import { toast } from "@/hooks/use-toast";
+import { usePermission } from "@/hooks/use-permission";
 
 // Default canvas for a new order
 const defaultOrder: Order = {
@@ -160,6 +161,19 @@ export default function CreateOrder() {
     });
     router.push("/dashboard/orders");
   };
+
+
+
+  // Check if the user has view permission
+  const hasViewPermission = usePermission();
+
+  if (!hasViewPermission("orders", "create")) {
+    return <div>You dont have permission to view this page</div>;
+  }
+
+
+
+
   return (
     order && (
       <div className="space-y-6    p-6 bg-white rounded-lg shadow">

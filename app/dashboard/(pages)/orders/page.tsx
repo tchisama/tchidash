@@ -46,16 +46,12 @@ export default function Page() {
     search: "",
   });
 
-  
   // Check if the user has view permission
   const hasViewPermission = usePermission();
 
-   if (!hasViewPermission("orders", "view")) {
+  if (!hasViewPermission("orders", "view")) {
     return <div>You dont have permission to view this page</div>;
   }
-
-
-
 
   return (
     <main
@@ -144,12 +140,16 @@ export default function Page() {
                     </Button>
                   </Link>
                 )}
-                <Link className="" href="/dashboard/orders/new">
-                  <Button className=" gap-1 w-[130px] text-sm">
-                    <PlusCircle className="h-4 w-4" />
-                    <span className="sr-only sm:not-sr-only">New Order</span>
-                  </Button>
-                </Link>
+                {hasViewPermission("orders", "create") ? (
+                  <Link className="" href="/dashboard/orders/new">
+                    <Button className=" gap-1 w-[130px] text-sm">
+                      <PlusCircle className="h-4 w-4" />
+                      <span className="sr-only sm:not-sr-only">New Order</span>
+                    </Button>
+                  </Link>
+                ) : (
+                  <Button disabled>New Order</Button>
+                )}
               </div>
             </div>
           </div>

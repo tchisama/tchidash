@@ -30,7 +30,15 @@ import {
 } from "@/components/ui/table";
 import Photo from "@/public/images/svgs/icons/photo.svg";
 import Link from "next/link";
-import { collection, doc, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getAggregateFromServer,
+  query,
+  sum,
+  updateDoc,
+  where,
+} from "firebase/firestore";
 import { useProducts } from "@/store/products";
 import { db } from "@/firebase";
 import { Product, Variant } from "@/types/product";
@@ -101,6 +109,28 @@ const ProductLine = ({ product }: { product: Product }) => {
   console.log(stockQuantity);
   if (error) console.error(error);
 
+  // a function to get total sales of a product
+  const { data: totalSales } = useQuery({
+    queryKey: ["totalSales", product.id],
+    queryFn: async function totalSalesFun() {
+      const coll = collection(db, "inventoryItems"); // Replace "inventory" with your collection name
+
+      // Create a query to filter items by product name
+      const q = query(
+        coll,
+        where("productId", "==", product.id),
+        where("storeId", "==", storeId),
+        where("type", "==", "OUT"),
+      );
+
+      return getAggregateFromServer(q, {
+        totalSales: sum("quantity"),
+      }).then((result) => {
+        return result.data().totalSales;
+      });
+    },
+  });
+
   return (
     <>
       <TableRow key={product.id} className="group">
@@ -164,7 +194,11 @@ const ProductLine = ({ product }: { product: Product }) => {
           </div>
         </TableCell>
         <TableCell className="hidden md:table-cell">
-          {product?.totalSales ?? 0} Sales
+          {
+            // totalSales()
+            totalSales * -1
+          }{" "}
+          Sales
         </TableCell>
         <TableCell className="hidden md:table-cell">
           {product.createdAt.toDate().toLocaleDateString()}
