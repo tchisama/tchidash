@@ -121,6 +121,7 @@ const ProductLine = ({ product }: { product: Product }) => {
         where("productId", "==", product.id),
         where("storeId", "==", storeId),
         where("type", "==", "OUT"),
+        where("status" , "==", "APPROVED"),
       );
 
       return getAggregateFromServer(q, {
@@ -195,8 +196,10 @@ const ProductLine = ({ product }: { product: Product }) => {
         </TableCell>
         <TableCell className="hidden md:table-cell">
           {
-            // totalSales()
-            totalSales * -1
+            (totalSales??0) * -1
+            // Math.min(
+            // totalSales ??0,0
+            // )
           }{" "}
           Sales
         </TableCell>

@@ -51,9 +51,36 @@ function Page() {
       }),
     );
   };
-  //const RemoveAllProducts = () => {};
-  //const RemoveAllReviews = () => {};
-  //const RemoveAllInventory = () => {};
+  const RemoveAllProducts = () => {
+    if (!confirm("Are you sure you want to remove all products?")) return;
+    const q = query(collection(db, "products"), where("storeId", "==", storeId));
+    if (!storeId) return;
+    dbGetDocs(q, storeId, "").then((response) =>
+      response.docs.forEach((doc) => {
+        dbDeleteDoc(doc.ref, storeId, "");
+      }),
+    );
+  };
+  const RemoveAllReviews = () => {
+    if (!confirm("Are you sure you want to remove all reviews?")) return;
+    const q = query(collection(db, "reviews"), where("storeId", "==", storeId));
+    if (!storeId) return;
+    dbGetDocs(q, storeId, "").then((response) =>
+      response.docs.forEach((doc) => {
+        dbDeleteDoc(doc.ref, storeId, "");
+      }),
+    );
+  };
+  const RemoveAllInventory = () => {
+    if (!confirm("Are you sure you want to remove all inventory?")) return;
+    const q = query(collection(db, "inventoryItems"), where("storeId", "==", storeId));
+    if (!storeId) return;
+    dbGetDocs(q, storeId, "").then((response) =>
+      response.docs.forEach((doc) => {
+        dbDeleteDoc(doc.ref, storeId, "");
+      }),
+    );
+  };
   return (
     <div>
       <Card>
@@ -85,19 +112,25 @@ function Page() {
             <AccordionItem value="products">
               <AccordionTrigger>Products</AccordionTrigger>
               <AccordionContent>
-                <Button variant={"destructive"}>Remove All Products</Button>
+                <Button variant={"destructive"} onClick={RemoveAllProducts}>
+                  Remove All Products
+                </Button>
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="reviews">
               <AccordionTrigger>Reviews</AccordionTrigger>
               <AccordionContent>
-                <Button variant={"destructive"}>Remove All Reviews</Button>
+                <Button variant={"destructive"} onClick={RemoveAllReviews}>
+                  Remove All Reviews
+                </Button>
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="inventory">
               <AccordionTrigger>Inventory</AccordionTrigger>
               <AccordionContent>
-                <Button variant={"destructive"}>Remove All Inventory</Button>
+                <Button variant={"destructive"} onClick={RemoveAllInventory}>
+                  Remove All Inventory
+                </Button>
               </AccordionContent>
             </AccordionItem>
           </Accordion>

@@ -96,7 +96,7 @@ export async function POST(req: Request) {
             note: "",
             createdById: customer.name,
             type: "OUT",
-            status: "APPROVED",
+            status: statusEffect ? "APPROVED" : "PENDING",
             referenceNumber: "SO-" + v4().substring(0, 8),
           },
           storeId,
