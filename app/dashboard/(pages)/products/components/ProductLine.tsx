@@ -4,12 +4,14 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import {
+  AlarmClockCheck,
   Archive,
   Copy,
   Edit,
   Eye,
   EyeOff,
   MoreHorizontal,
+  ShoppingCartIcon,
   Trash2,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -121,7 +123,7 @@ const ProductLine = ({ product }: { product: Product }) => {
         where("productId", "==", product.id),
         where("storeId", "==", storeId),
         where("type", "==", "OUT"),
-        where("status" , "==", "APPROVED"),
+        where("status", "==", "APPROVED"),
       );
 
       return getAggregateFromServer(q, {
@@ -139,7 +141,7 @@ const ProductLine = ({ product }: { product: Product }) => {
           {Array.isArray(product.images) &&
           (product.images[0] || product.variants?.find((v) => v.image)) ? (
             <Image
-              src={product.images[0] ?? ""}
+              src={product.images[0] ?? product.variants?.[0].images?.[0] ?? ""}
               alt={product.title || "Product Image"}
               width={100}
               height={100}
@@ -170,7 +172,13 @@ const ProductLine = ({ product }: { product: Product }) => {
         </TableCell>
         <TableCell>{product.variants?.length || 1} Variants</TableCell>
         <TableCell>
-          <Badge variant="outline">{product.status}</Badge>
+          <Badge variant={
+            product.status === "active"
+              ? "default"
+              : product.status === "archived"
+              ? "outline"
+              : "secondary"
+          }>{product.status}</Badge>
         </TableCell>
         <TableCell className="hidden md:table-cell">
           {product.variants &&
@@ -184,24 +192,21 @@ const ProductLine = ({ product }: { product: Product }) => {
         </TableCell>
         <TableCell className="hidden md:table-cell">
           <div>
-            {/*product.variants &&
-            product.variants.length > 0 &&
-            product.variantsAreOneProduct === false
-              ? "Have variants"
-              : product.hasInfiniteStock
-                ? "Infinite Stock"
-                : product.stockQuantity + " Items"*/}{" "}
-            {stockQuantity}
+            {stockQuantity} Items
           </div>
         </TableCell>
         <TableCell className="hidden md:table-cell">
+          <div className="flex items-center">
+
           {
-            (totalSales??0) * -1
+            (totalSales ?? 0) * -1
             // Math.min(
             // totalSales ??0,0
             // )
           }{" "}
           Sales
+          <ShoppingCartIcon className="h-4 w-4 ml-2" />
+          </div>
         </TableCell>
         <TableCell className="hidden md:table-cell">
           {product.createdAt.toDate().toLocaleDateString()}
@@ -312,6 +317,28 @@ const VariantLine = ({
     queryFn: () => getStock(storeId ?? "", product, variant),
   });
 
+  const { data: totalSales } = useQuery({
+    queryKey: ["totalSales", variant.id],
+    queryFn: async function totalSalesFun() {
+      const coll = collection(db, "inventoryItems"); // Replace "inventory" with your collection name
+
+      // Create a query to filter items by product name
+      const q = query(
+        coll,
+        where("variantId", "==", variant.id),
+        where("storeId", "==", storeId),
+        where("type", "==", "OUT"),
+        where("status", "==", "APPROVED"),
+      );
+
+      return getAggregateFromServer(q, {
+        totalSales: sum("quantity"),
+      }).then((result) => {
+        return result.data().totalSales;
+      });
+    },
+  });
+
   if (error) console.error(error);
 
   return (
@@ -342,9 +369,14 @@ const VariantLine = ({
         {variant.price} Dh
       </TableCell>
       <TableCell className={product.variantsAreOneProduct ? "hidden" : ""}>
-        {variant.hasInfiniteStock ? "infinite" : stockQuantity || 0}
+        {variant.hasInfiniteStock ? "infinite" : stockQuantity || 0} Items
       </TableCell>
-      <TableCell>{variant.totalSales || 0}</TableCell>
+      <TableCell>
+        <div className="flex items-center">
+        {(totalSales ?? 0) * -1} Sales
+        <ShoppingCartIcon className="h-4 w-4 ml-2" />
+        </div>
+      </TableCell>
     </TableRow>
   );
 };

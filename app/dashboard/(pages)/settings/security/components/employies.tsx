@@ -231,7 +231,7 @@ const UpdateEmployee = ({
   const [updatedEmployee, setUpdatedEmployee] = useState<Employee>(employee);
 
   const handleRoleChange = (role: Role) => {
-    const newRoles = updatedEmployee.roles.includes(role)
+    const newRoles = updatedEmployee?.roles?.includes(role)
       ? updatedEmployee.roles.filter((r) => r !== role) // Remove role
       : [...updatedEmployee.roles, role]; // Add role
 
@@ -284,8 +284,8 @@ const UpdateEmployee = ({
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="outline" className="w-full justify-start">
-                  {updatedEmployee.roles.length > 0
-                    ? updatedEmployee.roles.map((role) => (
+                  {updatedEmployee?.roles?.length > 0
+                    ? updatedEmployee?.roles?.map((role) => (
                         <Badge variant={"outline"} key={role} className="mr-1">
                           {role}
                         </Badge>
@@ -302,7 +302,7 @@ const UpdateEmployee = ({
                     className="w-full flex justify-between"
                   >
                     {role}{" "}
-                    <div>{updatedEmployee.roles.includes(role) && "✔️"} </div>
+                    <div>{updatedEmployee?.roles?.includes(role) && "✔️"} </div>
                   </Button>
                 ))}
               </PopoverContent>
