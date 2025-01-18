@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import {
-  AlarmClockCheck,
   Archive,
   Copy,
   Edit,
@@ -172,13 +171,17 @@ const ProductLine = ({ product }: { product: Product }) => {
         </TableCell>
         <TableCell>{product.variants?.length || 1} Variants</TableCell>
         <TableCell>
-          <Badge variant={
-            product.status === "active"
-              ? "default"
-              : product.status === "archived"
-              ? "outline"
-              : "secondary"
-          }>{product.status}</Badge>
+          <Badge
+            variant={
+              product.status === "active"
+                ? "default"
+                : product.status === "archived"
+                  ? "outline"
+                  : "secondary"
+            }
+          >
+            {product.status}
+          </Badge>
         </TableCell>
         <TableCell className="hidden md:table-cell">
           {product.variants &&
@@ -191,21 +194,18 @@ const ProductLine = ({ product }: { product: Product }) => {
           {store?.settings.currency.symbol}
         </TableCell>
         <TableCell className="hidden md:table-cell">
-          <div>
-            {stockQuantity} Items
-          </div>
+          <div>{stockQuantity} Items</div>
         </TableCell>
         <TableCell className="hidden md:table-cell">
           <div className="flex items-center">
-
-          {
-            (totalSales ?? 0) * -1
-            // Math.min(
-            // totalSales ??0,0
-            // )
-          }{" "}
-          Sales
-          <ShoppingCartIcon className="h-4 w-4 ml-2" />
+            {
+              (totalSales ?? 0) * -1
+              // Math.min(
+              // totalSales ??0,0
+              // )
+            }{" "}
+            Sales
+            <ShoppingCartIcon className="h-4 w-4 ml-2" />
           </div>
         </TableCell>
         <TableCell className="hidden md:table-cell">
@@ -373,8 +373,8 @@ const VariantLine = ({
       </TableCell>
       <TableCell>
         <div className="flex items-center">
-        {(totalSales ?? 0) * -1} Sales
-        <ShoppingCartIcon className="h-4 w-4 ml-2" />
+          {(totalSales ?? 0) * -1} Sales
+          <ShoppingCartIcon className="h-4 w-4 ml-2" />
         </div>
       </TableCell>
     </TableRow>
