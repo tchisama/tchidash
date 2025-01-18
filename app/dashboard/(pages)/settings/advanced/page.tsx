@@ -18,9 +18,18 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
+import { usePermission } from "@/hooks/use-permission";
 
 function Page() {
   const { storeId } = useStore();
+
+  // Check if the user has view permission
+  const hasViewPermission = usePermission();
+
+  if (!hasViewPermission("settings_advanced", "view")) {
+    return <div>You dont have permission to view this page</div>;
+  }
+
   const RemoveAllCustomers = async () => {
     if (!confirm("Are you sure you want to remove all customers?")) return;
     const q = query(
@@ -53,7 +62,10 @@ function Page() {
   };
   const RemoveAllProducts = () => {
     if (!confirm("Are you sure you want to remove all products?")) return;
-    const q = query(collection(db, "products"), where("storeId", "==", storeId));
+    const q = query(
+      collection(db, "products"),
+      where("storeId", "==", storeId),
+    );
     if (!storeId) return;
     dbGetDocs(q, storeId, "").then((response) =>
       response.docs.forEach((doc) => {
@@ -73,7 +85,10 @@ function Page() {
   };
   const RemoveAllInventory = () => {
     if (!confirm("Are you sure you want to remove all inventory?")) return;
-    const q = query(collection(db, "inventoryItems"), where("storeId", "==", storeId));
+    const q = query(
+      collection(db, "inventoryItems"),
+      where("storeId", "==", storeId),
+    );
     if (!storeId) return;
     dbGetDocs(q, storeId, "").then((response) =>
       response.docs.forEach((doc) => {

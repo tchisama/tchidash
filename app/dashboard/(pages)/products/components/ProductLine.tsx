@@ -33,11 +33,11 @@ import Photo from "@/public/images/svgs/icons/photo.svg";
 import Link from "next/link";
 import {
   collection,
+  deleteDoc,
   doc,
   getAggregateFromServer,
   query,
   sum,
-  updateDoc,
   where,
 } from "firebase/firestore";
 import { useProducts } from "@/store/products";
@@ -91,11 +91,14 @@ const ProductLine = ({ product }: { product: Product }) => {
 
   const deleteProduct = () => {
     if (!storeId) return;
-    updateDoc(doc(db, "products", product.id), {
-      ...product,
-      status: "deleted",
-    });
-    setProducts(products.filter((p) => p.id !== product.id));
+    // updateDoc(doc(db, "products", product.id), {
+    //   ...product,
+    //   status: "deleted",
+    // });
+    if (confirm("Are you sure you want to delete this product?")) {
+      deleteDoc(doc(db, "products", product.id));
+      setProducts(products.filter((p) => p.id !== product.id));
+    }
   };
   // const stock = (product.variants && product.variants.length > 0)
   //   ? product.variants.reduce((acc, variant) => acc + variant.inventoryQuantity, 0)
@@ -191,7 +194,7 @@ const ProductLine = ({ product }: { product: Product }) => {
               " - " +
               Math.max(...product.variants.map((v) => v.price))
             : product.price}{" "}
-          {store?.settings.currency.symbol}
+          {store?.settings.currency.symbol ?? "Dh"}
         </TableCell>
         <TableCell className="hidden md:table-cell">
           <div>{stockQuantity} Items</div>

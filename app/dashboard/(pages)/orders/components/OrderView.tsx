@@ -38,16 +38,14 @@ import {
 } from "lucide-react";
 import { useOrderStore } from "@/store/orders";
 import { db } from "@/firebase";
-import { collection, doc, Timestamp } from "firebase/firestore";
+import { doc } from "firebase/firestore";
 import { motion } from "framer-motion";
-import { dbAddDoc, dbDeleteDoc } from "@/lib/dbFuntions/fbFuns";
+import { dbDeleteDoc } from "@/lib/dbFuntions/fbFuns";
 import { useStore } from "@/store/storeInfos";
 import OrderToImage from "./OrderToImage";
-import axios from "axios";
 import DigylogDialog from "./DigylogDialog";
 import { useDialogs } from "@/store/dialogs";
 import { IconBrandWhatsapp } from "@tabler/icons-react";
-import { generateEmbedding } from "@/lib/ai/openai/embedding";
 import DetailsOrderView from "./DetailsOrderView";
 import OrderNotes from "./OrderNotes";
 import { useRouter } from "next/navigation";
@@ -108,46 +106,46 @@ function OrderView() {
                   </CardDescription>
                 </div>
                 <div className="ml-auto flex items-center gap-1">
-                  <Button
-                    variant={"ghost"}
-                    onClick={async () => {
-                      if (!storeId) return;
-                      const embedding = await generateEmbedding({
-                        text: `
-Order ID: ${currentOrder.id}
-Customer Name: ${currentOrder.customer.name}
-Customer Phone: ${currentOrder.customer.phoneNumber}
-Customer Email: ${currentOrder.customer.email ?? "no email"}
-Customer Address: ${currentOrder.customer.shippingAddress.address}, ${currentOrder.customer.shippingAddress.city} 
-Order Total: ${currentOrder.totalPrice} Dh
-Order Status: ${currentOrder.orderStatus}
-Shipping Cost: ${currentOrder.shippingInfo.cost ?? "Free"}
-Order Items: ${currentOrder.items.map((item) => ` - ${item.title} x ${item.quantity} = ${item.totalPrice} Dh`).join("\n")}
-Order Note : ${currentOrder.note?.content ?? "No note"}
-Created At: ${currentOrder.createdAt.toDate().toLocaleDateString()} at ${currentOrder.createdAt.toDate().toLocaleTimeString()}
-`,
-                      });
-
-                      const a = {
-                        id: currentOrder.id,
-                        values: embedding,
-                        metadata: {
-                          storeId: storeId,
-                          createdAt: new Date(
-                            currentOrder.createdAt.toDate(),
-                          ).getTime(),
-                        },
-                      };
-                      axios
-                        .post("/api/ai/pinecone", a)
-                        .then((res) => {
-                          console.log(res.data);
-                        })
-                        .catch((e) => console.error(e));
-                    }}
-                  >
-                    Victor It
-                  </Button>
+                  {/*                   <Button */}
+                  {/*                     variant={"ghost"} */}
+                  {/*                     onClick={async () => { */}
+                  {/*                       if (!storeId) return; */}
+                  {/*                       const embedding = await generateEmbedding({ */}
+                  {/*                         text: ` */}
+                  {/* Order ID: ${currentOrder.id} */}
+                  {/* Customer Name: ${currentOrder.customer.name} */}
+                  {/* Customer Phone: ${currentOrder.customer.phoneNumber} */}
+                  {/* Customer Email: ${currentOrder.customer.email ?? "no email"} */}
+                  {/* Customer Address: ${currentOrder.customer.shippingAddress.address}, ${currentOrder.customer.shippingAddress.city}  */}
+                  {/* Order Total: ${currentOrder.totalPrice} Dh */}
+                  {/* Order Status: ${currentOrder.orderStatus} */}
+                  {/* Shipping Cost: ${currentOrder.shippingInfo.cost ?? "Free"} */}
+                  {/* Order Items: ${currentOrder.items.map((item) => ` - ${item.title} x ${item.quantity} = ${item.totalPrice} Dh`).join("\n")} */}
+                  {/* Order Note : ${currentOrder.note?.content ?? "No note"} */}
+                  {/* Created At: ${currentOrder.createdAt.toDate().toLocaleDateString()} at ${currentOrder.createdAt.toDate().toLocaleTimeString()} */}
+                  {/* `, */}
+                  {/*                       }); */}
+                  {/**/}
+                  {/*                       const a = { */}
+                  {/*                         id: currentOrder.id, */}
+                  {/*                         values: embedding, */}
+                  {/*                         metadata: { */}
+                  {/*                           storeId: storeId, */}
+                  {/*                           createdAt: new Date( */}
+                  {/*                             currentOrder.createdAt.toDate(), */}
+                  {/*                           ).getTime(), */}
+                  {/*                         }, */}
+                  {/*                       }; */}
+                  {/*                       axios */}
+                  {/*                         .post("/api/ai/pinecone", a) */}
+                  {/*                         .then((res) => { */}
+                  {/*                           console.log(res.data); */}
+                  {/*                         }) */}
+                  {/*                         .catch((e) => console.error(e)); */}
+                  {/*                     }} */}
+                  {/*                   > */}
+                  {/*                     Victor It */}
+                  {/*                   </Button> */}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button size="icon" variant="outline" className="h-8 w-8">
@@ -158,20 +156,36 @@ Created At: ${currentOrder.createdAt.toDate().toLocaleDateString()} at ${current
                     <DropdownMenuContent align="end" className="w-[200px]">
                       <DropdownMenuItem
                         onClick={() => {
-                          if (!storeId) return;
-                          dbAddDoc(
-                            collection(db, "whatsapp-sender-messages"),
-                            {
-                              message: `Hello ${currentOrder.customer.name}, we want to confirm your order with you`,
-                              storeId,
-                              status: "pending",
-                              type: "orderConfirmation",
-                              createdAt: Timestamp.now(),
-                              orderId: currentOrder.id,
-                              to: currentOrder.customer.phoneNumber,
-                            },
-                            storeId,
-                            "",
+                          const whatsappConfirmMessage =
+                            store?.whatsappConfirmationMessage;
+                          if (!whatsappConfirmMessage) return;
+                          const message = whatsappConfirmMessage
+                            .replaceAll("{{name}}", currentOrder?.customer.name)
+                            .replaceAll(
+                              "{{lastname}}",
+                              currentOrder?.customer.lastName ?? "",
+                            )
+                            .replaceAll(
+                              "{{phone}}",
+                              currentOrder?.customer.phoneNumber ?? "",
+                            )
+                            .replaceAll(
+                              "{{address}}",
+                              currentOrder?.customer.shippingAddress.address,
+                            )
+                            .replaceAll(
+                              "{{city}}",
+                              currentOrder?.customer.shippingAddress.city,
+                            )
+                            .replaceAll(
+                              "{{total_price}}",
+                              currentOrder?.totalPrice.toString(),
+                            );
+
+                          window.open(
+                            `https://wa.me/212${currentOrder?.customer?.phoneNumber}?text=${encodeURIComponent(
+                              message,
+                            )}`,
                           );
                         }}
                       >
@@ -265,10 +279,6 @@ Created At: ${currentOrder.createdAt.toDate().toLocaleDateString()} at ${current
                 <TabsTrigger value="notes" className="border">
                   <FileText className="h-3.5 mr-2 w-3.5" />
                   Notes
-                </TabsTrigger>
-                <TabsTrigger value="whatsapp" className="border">
-                  <IconBrandWhatsapp className="h-3.5 mr-2 w-3.5" />
-                  Whatsapp
                 </TabsTrigger>
               </TabsList>
               <CardContent className="flex-1 overflow-auto bg-white">

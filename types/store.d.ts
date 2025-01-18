@@ -56,6 +56,7 @@ export type Store = {
   employeesEmails?: string[];
   employees?: Employee[];
   integrations?: Integration[];
+  whatsappConfirmationMessage?: string;
 };
 
 export type Employee = {

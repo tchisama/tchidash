@@ -30,6 +30,22 @@ export type Permissions = {
     dataType: Customer;
     action: "view" | "create" | "update" | "delete";
   };
+  settings: {
+    dataType: null;
+    action: "view" | "update";
+  };
+  settings_security: {
+    dataType: null;
+    action: "view" | "update";
+  };
+  settings_integrations: {
+    dataType: null;
+    action: "view" | "update";
+  };
+  settings_advanced: {
+    dataType: null;
+    action: "view" | "update";
+  };
 };
 
 export type Role =
@@ -71,6 +87,10 @@ const ROLES: RolesWithPermissions = {
     messages: { view: true, create: true, update: true, delete: true },
     reviews: { view: true, create: true, update: true, delete: true },
     customers: { view: true, create: true, update: true, delete: true },
+    settings: { view: true, update: true },
+    settings_security: { view: true, update: true },
+    settings_integrations: { view: true, update: true },
+    settings_advanced: { view: true, update: true },
   },
   admin: {
     orders: { view: true, create: true, update: true, delete: true },
@@ -79,6 +99,7 @@ const ROLES: RolesWithPermissions = {
     messages: { view: true, create: true, update: true, delete: true },
     reviews: { view: true, create: true, update: true, delete: true },
     customers: { view: true, create: true, update: true, delete: true },
+    settings: { view: true, update: true },
   },
   order_manager: {
     orders: { view: true, create: true, update: true, delete: false },
