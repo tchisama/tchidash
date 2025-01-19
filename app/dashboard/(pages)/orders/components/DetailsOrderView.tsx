@@ -6,7 +6,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { ArrowRightIcon, Phone, QrCodeIcon, StarsIcon } from "lucide-react";
+import { ArrowRightIcon, QrCodeIcon, StarsIcon } from "lucide-react";
 import QRCode from "react-qr-code";
 import { useOrderStore } from "@/store/orders";
 import { StateChanger } from "./StateChanger";
@@ -23,13 +23,11 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import Image from "next/image";
-import { dbAddDoc, dbUpdateDoc } from "@/lib/dbFuntions/fbFuns";
-import { collection, doc, increment, Timestamp } from "firebase/firestore";
-import { db } from "@/firebase";
-import { useSession } from "next-auth/react";
+import CancelledCalls from "./CancelledCalls";
+import ScheduledOrdersDate from "./ScheduledOrdersDate";
 
 function DetailsOrderView() {
-  const { currentOrder, setCurrentOrderData } = useOrderStore();
+  const { currentOrder } = useOrderStore();
   const { store, storeId } = useStore();
 
   const { data: digylogData } = useQuery({
@@ -66,8 +64,6 @@ function DetailsOrderView() {
     staleTime: 1000 * 60 * 1,
   });
 
-  const { data: session } = useSession();
-
   return (
     store &&
     currentOrder && (
@@ -90,44 +86,9 @@ function DetailsOrderView() {
                 </PopoverContent>
               </Popover>
               <div className="flex gap-2">
-                {currentOrder.orderStatus == "cancelled" && (
-                  <Button
-                    onClick={() => {
-                      if (!currentOrder) return;
-                      if (!storeId) return;
-                      dbUpdateDoc(
-                        doc(db, "orders", currentOrder.id),
-                        {
-                          numberOfCalls: increment(1),
-                        },
-                        storeId,
-                        "",
-                      );
-                      dbAddDoc(
-                        collection(db, "notes"),
-                        {
-                          content: "CALL: a call was made to the customer",
-                          creator: session?.user?.email,
-                          createdAt: Timestamp.now(),
-                          details: {
-                            for: "order",
-                            orderId: currentOrder?.id,
-                          },
-                        },
-                        storeId,
-                        "",
-                      );
-                      setCurrentOrderData({
-                        ...currentOrder,
-                        numberOfCalls: (currentOrder.numberOfCalls || 0) + 1,
-                      });
-                    }}
-                    size={"sm"}
-                    variant={"outline"}
-                  >
-                    <Phone className="mr-2 h-4 w-4" />
-                    {currentOrder?.numberOfCalls ?? 0}
-                  </Button>
+                {currentOrder.orderStatus == "cancelled" && <CancelledCalls />}
+                {currentOrder.orderStatus == "scheduled" && (
+                  <ScheduledOrdersDate />
                 )}
                 <StateChanger
                   showNumberOfCalls={false}

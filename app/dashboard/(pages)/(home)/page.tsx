@@ -1,21 +1,16 @@
+"use client";
 
-"use client"
+import Link from "next/link";
+import { ArrowUpRight, Stars } from "lucide-react";
 
-
-
-import Link from "next/link"
-import {
-  ArrowUpRight,
-} from "lucide-react"
-
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -23,19 +18,20 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { useSession } from "next-auth/react"
-import { useQuery } from "@tanstack/react-query"
-import { dbGetDocs } from "@/lib/dbFuntions/fbFuns"
-import { collection, limit, orderBy, query, where } from "firebase/firestore"
-import { db } from "@/firebase"
-import { useStore } from "@/store/storeInfos"
-import { Order } from "@/types/order"
+} from "@/components/ui/table";
+import { useSession } from "next-auth/react";
+import { useQuery } from "@tanstack/react-query";
+import { dbGetDocs } from "@/lib/dbFuntions/fbFuns";
+import { collection, limit, orderBy, query, where } from "firebase/firestore";
+import { db } from "@/firebase";
+import { useStore } from "@/store/storeInfos";
+import { Order } from "@/types/order";
+import ScheduledOrdersTable from "./components/ScheduledOrdersTable";
 
 export default function Page() {
-  const {data:session} = useSession()
-  const {storeId} = useStore()
-  const {data:orders} = useQuery({
+  const { data: session } = useSession();
+  const { storeId } = useStore();
+  const { data: orders } = useQuery({
     queryKey: ["pending-orders"],
     queryFn: async () => {
       if (!storeId) return;
@@ -56,12 +52,13 @@ export default function Page() {
       );
       return data;
     },
-  })
+  });
   return (
     <main className="flex flex-1 flex-col gap-4  md:gap-8 ">
       <h1 className="text-4xl text-slate-800 capitalize font-bold tracking-tight">
         {/* // with emoji of hi */}
-        <span className="text-5xl">Hello</span><br />
+        <span className="text-5xl">Hello</span>
+        <br />
         {session?.user?.name} 👋
       </h1>
       {/* <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
@@ -119,12 +116,13 @@ export default function Page() {
         </Card>
       </div> */}
       <div className="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
-        <Card
-          className="xl:col-span-2" x-chunk="dashboard-01-chunk-4"
-        >
+        <Card className="xl:col-span-2" x-chunk="dashboard-01-chunk-4">
           <CardHeader className="flex flex-row items-center">
             <div className="grid gap-2">
-              <CardTitle>Pending Orders</CardTitle>
+              <CardTitle className="flex gap-2 items-center">
+                <Stars className="h-6 w-6" />
+                Pending Orders
+              </CardTitle>
               <CardDescription>
                 {orders?.length} pending orders waiting for your approval
               </CardDescription>
@@ -141,46 +139,38 @@ export default function Page() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Customer</TableHead>
-                  <TableHead className="">
-                    Address
-                  </TableHead>
+                  <TableHead className="">Address</TableHead>
                   <TableHead className="text-right">Amount</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {
-                  orders?.map((order) => (
-                    <TableRow key={order.id}>
-                      <TableCell>
-                        <div className="font-medium">
-                          {order.customer.name}
-                        </div>
-                        <div className="hidden text-sm text-muted-foreground md:inline">
-                          {order.customer.phoneNumber}
-                        </div>
-                      </TableCell>
-                      <TableCell className="font-sm">
-                        <div>
-                          {order.customer.shippingAddress.city}
-                        </div>
-                        <div className="hidden text-sm text-muted-foreground md:inline">
-                        {order.customer.shippingAddress.address.slice(0, 50)
-                        }{
-                          order.customer.shippingAddress.address.length > 50
-                          && "..."
-                        }</div>
-                      </TableCell>
-                      <TableCell className="text-right font-bold">
-                        {order.totalPrice} Dh
-                      </TableCell>
-                    </TableRow>
-                  ))
-                }
+                {orders?.map((order) => (
+                  <TableRow key={order.id}>
+                    <TableCell>
+                      <div className="font-medium">{order.customer.name}</div>
+                      <div className="hidden text-sm text-muted-foreground md:inline">
+                        {order.customer.phoneNumber}
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-sm">
+                      <div>{order.customer.shippingAddress.city}</div>
+                      <div className="hidden text-sm text-muted-foreground md:inline">
+                        {order.customer.shippingAddress.address.slice(0, 50)}
+                        {order.customer.shippingAddress.address.length > 50 &&
+                          "..."}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right font-bold">
+                      {order.totalPrice} Dh
+                    </TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </CardContent>
         </Card>
+        <ScheduledOrdersTable />
       </div>
     </main>
-  )
+  );
 }

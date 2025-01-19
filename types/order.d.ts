@@ -101,6 +101,7 @@ export type Order = {
   paymentInfo?: PaymentInfo;
   orderStatus: OrderStatus;
   numberOfCalls?: number;
+  scheduledDate?: Timestamp;
   createdAt: Timestamp;
   updatedAt?: Timestamp;
   storeId: string;

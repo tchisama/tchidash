@@ -1,12 +1,17 @@
 "use client";
-import { Check, Filter, PlusCircle, TicketsIcon } from "lucide-react";
+import {
+  Check,
+  CheckCircle,
+  Filter,
+  PlusCircle,
+  TicketsIcon,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { OrdersTable } from "./components/Table";
 import Link from "next/link";
 import OrderView from "./components/OrderView";
-// import Analytic from "./components/analytic";
 import { cn } from "@/lib/utils";
 import { useOrderStore } from "@/store/orders";
 import { useState } from "react";
@@ -53,6 +58,27 @@ export default function Page() {
     return <div>You dont have permission to view this page</div>;
   }
 
+  const handleStatusFilterChange = (statusName: string) => {
+    if (statusName === "all") {
+      // If "All" is selected, toggle between selecting all statuses and none
+      setFilter((prevFilter) => ({
+        ...prevFilter,
+        status:
+          prevFilter.status.length === orderStatusValuesWithIcon.length
+            ? []
+            : orderStatusValuesWithIcon.map((status) => status.name),
+      }));
+    } else {
+      // Toggle the selected status
+      setFilter((prevFilter) => ({
+        ...prevFilter,
+        status: prevFilter.status.includes(statusName)
+          ? prevFilter.status.filter((s) => s !== statusName)
+          : [...prevFilter.status, statusName],
+      }));
+    }
+  };
+
   return (
     <main
       className={cn(
@@ -61,7 +87,6 @@ export default function Page() {
       )}
     >
       <div className="grid duration-200 auto-rows-max items-start gap-4  lg:col-span-2">
-        {/* <Analytic /> */}
         <Analytic />
         <div className="">
           <div className="ml-auto mb-2 flex items-center gap-2">
@@ -77,17 +102,25 @@ export default function Page() {
                   <div className="p-1 px-2">
                     <Label>Order Status</Label>
                   </div>
-                  {orderStatusValuesWithIcon.map((status) => (
+                  {/* Add "All" option */}
+                  <Button
+                    onClick={() => handleStatusFilterChange("all")}
+                    size="sm"
+                    variant="outline"
+                    className="w-full gap-2 justify-start text-left shadow-none border font-normal"
+                  >
+                    <CheckCircle className="h-4 w-4" />
+                    All
+                    {filter.status.length ===
+                      orderStatusValuesWithIcon.length && (
+                      <Check className="ml-auto h-4 w-4" />
+                    )}
+                  </Button>
+                  <div className="border-t border-gray-200 my-2"></div>
+                  {[...orderStatusValuesWithIcon].map((status) => (
                     <Button
                       key={status.name}
-                      onClick={() => {
-                        setFilter({
-                          ...filter,
-                          status: filter.status.includes(status.name)
-                            ? filter.status.filter((s) => s !== status.name)
-                            : [...filter.status, status.name],
-                        });
-                      }}
+                      onClick={() => handleStatusFilterChange(status.name)}
                       style={{
                         background: status.color + "50",
                         borderColor: status.color + "30",
