@@ -61,19 +61,33 @@ export async function POST(request: NextRequest) {
   if (!storeId) {
     return NextResponse.json({ error: "storeId is required" }, { status: 400 });
   }
-  const store = (await getDoc(
+  const store = await getDoc(
     doc(db, "stores", storeId)
-  )).data() as Store;
+  ).then((doc) => {
+    if (doc.exists()) {
+      return doc.data() as Store;
+    }
+  })
   let orderSequence ;
   if(update){
     orderSequence = body.sequence
   }else{
-    orderSequence = store?.sequences?.orders || 0;
-    updateDoc(doc(db, "stores", storeId), {
-      sequences: {
-        orders: increment(1),
-      },
-    })
+    orderSequence = (store?.sequences?.orders || 0);
+    if(!store?.sequences?.orders){
+      updateDoc(doc(db, "stores", storeId), {
+        sequences: {
+          orders: 1,
+        },
+      })
+    }else{
+      updateDoc(doc(db, "stores", storeId), {
+        sequences: {
+          orders: orderSequence + 1,
+        },
+      }).then(() => {
+        console.log("Sequence up successfully");
+      })
+    }
   }
 
 
