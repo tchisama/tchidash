@@ -71,7 +71,7 @@ const OrderActions = () => (
   </Card>
 )
 
-const CustomerInfo = ( order : Order) => {
+const CustomerInfo = (order: Order) => {
   const customerName = order.customer.name
   const email = order.customer.email
   const phone = order.customer.phoneNumber
@@ -125,30 +125,33 @@ const OrderSummary = (order: Order) => {
     </CardHeader>
     <CardContent>
       <div className="space-y-2">
-        <div className="flex justify-between">
+        {/* <div className="flex justify-between">
           <span>Payment Method:</span>
           <span>{paymentMethod}</span>
         </div>
         <div className="flex justify-between">
           <span>Shipping Method:</span>
           <span>{shippingMethod}</span>
-        </div>
+        </div> */}
         <div className="flex justify-between">
           <span>Total Items:</span>
           <span>{items.reduce((sum, item) => sum + item.quantity, 0)}</span>
         </div>
         <div className="flex justify-between">
           <span>Subtotal:</span>
-          <span>${(total - 10).toFixed(2)}</span>
+          <span>{(total - order.shippingInfo.cost).toFixed(2)} Dh</span>
         </div>
         <div className="flex justify-between">
           <span>Shipping:</span>
-          <span>$10.00</span>
+          <span>{
+            order.shippingInfo.cost
+          } Dh
+          </span>
         </div>
         <Separator />
         <div className="flex justify-between font-semibold">
           <span>Total Amount:</span>
-          <span>${total.toFixed(2)}</span>
+          <span className="text-xl">{total.toFixed(2)} Dh</span>
         </div>
       </div>
     </CardContent>
@@ -177,7 +180,7 @@ const OrderItemsTable = ({ items }: { items: OrderItem[] }) => (
             <TableRow key={item.id}>
               <TableCell>
                 <Image
-                  src={item.imageUrl??""}
+                  src={item.imageUrl ?? ""}
                   alt={item.title}
                   width={75}
                   height={75}
@@ -185,9 +188,9 @@ const OrderItemsTable = ({ items }: { items: OrderItem[] }) => (
                 />
               </TableCell>
               <TableCell className="font-medium">{item.title}</TableCell>
-              <TableCell>${item.price.toFixed(2)}</TableCell>
+              <TableCell>{item.price.toFixed(2)} Dh</TableCell>
               <TableCell>{item.quantity}</TableCell>
-              <TableCell>${item.totalPrice.toFixed(2)}</TableCell>
+              <TableCell>{item.totalPrice.toFixed(2)} Dh</TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -227,7 +230,7 @@ const OrderCart = ({ isCartOpen, setIsCartOpen, order }: { isCartOpen: boolean, 
                 <h3 className="font-semibold">{item.title}</h3>
                 <p className="text-sm text-gray-500">Quantity: {item.quantity}</p>
               </div>
-              <p className="font-semibold">${item.totalPrice.toFixed(2)}</p>
+              <p className="font-semibold">{item.totalPrice.toFixed(2)} Dh</p>
             </div>
             {/* <p className={`text-sm mt-2 ${getItemStatusColor(item.status)}`}>{item.status}</p> */}
           </div>
@@ -240,14 +243,14 @@ const OrderCart = ({ isCartOpen, setIsCartOpen, order }: { isCartOpen: boolean, 
         </div>
         <div className="flex justify-between items-center mb-2">
           <span>Shipping:</span>
-          <span>$10.00</span>
+          <span>{order.shippingInfo.cost} Dh</span>
         </div>
         <Separator className="my-2" />
         <div className="flex justify-between items-center mb-4">
           <span className="font-semibold">Total:</span>
           <span className="font-semibold text-xl">{
             order.shippingInfo.cost
-            } Dh</span>
+          } Dh</span>
         </div>
         <Button className="w-full">Checkout</Button>
       </div>
@@ -271,10 +274,10 @@ export function OrderView({ order }: { order: Order }) {
 
           <div className="flex gap-2">
             {currentOrder.orderStatus == "cancelled" && <CancelledCalls />}
-              {currentOrder.orderStatus == "scheduled" && (
-                <ScheduledOrdersDate />
-              )}
-          <StateChanger order={order} state={order.orderStatus} showNumberOfCalls />
+            {currentOrder.orderStatus == "scheduled" && (
+              <ScheduledOrdersDate />
+            )}
+            <StateChanger order={order} state={order.orderStatus} showNumberOfCalls />
           </div>
         </div>
 

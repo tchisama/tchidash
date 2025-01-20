@@ -31,61 +31,71 @@ import {
   UserRoundCheck,
   UserRoundX,
 } from "lucide-react";
+import next from "next";
 
 export const orderStatusValuesWithIcon = [
   {
     name: "pending",
     icon: <Stars className="h-4 w-4" />,
-    color: "#a3b18a",
+    color: "#adc178",
     effectStock: false,
+    next:["confirmed","scheduled","cancelled","fake"]
   },
   {
     name: "confirmed",
     icon: <UserRoundCheck className="h-4 w-4" />,
     color: "#3a86ff",
     effectStock: true,
+    next:["packed","cancelled","scheduled","pending"]
   },
   {
     name: "packed",
     icon: <PackageCheck className="h-4 w-4" />,
     color: "#5c374c",
     effectStock: true,
+    next:["shipped","cancelled","scheduled","pending"]
   },
   {
     name: "shipped",
     icon: <Truck className="h-4 w-4" />,
     color: "#5a189a",
     effectStock: true,
+    next:["delivered","cancelled","scheduled","pending","returned"]
   },
   {
     name: "delivered",
     icon: <MapPinCheckInside className="h-4 w-4" />,
     color: "#386641",
     effectStock: true,
+    next:[]
   },
   {
     name: "scheduled",
     icon: <Clock className="h-4 w-4" />,
     color: "#f8961e",
     effectStock: true,
+    next:["packed","cancelled"]
   },
   {
     name: "cancelled",
     icon: <PhoneOff className="h-4 w-4" />,
     color: "#fb5607",
     effectStock: false,
+    next:[]
   },
   {
     name: "returned",
     icon: <Undo className="h-4 w-4" />,
     color: "#e63946",
     effectStock: false,
+    next:[]
   },
   {
     name: "fake",
     icon: <UserRoundX className="h-4 w-4" />,
     color: "#6d6a75",
     effectStock: false,
+    next:["confirmed"]
   },
 ];
 
@@ -156,11 +166,11 @@ export function StateChanger({
               background:
                 orderStatusValuesWithIcon.find(
                   (status) => status.name === state,
-                )?.color + "50",
+                )?.color + "90",
               borderColor:
                 orderStatusValuesWithIcon.find(
                   (status) => status.name === state,
-                )?.color + "30",
+                )?.color + "90",
               color: "#000a",
             }}
             size="sm"
@@ -200,11 +210,19 @@ export function StateChanger({
               <DropdownMenuItem
                 key={status.name}
                 style={{
-                  background: status.color + "50",
-                  borderColor: status.color + "30",
-                  color: "#000a",
+                  background: status.color + "80",
+                  borderColor: status.color + "90",
+                  color:"#000a",
+                  // opacity: !orderStatusValuesWithIcon.find(
+                  //   (s) => s.name === state,
+                  // )?.next.includes(status.name) ? "0.3" : "1",
                 }}
                 className="py-1 mt-[2px] cursor-pointer border"
+                disabled={false
+                  // !orderStatusValuesWithIcon.find(
+                  //   (s) => s.name === state,
+                  // )?.next.includes(status.name)
+                }
                 onClick={async () => {
                   setActionLoading(true);
                   setState(status.name as OrderStatus);
