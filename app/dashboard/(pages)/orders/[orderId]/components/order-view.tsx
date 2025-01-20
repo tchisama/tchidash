@@ -112,8 +112,8 @@ const CustomerInfo = (order: Order) => {
 }
 
 const OrderSummary = (order: Order) => {
-  const paymentMethod = order.paymentMethod
-  const shippingMethod = order.shippingInfo.method
+  // const paymentMethod = order.paymentMethod
+  // const shippingMethod = order.shippingInfo.method
   const items = order.items
   const total = order.totalPrice
 

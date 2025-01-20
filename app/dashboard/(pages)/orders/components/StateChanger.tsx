@@ -31,7 +31,6 @@ import {
   UserRoundCheck,
   UserRoundX,
 } from "lucide-react";
-import next from "next";
 
 export const orderStatusValuesWithIcon = [
   {
