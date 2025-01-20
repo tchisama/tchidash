@@ -139,12 +139,12 @@ const OrderSummary = (order: Order) => {
         </div>
         <div className="flex justify-between">
           <span>Subtotal:</span>
-          <span>{(total - order.shippingInfo.cost).toFixed(2)} Dh</span>
+          <span>{(total - (order.shippingInfo.cost??0)).toFixed(2)} Dh</span>
         </div>
         <div className="flex justify-between">
           <span>Shipping:</span>
           <span>{
-            order.shippingInfo.cost
+            order.shippingInfo.cost ??0
           } Dh
           </span>
         </div>

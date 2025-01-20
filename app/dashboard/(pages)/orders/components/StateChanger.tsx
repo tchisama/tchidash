@@ -180,7 +180,9 @@ export function StateChanger({
               orderStatusValuesWithIcon.find((status) => status.name === state)
                 ?.icon
             }
+            <div className="capitalize">
             {state}
+            </div>
             {
               state == "cancelled" && showNumberOfCalls && order?.numberOfCalls  &&
               <div className="bg-white/30 border border-red-600/30 w-6 h-5  rounded-full flex justify-center items-center">{
@@ -201,7 +203,7 @@ export function StateChanger({
             )}
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" side="right">
+        <DropdownMenuContent className="shadow-2xl" align="start" side="right">
           <DropdownMenuLabel>Order Status</DropdownMenuLabel>
           <DropdownMenuSeparator />
           {orderStatusValuesWithIcon.map((status) => (
@@ -216,7 +218,7 @@ export function StateChanger({
                   //   (s) => s.name === state,
                   // )?.next.includes(status.name) ? "0.3" : "1",
                 }}
-                className="py-1 mt-[2px] cursor-pointer border"
+                className="py-1 rounded-sm mt-[1px] cursor-pointer border"
                 disabled={false
                   // !orderStatusValuesWithIcon.find(
                   //   (s) => s.name === state,
@@ -278,7 +280,9 @@ export function StateChanger({
                 }}
               >
                 <span className="mr-2">{status.icon}</span>
+                <span className="capitalize">
                 {status.name}
+                </span>
               </DropdownMenuItem>
               {(status.name == "delivered" || status.name == "pending") && (
                 <DropdownMenuSeparator className="w-full h-[2px]" />
