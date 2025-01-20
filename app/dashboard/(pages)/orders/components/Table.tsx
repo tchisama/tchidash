@@ -212,6 +212,7 @@ export function OrdersTable({
                 />
               </div>
             </TableHead>
+            <TableHead className="">Sequence</TableHead>
             <TableHead className="">Product</TableHead>
             <TableHead>Customer</TableHead>
             <TableHead className="">Status</TableHead>
@@ -224,6 +225,7 @@ export function OrdersTable({
         <TableBody>
           {orders?.map((order) => (
             <TableRow
+              onDoubleClick={() => window.open(`/dashboard/orders/${order?.sequence}`)}
               key={order.id}
               onClick={() => setCurrentOrder(order.id)}
               className={cn(
@@ -250,6 +252,9 @@ export function OrdersTable({
                     checked={selectedOrder.includes(order.id)}
                   />
                 </div>
+              </TableCell>
+              <TableCell>
+                #{order?.sequence ?? "-"} 
               </TableCell>
               <TableCell className="w-[130px]">
                 <div className="relative h-10 w-20">

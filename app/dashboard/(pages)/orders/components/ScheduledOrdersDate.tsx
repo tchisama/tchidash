@@ -40,6 +40,7 @@ function ScheduledOrdersDate() {
               "w-fit justify-start text-left font-normal",
               !date && "text-muted-foreground",
             )}
+            size={"sm"}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
             {date ? format(date, "PPP") : <span>Pick a date</span>}

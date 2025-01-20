@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
+  ArrowUpRight,
   Bike,
   Box,
   Copy,
@@ -146,6 +147,10 @@ function OrderView() {
                   {/*                   > */}
                   {/*                     Victor It */}
                   {/*                   </Button> */}
+
+                  <Button className="h-8 w-8" variant={"outline"} size="icon" onClick={() => router.push(`/dashboard/orders/${currentOrder?.sequence}`)}>
+                      <ArrowUpRight className="h-4 w-4" />
+                  </Button>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button size="icon" variant="outline" className="h-8 w-8">

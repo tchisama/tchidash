@@ -88,6 +88,7 @@ export interface Note {
 
 // Main Order type
 export type Order = {
+  sequence: number;
   id: string;
   customer: CustomerInfo; // Customer details for the order
   items: OrderItem[]; // List of ordered items

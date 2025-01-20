@@ -9,6 +9,7 @@ import {
   increment,
   setDoc,
   getDoc,
+  updateDoc,
 } from "firebase/firestore";
 import { dbAddDoc, dbGetDocs, dbUpdateDoc } from "@/lib/dbFuntions/fbFuns";
 import { db } from "@/firebase"; // Adjust this import based on your Firebase setup
@@ -16,6 +17,7 @@ import { Order } from "@/types/order";
 import { OrderItem } from "@/types/order";
 import { Customer } from "@/types/customer";
 import axios from "axios";
+import { Store } from "@/types/store";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -53,11 +55,37 @@ export async function POST(request: NextRequest) {
 
   // create New Order
   const body = await request.json();
+
+
+  // store 
+  if (!storeId) {
+    return NextResponse.json({ error: "storeId is required" }, { status: 400 });
+  }
+  const store = (await getDoc(
+    doc(db, "stores", storeId)
+  )).data() as Store;
+  let orderSequence ;
+  if(update){
+    orderSequence = body.sequence
+  }else{
+    orderSequence = store?.sequences?.orders || 0;
+    updateDoc(doc(db, "stores", storeId), {
+      sequences: {
+        orders: increment(1),
+      },
+    })
+  }
+
+
+
   const order = {
     ...body,
+    sequence: orderSequence,
     storeId,
     createdAt: Timestamp.now(),
   } as Order;
+
+
 
   if (!order.customer.firstName)
     return NextResponse.json(
