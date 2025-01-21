@@ -1,3 +1,4 @@
+"use client"
 import React from "react";
 import { Phone } from "lucide-react";
 import { collection, doc, increment, Timestamp } from "firebase/firestore";
@@ -6,10 +7,12 @@ import { useStore } from "@/store/storeInfos";
 import { useOrderStore } from "@/store/orders";
 import { db } from "@/firebase";
 import { Button } from "@/components/ui/button";
+import { useSession } from "next-auth/react";
 
 function CancelledCalls() {
   const { storeId } = useStore();
   const { currentOrder, setCurrentOrderData } = useOrderStore();
+  const { data:session } = useSession();
   return (
     <div>
       <Button

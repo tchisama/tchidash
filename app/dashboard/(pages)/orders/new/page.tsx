@@ -35,6 +35,7 @@ const defaultOrder: Order = {
       city: "", // Placeholder city
     },
   },
+  sequence: 0, // Placeholder sequence number
   items: [], // Empty array for ordered items
   totalItems: 0, // Default to zero items
   subtotal: 0, // Default subtotal as 0

@@ -3,8 +3,13 @@ import {
   Check,
   CheckCircle,
   Filter,
+  HashIcon,
+  PhoneIcon,
   PlusCircle,
+  SearchIcon,
   TicketsIcon,
+  UserIcon,
+  XIcon,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -14,7 +19,7 @@ import Link from "next/link";
 import OrderView from "./components/OrderView";
 import { cn } from "@/lib/utils";
 import { useOrderStore } from "@/store/orders";
-import { useState } from "react";
+import {  useState } from "react";
 import {
   Select,
   SelectContent,
@@ -36,7 +41,8 @@ import { usePermission } from "@/hooks/use-permission";
 export default function Page() {
   const { currentOrder, selectedOrder } = useOrderStore();
   const [pageSize, setPageSize] = useState(25);
-  const [filter, setFilter] = useState({
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState<{ status: string[]; search: string, searchBy: "Name" | "Number" | "Order ID" }>({
     status: [
       "pending",
       "confirmed",
@@ -49,7 +55,10 @@ export default function Page() {
       "fake",
     ],
     search: "",
+    searchBy: "Name",
   });
+
+
 
   // Check if the user has view permission
   const hasViewPermission = usePermission();
@@ -150,17 +159,63 @@ export default function Page() {
                   <SelectItem value="100">100</SelectItem>
                 </SelectContent>
               </Select>
+              <div className="flex flex-row-reverse">
+                <Button
+                variant={"outline"}
+                  onClick={() => {
+                    setFilter((prev) => ({ ...prev, search: search }));
+                  }}
+                  className="rounded-l-none border-l-0"
+                >
+                  <SearchIcon className="h-4 w-4" />
+                </Button>
+              <Select
+                defaultValue={filter.searchBy}
+                onValueChange={(value: "Name" | "Number" | "Order ID") => setFilter((prev) => ({ ...prev, searchBy: value }))}
+              >
+  <SelectTrigger className="w-fit rounded-none border-l-0 bg-white flex gap-2">
+    <SelectValue placeholder="Search By" />
+  </SelectTrigger>
+  <SelectContent className="bg-white">
+    {
+    [
+      {name: "Name", icon: UserIcon, selected:true},
+      {name: "Number", icon: PhoneIcon},
+      {name: "Order ID", icon: HashIcon},
+    ].map((item) => (
+      <SelectItem
+       className="bg-white" key={item.name} value={item.name}>
+        <div className="flex items-center gap-2">
+          <item.icon className="h-4 w-4" />
+          {item.name}
+        </div>
+      </SelectItem>
+    ))
+    }
+  </SelectContent>
+</Select>
+            <div className="relative">
               <Input
                 placeholder="Search"
-                value={filter.search}
-                className="min-w-[200px] bg-white"
-                onChange={(e) => {
-                  setFilter({
-                    ...filter,
-                    search: e.target.value,
-                  });
-                }}
+                className="min-w-[200px] rounded-r-none bg-white"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
               />
+              {
+                search &&
+              <Button
+                onClick={() => {
+                  setSearch("");
+                  setFilter((prev) => ({ ...prev, search: "" }));
+                }}
+               size={"icon"} variant={"secondary"}  className="absolute border w-6 h-6 right-2 top-1/2 -translate-y-1/2  border-l-0">
+                <XIcon className="h-4 w-4" />
+              </Button>
+              }
+            </div>
+
+
+              </div>
             </div>
 
             <div className="flex ml-auto flex-col gap-2 min-w-[100px]">

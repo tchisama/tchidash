@@ -29,6 +29,8 @@ import {
 import {
   and,
   collection,
+  getDocs,
+  or,
   query,
   QueryFilterConstraint,
   where,
@@ -36,7 +38,6 @@ import {
 import { db } from "@/firebase";
 import { StateChanger } from "./StateChanger";
 import { Skeleton } from "@/components/ui/skeleton";
-import { trackUserUsage } from "@/lib/queries/usage";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import NoteViewer from "./NoteViewer";
@@ -50,7 +51,7 @@ export function OrdersTable({
 }: {
   pageSize: number;
   setPageSize: React.Dispatch<React.SetStateAction<number>>;
-  filter: { status: string[]; search: string };
+  filter: { status: string[]; search: string, searchBy: "Name" | "Number" | "Order ID" };
 }) {
   const { storeId } = useStore();
   const {
@@ -71,29 +72,42 @@ export function OrdersTable({
       const wheres: QueryFilterConstraint[] = [];
       wheres.push(where("storeId", "==", storeId));
       wheres.push(where("orderStatus", "in", filter.status));
-      // if (filter.search) {
-      // const searchTermLower = filter.search.toLowerCase();
-      //   wheres.push(
-      //     or(
-      //       where("customer.name", ">=", searchTermLower),
-      //       where("customer.name", "<=", searchTermLower + "\uf8ff"),
-      //       where("customer.phoneNumber", ">=", searchTermLower),
-      //       where("customer.phoneNumber", "<=", searchTermLower + "\uf8ff")
-      //     )
-      //   );
-      // }
+
+
+
+    if (filter.search) {
+      if (filter.searchBy === "Name") {
+        wheres.push(or(
+          where("customer.firstName", "==", filter.search),
+          where("customer.lastName", "==", filter.search),
+          where("customer.name", "==", filter.search)
+        ));
+      } else if (filter.searchBy === "Number") {
+        wheres.push(where("customer.phoneNumber", "==", filter.search));
+      } else if (filter.searchBy === "Order ID") {
+        wheres.push(where("sequence", "==", parseInt(filter.search)));
+      }
+    }
+
+
 
       if (!storeId) return null;
       const queryBuilder = query(collection(db, "orders"), and(...wheres));
-      const response = await getPage(queryBuilder, currentPage, pageSize,storeId);
-      trackUserUsage({
-        userEmail: "",
-        storeId: storeId,
-        action: "download",
-        data: response.documents,
-        clctn: "orders",
-        endpoint: "/api/orders",
-      });
+      
+      let response
+      if(filter.search){
+        response = await getDocs(queryBuilder).then((snapshot) => ({
+          documents: snapshot.docs.map((doc) => {
+            return doc.data() as Order;
+          }),
+          currentPage: 1,
+          totalPages: 1,
+          pageSize: pageSize,
+          totalCount: snapshot.docs.length,
+        }));
+      }else{
+       response = await getPage(queryBuilder, currentPage, pageSize,storeId)
+      }
       return response;
     },
     refetchOnWindowFocus: false,

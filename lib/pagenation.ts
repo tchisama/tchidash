@@ -53,6 +53,7 @@ export async function getPage(
     // Get the document to start after
     const snapshot = await getDocs(query(baseQuery, orderBy(orderByField, 'desc'), limit(documentsToSkip)));
     const lastVisibleDoc = snapshot.docs[snapshot.docs.length - 1];
+    console.log(snapshot);
     
     // Add startAfter to the query constraints
     queryConstraints.push(startAfter(lastVisibleDoc));
@@ -60,6 +61,7 @@ export async function getPage(
 
   // Execute the query
   const finalQuery = query(baseQuery, ...queryConstraints);
+  // const finalQuery = baseQuery;
   const querySnapshot = await dbGetDocs(finalQuery,storeId,"");
 
   // Convert the query snapshot to an array of documents
