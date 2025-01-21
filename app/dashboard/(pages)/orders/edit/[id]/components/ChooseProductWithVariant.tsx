@@ -78,6 +78,8 @@ function ChooseProductWithVariant({ item }: { item: OrderItem }) {
   };
 
   useEffect(() => {
+    if(!selectedProduct) return;
+    // if(!selectedVariant) return;
     setNewOrder({
       ...newOrder,
       items: newOrder?.items.map((itm) => {
@@ -147,10 +149,7 @@ function ChooseProductWithVariant({ item }: { item: OrderItem }) {
             />
           )}
         </div>
-        {selectedProduct ? selectedProduct.title : "Choose a product"}
-        {selectedVariant
-          ? ` ( ${selectedProduct?.variants?.find((variant) => variant.id === selectedVariant)?.title} )`
-          : ""}
+        {item.title ?? "Choose a product"}
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>

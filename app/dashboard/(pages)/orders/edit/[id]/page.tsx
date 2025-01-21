@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,24 +11,45 @@ import axios from "axios";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 import { Order } from "@/types/order";
-import { Timestamp } from "firebase/firestore";
+import { collection, deleteDoc, getDocs, query, Timestamp, where } from "firebase/firestore";
 import { useOrderStore } from "@/store/orders";
 import ItemsTable from "./components/ItemsTable";
 import { getTotalPriceFromItem } from "@/lib/orders";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useStore } from "@/store/storeInfos";
 import { useSession } from "next-auth/react";
 import { toast } from "@/hooks/use-toast";
+import { useQuery } from "@tanstack/react-query";
+import { db } from "@/firebase";
 
 
 export default function CreateOrder() {
   const { newOrder: order, setNewOrder: setOrder } = useOrderStore();
+  const {id} = useParams<{id: string}>();
   const { storeId, store } = useStore();
   const { data: session } = useSession();
-  const {currentOrder} = useOrderStore();
-  useEffect(() => {
-    setOrder(currentOrder);
-  }, [setOrder, currentOrder]);
+
+
+
+  const {  } = useQuery({
+    queryKey: ["order", storeId, id],
+    queryFn: async () => {
+      if (!storeId) return;
+      if( !id) return;
+      const o = await getDocs(
+        query(collection(db, "orders"), where("storeId", "==", storeId),
+        where("sequence", "==", parseInt(id))
+        ),
+      ).then(async (response) => {
+        const data = response.docs.map((doc) => ({ ...doc.data(), id: doc.id }) as Order);
+        setOrder(data[0]);
+        return data[0];
+      })
+      return o;
+    },
+  });
+
+
 
   const router = useRouter();
 
@@ -59,8 +80,14 @@ export default function CreateOrder() {
   };
 
   const handleSubmit = async () => {
-    console.log(order);
-    if (!order) return;
+    // get all the inventory items and delete them before creating new ones
+    if(!order) return;
+    const inventoryItems =await getDocs(query(collection(db, "inventoryItems"), where("orderId", "==", order.id)));
+    inventoryItems.forEach(async (doc) => {
+      await deleteDoc(doc.ref);
+    });
+
+
     if (!storeId) return;
     if (!session) return;
     if (!session.user?.email) return;
@@ -100,7 +127,7 @@ export default function CreateOrder() {
     axios
       .post("/api/orders?storeId=" + storeId + "&update=true", {
         ...orderForUpdate,
-        createdAt: currentOrder?.createdAt,
+        createdAt: order?.createdAt,
         updatedAt: Timestamp.now(),
         }
         )

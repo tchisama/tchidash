@@ -199,7 +199,7 @@ function OrderView() {
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => {
-                          router.push(`/dashboard/orders/edit`);
+                          router.push(`/dashboard/orders/edit/${currentOrder?.sequence}`);
                         }}
                       >
                         <Edit className="h-3.5 w-3.5 mr-2" />

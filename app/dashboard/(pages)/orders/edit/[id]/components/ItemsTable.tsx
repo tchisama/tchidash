@@ -107,10 +107,10 @@ const ItemRow = ({ item }: { item: OrderItem }) => {
   const { data: stock } = useQuery({
     queryKey: ["stock", item.productId, item.variantId, storeId],
     queryFn: async () => {
-      if (!products) return 0;
-      if (!storeId) return 0;
+      if (!products) return ;
+      if (!storeId) return ;
       const product = products?.find((p) => p.id === item.productId);
-      if (!product) return 0;
+      if (!product) return ;
       if (product.variantsAreOneProduct || !product.variants) {
         return getStock(storeId, product);
       } else {
