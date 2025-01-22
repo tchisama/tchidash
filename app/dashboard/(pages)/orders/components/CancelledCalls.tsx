@@ -8,6 +8,7 @@ import { useOrderStore } from "@/store/orders";
 import { db } from "@/firebase";
 import { Button } from "@/components/ui/button";
 import { useSession } from "next-auth/react";
+import { createNotification } from "@/lib/utils/functions/notifications";
 
 function CancelledCalls() {
   const { storeId } = useStore();
@@ -27,6 +28,18 @@ function CancelledCalls() {
             storeId,
             "",
           );
+
+                createNotification({
+                    storeId: storeId,
+                    user: session?.user?.name ?? "",
+                    email: session?.user?.email ?? "",
+                    action: `called`,
+                    target: `customer ${currentOrder?.customer?.name} for order order:#${currentOrder?.sequence}`,
+                    image: session?.user?.image ?? "",
+                    id:"",
+                    createdAt: Timestamp.now(),
+                    seen:[],
+                  })
           dbAddDoc(
             collection(db, "notes"),
             {

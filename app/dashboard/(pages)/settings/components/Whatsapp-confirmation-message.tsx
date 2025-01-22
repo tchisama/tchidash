@@ -30,6 +30,9 @@ function WhatsappConfirmationMessage() {
   const { store } = useStore();
   const [saved, setSaved] = React.useState(false);
 
+
+
+
   useEffect(() => {
     if (store) {
       setConfirmationMessage(store?.whatsappConfirmationMessage ?? "");
@@ -95,6 +98,7 @@ function WhatsappConfirmationMessage() {
                     .replaceAll("{{address}}", demoData.address)
                     .replaceAll("{{city}}", demoData.city)
                     .replaceAll("{{total_price}}", demoData.total_price)
+                    .replaceAll("{{total_items}}", "2")
                     .replaceAll("\n", "<br />")
                     // replace **something** with <strong>something</strong>
                     .replaceAll(/\*(.*?)\*/g, "<strong>$1</strong>"),

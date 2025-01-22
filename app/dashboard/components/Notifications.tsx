@@ -5,15 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { db } from "@/firebase";
 import { useStore } from "@/store/storeInfos";
-import {  useQuery, useQueryClient } from "@tanstack/react-query";
-import { collection, getDocs, query, where, orderBy, limit } from "firebase/firestore";
-import { Bell } from "lucide-react";
+import {   useQueryClient } from "@tanstack/react-query";
+import { collection, query, where, orderBy, limit, onSnapshot } from "firebase/firestore";
+import { Bell, BellIcon } from "lucide-react";
 import { useSession } from "next-auth/react";
 import type { Notification as NotificationType } from "@/types/notification";
 import Image from "next/image";
 import { timeSince } from "@/lib/utils/functions/date";
-import React from "react";
+import React, { useEffect } from "react";
 import { markNotificationAsRead } from "@/lib/utils/functions/notifications";
+import { usePermission } from "@/hooks/use-permission";
 
 
 function Dot({ className }: { className?: string }) {
@@ -42,77 +43,69 @@ function Notification() {
   const email = session?.user?.email;
   
   const queryClient = useQueryClient();
+  const [notifications, setNotifications] = React.useState<NotificationType[] | undefined>(undefined);
 
 
-  const {data: notifications, isLoading} = useQuery({
-    queryKey:["notifications", storeId, numberOfNotifications],
-    queryFn: async () => {
-      if (!storeId) return;
-      const notifications = await getDocs(query(
-        collection(db, "notifications"),
-        where("storeId", "==", storeId),
-        orderBy("createdAt", "desc"),
-        limit(numberOfNotifications)
-      )).then((response) => {
-        return response.docs.map((doc) => ({...doc.data(),id: doc.id}) as NotificationType);
-      });
-      if (!notifications) return [];
-      if (!email) return notifications;
-      setUnreadCount(
-        notifications.filter((notification) => !notification.seen.includes(email)).length
-      );
-      // console.log(notifications);
-      return notifications ?? [];
+useEffect(() => {
+    if (!storeId) return;
+
+    // Set up the real-time listener
+    const q = query(
+      collection(db, "notifications"),
+      where("storeId", "==", storeId),
+      orderBy("createdAt", "desc"),
+      limit(numberOfNotifications)
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const data = snapshot.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      })) as NotificationType[];
+
+      // Update the React Query cache
+      setNotifications(data);
+
+      // Update unread count if email is provided
+    });
+
+    // Clean up the listener on unmount
+    return () => unsubscribe();
+  }, [storeId, email, numberOfNotifications, queryClient]);
+
+
+  useEffect(() => {
+    if (!notifications) return;
+    if (email) {
+      const unreadCount = notifications.filter((notification) => !notification.seen?.includes(email)).length;
+      setUnreadCount(unreadCount); // Assuming setUnreadCount is defined elsewhere
     }
-  })
+  }, [notifications, email]);
+
+
+
 
   const handleMarkAllAsRead = () => {
     if (!email || !storeId) return;
 
     // mark all notifications as read in the backend
     notifications?.forEach((notification) => {
-      if (!notification.seen.includes(email)) {
-        markNotificationAsRead(notification.id, email);
+      if (!notification.seen.includes(email??"")) {
+        markNotificationAsRead(notification.id, email??"");
       }
     });
-    // Mark all notifications as read
-    queryClient.setQueryData(["notifications", storeId, numberOfNotifications], (oldData: NotificationType[] | undefined) => {
-      if (!oldData) return [];
-
-      return oldData.map((notification) => ({
-        ...notification,
-        seen: [...(notification.seen ?? []), email], // Add email to the `seen` array
-      }));
-    });
-    setUnreadCount(0);
-
-    // Optionally, you can also update the backend to mark all notifications as read
-    // await markAllNotificationsAsRead(storeId, email);
   };
 
   const handleNotificationClick = (id: string) => {
     if (!email || !storeId) return;
-
-    // Mark the notification as read in the backend
     markNotificationAsRead(id, email); // Assuming markNotificationAsRead is defined elsewhere
-
-    // Update the local cache
-    queryClient.setQueryData(["notifications", storeId, numberOfNotifications], (oldData: NotificationType[] | undefined) => {
-      if (!oldData) return [];
-
-      return oldData.map((notification) => {
-        if (notification.id === id) {
-          return {
-            ...notification,
-            seen: [...(notification.seen ?? []), email], // Add email to the `seen` array
-          };
-        }
-        return notification;
-      });
-    });
-    setUnreadCount((count) => count - 1);
   };
 
+  const hasViewPermission = usePermission();
+
+  if (!hasViewPermission("notifications", "view")) {
+    return <div></div>;
+  }
 
 
   return (
@@ -142,32 +135,46 @@ function Notification() {
           className="-mx-1 my-1 h-px bg-border"
         ></div>
         {
-          isLoading ? <div className="text-center py-2">Loading...</div>
+          notifications?.length === 0 && (
+            <div className="flex flex-col gap-2 opacity-30">
+              <BellIcon className="w-10 h-10 mx-auto mt-8" />
+            <div className="text-center py-2">No notifications</div>
+            </div>
+          )
+        }
+        {
+          false ? <div className="text-center py-2">Loading...</div>
           :
           notifications &&
         notifications.map((notification) => (
           <div
             key={notification.id}
+            style={{
+              opacity: notification.seen.includes(email ?? "") ? 0.7 : 1,
+            }}
             className="rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent"
           >
             <div className="relative flex items-start gap-3 pe-3">
               <Image
-                className="size-9 rounded-md"
+                className="size-10 rounded-md bg-slate-100 border"
                 src={notification.image}
-                width={32}
-                height={32}
-                alt={notification.user}
+                width={34}
+                height={34}
+                alt={""}
               />
               <div className="flex-1 space-y-1">
                 <button
                   className="text-left text-foreground/80 after:absolute after:inset-0"
                   onClick={() => handleNotificationClick(notification.id)}
                 >
-                  <span className="font-medium text-foreground hover:underline">
+                  <span className=" text-black hover:underline">
                     {notification.user}
                   </span>{" "}
+                  <span className="font-medium text-black ">
                   {notification.action}{" "}
-                  <span className="font-medium text-foreground hover:underline">
+                  </span>
+
+                  <span className=" text-slate-700 hover:underline">
                     {notification.target}
                   </span>
                   .
@@ -188,6 +195,8 @@ function Notification() {
           </div>
         ))}
         <div className="text-center py-2">
+          {
+            notifications && notifications.length > 0 &&
           <Button
             size="sm"
             variant="outline"
@@ -195,6 +204,7 @@ function Notification() {
           >
             Load more
           </Button>
+          }
         </div>
       </PopoverContent>
     </Popover>

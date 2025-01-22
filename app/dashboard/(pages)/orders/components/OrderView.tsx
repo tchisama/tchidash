@@ -39,7 +39,7 @@ import {
 } from "lucide-react";
 import { useOrderStore } from "@/store/orders";
 import { db } from "@/firebase";
-import { doc } from "firebase/firestore";
+import { doc, Timestamp } from "firebase/firestore";
 import { motion } from "framer-motion";
 import { dbDeleteDoc } from "@/lib/dbFuntions/fbFuns";
 import { useStore } from "@/store/storeInfos";
@@ -51,11 +51,16 @@ import DetailsOrderView from "./DetailsOrderView";
 import OrderNotes from "./OrderNotes";
 import { useRouter } from "next/navigation";
 import WhatsappCard from "./Whatsapp";
+import { createNotification } from "@/lib/utils/functions/notifications";
+import { useSession } from "next-auth/react";
+import useRenderWhatsappMessage from "@/lib/utils/functions/renderWhatsappMessage";
 function OrderView() {
   const { currentOrder, setCurrentOrder } = useOrderStore();
   const { storeId, store } = useStore();
   const { setDigylogOpen, setOrderToImageOpen } = useDialogs();
   const router = useRouter();
+  const {data:session} = useSession();
+  const renderMessage = useRenderWhatsappMessage();
 
   const deleteOrder = async (orderId: string) => {
     if (!currentOrder) return;
@@ -107,46 +112,6 @@ function OrderView() {
                   </CardDescription>
                 </div>
                 <div className="ml-auto flex items-center gap-1">
-                  {/*                   <Button */}
-                  {/*                     variant={"ghost"} */}
-                  {/*                     onClick={async () => { */}
-                  {/*                       if (!storeId) return; */}
-                  {/*                       const embedding = await generateEmbedding({ */}
-                  {/*                         text: ` */}
-                  {/* Order ID: ${currentOrder.id} */}
-                  {/* Customer Name: ${currentOrder.customer.name} */}
-                  {/* Customer Phone: ${currentOrder.customer.phoneNumber} */}
-                  {/* Customer Email: ${currentOrder.customer.email ?? "no email"} */}
-                  {/* Customer Address: ${currentOrder.customer.shippingAddress.address}, ${currentOrder.customer.shippingAddress.city}  */}
-                  {/* Order Total: ${currentOrder.totalPrice} Dh */}
-                  {/* Order Status: ${currentOrder.orderStatus} */}
-                  {/* Shipping Cost: ${currentOrder.shippingInfo.cost ?? "Free"} */}
-                  {/* Order Items: ${currentOrder.items.map((item) => ` - ${item.title} x ${item.quantity} = ${item.totalPrice} Dh`).join("\n")} */}
-                  {/* Order Note : ${currentOrder.note?.content ?? "No note"} */}
-                  {/* Created At: ${currentOrder.createdAt.toDate().toLocaleDateString()} at ${currentOrder.createdAt.toDate().toLocaleTimeString()} */}
-                  {/* `, */}
-                  {/*                       }); */}
-                  {/**/}
-                  {/*                       const a = { */}
-                  {/*                         id: currentOrder.id, */}
-                  {/*                         values: embedding, */}
-                  {/*                         metadata: { */}
-                  {/*                           storeId: storeId, */}
-                  {/*                           createdAt: new Date( */}
-                  {/*                             currentOrder.createdAt.toDate(), */}
-                  {/*                           ).getTime(), */}
-                  {/*                         }, */}
-                  {/*                       }; */}
-                  {/*                       axios */}
-                  {/*                         .post("/api/ai/pinecone", a) */}
-                  {/*                         .then((res) => { */}
-                  {/*                           console.log(res.data); */}
-                  {/*                         }) */}
-                  {/*                         .catch((e) => console.error(e)); */}
-                  {/*                     }} */}
-                  {/*                   > */}
-                  {/*                     Victor It */}
-                  {/*                   </Button> */}
 
                   <Button className="h-8 w-8" variant={"outline"} size="icon" onClick={() => router.push(`/dashboard/orders/${currentOrder?.sequence}`)}>
                       <ArrowUpRight className="h-4 w-4" />
@@ -164,29 +129,22 @@ function OrderView() {
                           const whatsappConfirmMessage =
                             store?.whatsappConfirmationMessage;
                           if (!whatsappConfirmMessage) return;
-                          const message = whatsappConfirmMessage
-                            .replaceAll("{{name}}", currentOrder?.customer.name)
-                            .replaceAll(
-                              "{{lastname}}",
-                              currentOrder?.customer.lastName ?? "",
-                            )
-                            .replaceAll(
-                              "{{phone}}",
-                              currentOrder?.customer.phoneNumber ?? "",
-                            )
-                            .replaceAll(
-                              "{{address}}",
-                              currentOrder?.customer.shippingAddress.address,
-                            )
-                            .replaceAll(
-                              "{{city}}",
-                              currentOrder?.customer.shippingAddress.city,
-                            )
-                            .replaceAll(
-                              "{{total_price}}",
-                              currentOrder?.totalPrice.toString(),
-                            );
-
+                          if(!storeId) return;
+                          if(!session) return;
+                          createNotification({
+                            storeId: storeId,
+                            user: session?.user?.name ?? "",
+                            email: session?.user?.email ?? "",
+                            action: `Sent whatsapp confirmation`,
+                            image: session?.user?.image ?? "",
+                            target: `of order:#${currentOrder?.sequence} `,
+                            id:"",
+                            createdAt: Timestamp.now(),
+                            seen:[],
+                          })
+                          const message = renderMessage(
+                            whatsappConfirmMessage,
+                          )
                           window.open(
                             `https://wa.me/212${currentOrder?.customer?.phoneNumber}?text=${encodeURIComponent(
                               message,

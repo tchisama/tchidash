@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/popover";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { createNotification } from "@/lib/utils/functions/notifications";
 
 function ScheduledOrdersDate() {
   const { storeId } = useStore();
@@ -61,6 +62,17 @@ function ScheduledOrdersDate() {
                 storeId,
                 "",
               );
+                createNotification({
+                    storeId: storeId,
+                    user: session?.user?.name ?? "",
+                    email: session?.user?.email ?? "",
+                    action: `scheduled`,
+                    target: `order order:#${currentOrder?.sequence} for ${format(date as Date, "dd/MM/yyyy")}`,
+                    image: session?.user?.image ?? "",
+                    id:"",
+                    createdAt: Timestamp.now(),
+                    seen:[],
+                  })
               dbAddDoc(
                 collection(db, "notes"),
                 {

@@ -46,6 +46,10 @@ export type Permissions = {
     dataType: null;
     action: "view" | "update";
   };
+  notifications: {
+    dataType: null;
+    action: "view" ;
+  };
 };
 
 export type Role =
@@ -91,6 +95,7 @@ const ROLES: RolesWithPermissions = {
     settings_security: { view: true, update: true },
     settings_integrations: { view: true, update: true },
     settings_advanced: { view: true, update: true },
+    notifications: { view: true },
   },
   admin: {
     orders: { view: true, create: true, update: true, delete: true },
@@ -100,6 +105,7 @@ const ROLES: RolesWithPermissions = {
     reviews: { view: true, create: true, update: true, delete: true },
     customers: { view: true, create: true, update: true, delete: true },
     settings: { view: true, update: true },
+    notifications: { view: true },
   },
   order_manager: {
     orders: { view: true, create: true, update: true, delete: false },
