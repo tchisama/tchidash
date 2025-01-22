@@ -40,11 +40,17 @@ function Notification() {
   const [numberOfNotifications, setNumberOfNotifications] = React.useState(8);
 
 
-  const email = session?.user?.email;
+  const [email , setEmail] = React.useState<string | null>(null);
   
   const queryClient = useQueryClient();
   const [notifications, setNotifications] = React.useState<NotificationType[] | undefined>(undefined);
 
+useEffect(() => {
+    if (session?.user?.email) {
+      setEmail(session.user.email);
+    }
+  }
+  , [session]);
 
 useEffect(() => {
     if (!storeId) return;
@@ -65,6 +71,7 @@ useEffect(() => {
 
       // Update the React Query cache
       setNotifications(data);
+      console.log("Notifications", data);
 
       // Update unread count if email is provided
     });
@@ -98,6 +105,7 @@ useEffect(() => {
 
   const handleNotificationClick = (id: string) => {
     if (!email || !storeId) return;
+    alert("Notification clicked :"+id);
     markNotificationAsRead(id, email); // Assuming markNotificationAsRead is defined elsewhere
   };
 
@@ -109,7 +117,7 @@ useEffect(() => {
 
 
   return (
-    <Popover>
+    <Popover >
       <PopoverTrigger asChild>
         <Button size="icon"  variant="outline" className="relative w-10 h-10" aria-label="Open notifications">
           <Bell size={16} strokeWidth={2} aria-hidden="true" />
@@ -120,8 +128,8 @@ useEffect(() => {
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[400px] p-1">
-        <div className="flex items-baseline justify-between gap-4 px-3 py-2">
+      <PopoverContent className="w-[400px]  p-1">
+        <div className="flex items-baseline drop-shadow-2xl justify-between gap-4 px-3 py-2">
           <div className="text-sm font-semibold">Notifications</div>
           {unreadCount > 0 && (
             <button className="text-xs font-medium hover:underline" onClick={handleMarkAllAsRead}>

@@ -94,7 +94,11 @@ export default function Page() {
                 reviews.map((review: Review) => (
                   <TableRow key={review.id}>
                     <TableCell>{review.reviewerName}</TableCell>
-                    <TableCell>{review.rating} ⭐</TableCell>
+                    <TableCell>{
+                      new Array(review.rating).fill(0).map(() => (
+                        "⭐"
+                      ))
+                    }</TableCell>
                     <TableCell>{review.reviewText}</TableCell>
                     <TableCell>
                       {review.images && review.images.length > 0 ? (
