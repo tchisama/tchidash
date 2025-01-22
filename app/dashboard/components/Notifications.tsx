@@ -36,6 +36,7 @@ function Notification() {
   const [unreadCount, setUnreadCount] = React.useState(0);
   const {storeId} = useStore();
   const {data:session} = useSession();
+  const [numberOfNotifications, setNumberOfNotifications] = React.useState(8);
 
 
   const email = session?.user?.email;
@@ -44,14 +45,14 @@ function Notification() {
 
 
   const {data: notifications, isLoading} = useQuery({
-    queryKey:["notifications", storeId],
+    queryKey:["notifications", storeId, numberOfNotifications],
     queryFn: async () => {
       if (!storeId) return;
       const notifications = await getDocs(query(
         collection(db, "notifications"),
         where("storeId", "==", storeId),
         orderBy("createdAt", "desc"),
-        limit(30)
+        limit(numberOfNotifications)
       )).then((response) => {
         return response.docs.map((doc) => ({...doc.data(),id: doc.id}) as NotificationType);
       });
@@ -75,7 +76,7 @@ function Notification() {
       }
     });
     // Mark all notifications as read
-    queryClient.setQueryData(["notifications", storeId], (oldData: NotificationType[] | undefined) => {
+    queryClient.setQueryData(["notifications", storeId, numberOfNotifications], (oldData: NotificationType[] | undefined) => {
       if (!oldData) return [];
 
       return oldData.map((notification) => ({
@@ -96,7 +97,7 @@ function Notification() {
     markNotificationAsRead(id, email); // Assuming markNotificationAsRead is defined elsewhere
 
     // Update the local cache
-    queryClient.setQueryData(["notifications", storeId], (oldData: NotificationType[] | undefined) => {
+    queryClient.setQueryData(["notifications", storeId, numberOfNotifications], (oldData: NotificationType[] | undefined) => {
       if (!oldData) return [];
 
       return oldData.map((notification) => {
@@ -186,6 +187,15 @@ function Notification() {
             </div>
           </div>
         ))}
+        <div className="text-center py-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setNumberOfNotifications((prev) => prev + 5)}
+          >
+            Load more
+          </Button>
+        </div>
       </PopoverContent>
     </Popover>
   );
