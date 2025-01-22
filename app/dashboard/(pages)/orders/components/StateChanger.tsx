@@ -31,6 +31,7 @@ import {
   UserRoundCheck,
   UserRoundX,
 } from "lucide-react";
+import { createNotification } from "@/lib/utils/functions/notifications";
 
 export const orderStatusValuesWithIcon = [
   {
@@ -244,6 +245,19 @@ export function StateChanger({
                     } as Order);
 
                     if (!order.storeId) return;
+                    // Send notification
+                    createNotification({
+                      storeId: order.storeId,
+                      user: session?.user?.name ?? "",
+                      email: session?.user?.email ?? "",
+                      action: `Change order state`,
+                      target: `of order:#${order.sequence} to ${status.name}`,
+                      image: session?.user?.image ?? "",
+                      id:"",
+                      createdAt: Timestamp.now(),
+                      seen:[],
+                    })
+                    // Add note
                     dbAddDoc(
                       collection(db, "notes"),
                       {

@@ -22,6 +22,7 @@ import { useRouter } from "next/navigation";
 import useClean from "@/hooks/useClean";
 import BottomBar from "./BottomBar";
 import { useStore } from "@/store/storeInfos";
+import { Notification } from "./Notifications";
 
 export const description =
   "An orders dashboard with a sidebar navigation. The sidebar has icon navigation. The content area has a breadcrumb and search in the header. The main area has a list of recent orders with a filter and export button. The main area also has a detailed view of a single order with order details, shipping information, billing information, customer information, and payment information.";
@@ -58,7 +59,8 @@ export default function DashboardUiProvider({
             )}
             {/* <DashboardCommand /> */}
           </div>
-          <div className="flex-1 flex justify-end">
+          <div className="flex-1 flex gap-2 items-center justify-end">
+          <Notification />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
