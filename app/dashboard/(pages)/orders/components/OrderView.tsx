@@ -68,9 +68,21 @@ function OrderView() {
       ["cancelled", "returned", "pending"].includes(currentOrder.orderStatus)
     ) {
       if (!storeId) return;
+
       dbDeleteDoc(doc(db, "orders", orderId), storeId, "");
       dbDeleteDoc(doc(db, "sales", orderId), storeId, "");
       setCurrentOrder("");
+                          createNotification({
+                            storeId: storeId,
+                            user: session?.user?.name ?? "",
+                            email: session?.user?.email ?? "",
+                            action: `deleted`,
+                            image: session?.user?.image ?? "",
+                            target: `order #${currentOrder.sequence}`,
+                            id:"",
+                            createdAt: Timestamp.now(),
+                            seen:[],
+                          })
       return;
     } else {
       alert("You can't delete an order that is not cancelled or returned");

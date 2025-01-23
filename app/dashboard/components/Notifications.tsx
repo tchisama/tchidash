@@ -164,6 +164,9 @@ useEffect(() => {
           >
             <Button
              onClick={() => handleNotificationClick(notification.id)}
+             style={{
+              opacity: notification.seen.includes(email ?? "") ? 0 : 1,
+             }}
              size={"icon"} variant="outline" className="size-7 absolute top-1/2 z-10 hidden group-hover:flex -translate-y-1/2 right-2">
               <Check className="h-4 w-4" />
             </Button>
