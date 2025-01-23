@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { doc, Timestamp } from "firebase/firestore";
+import { doc, Timestamp, getDoc } from "firebase/firestore";
 import { db } from "@/firebase";
 import { dbGetDoc, dbSetDoc, dbUpdateDoc } from "@/lib/dbFuntions/fbFuns";
 import { v4 } from "uuid";
@@ -77,31 +77,48 @@ export async function POST(req: Request) {
     // Adjust inventory stock based on new status
     if (statusEffect == true && statusEffectOld == false) {
       for (const item of items) {
-        await dbSetDoc(
-          doc(db, "inventoryItems", orderId + item.id),
-          {
-            id: "",
-            productId: item.productId,
-            variantId: item?.variantId,
-            title: item.title,
-            createdAt: Timestamp.now(),
-            updatedAt: Timestamp.now(),
-            quantity: -item.quantity,
+        const inventoryItemRef = doc(db, "inventoryItems", orderId + item.id);
+        const inventoryItemDoc = await getDoc(inventoryItemRef);
+
+        if (inventoryItemDoc.exists()) {
+          // Update existing inventory item
+          await dbUpdateDoc(
+            inventoryItemRef,
+            {
+              status: "APPROVED",
+              updatedAt: Timestamp.now(),
+            },
             storeId,
-            imageUrl: item.imageUrl,
-            cost: item.totalPrice,
-            unitPrice: item.price,
-            vendorId: "",
-            orderId,
-            note: "",
-            createdById: customer.name,
-            type: "OUT",
-            status: statusEffect ? "APPROVED" : "PENDING",
-            referenceNumber: "SO-" + v4().substring(0, 8),
-          },
-          storeId,
-          "",
-        );
+            "",
+          );
+        } else {
+          // Create new inventory item
+          await dbSetDoc(
+            inventoryItemRef,
+            {
+              id: "",
+              productId: item.productId,
+              variantId: item?.variantId,
+              title: item.title,
+              createdAt: Timestamp.now(),
+              updatedAt: Timestamp.now(),
+              quantity: -item.quantity,
+              storeId,
+              imageUrl: item.imageUrl,
+              cost: item.totalPrice,
+              unitPrice: item.price,
+              vendorId: "",
+              orderId,
+              note: "",
+              createdById: customer.name,
+              type: "OUT",
+              status: "APPROVED",
+              referenceNumber: "SO-" + v4().substring(0, 8),
+            },
+            storeId,
+            "",
+          );
+        }
       }
     }
 
@@ -109,39 +126,50 @@ export async function POST(req: Request) {
     if (
       statusEffect == false &&
       statusEffectOld == true
-      // (oldStatus === "processing" ||
-      //   oldStatus === "shipped" ||
-      //   oldStatus === "delivered") &&
-      // (newStatus === "cancelled" ||
-      //   newStatus === "returned" ||
-      //   newStatus === "pending")
     ) {
       for (const item of items) {
-        await dbSetDoc(
-          doc(db, "inventoryItems", orderId + item.id),
-          {
-            id: "",
-            productId: item.productId,
-            variantId: item?.variantId,
-            title: item.title,
-            createdAt: Timestamp.now(),
-            updatedAt: Timestamp.now(),
-            quantity: item.quantity,
+        const inventoryItemRef = doc(db, "inventoryItems", orderId + item.id);
+        const inventoryItemDoc = await getDoc(inventoryItemRef);
+
+        if (inventoryItemDoc.exists()) {
+          // Update existing inventory item
+          await dbUpdateDoc(
+            inventoryItemRef,
+            {
+              status: "REJECTED",
+              updatedAt: Timestamp.now(),
+            },
             storeId,
-            imageUrl: item.imageUrl,
-            cost: item.totalPrice,
-            unitPrice: item.price,
-            vendorId: "",
-            orderId,
-            note: "",
-            createdById: customer.name,
-            type: "OUT",
-            status: "REJECTED",
-            referenceNumber: "SO-" + v4().substring(0, 8),
-          },
-          storeId,
-          "",
-        );
+            "",
+          );
+        } else {
+          // Create new inventory item
+          await dbSetDoc(
+            inventoryItemRef,
+            {
+              id: "",
+              productId: item.productId,
+              variantId: item?.variantId,
+              title: item.title,
+              createdAt: Timestamp.now(),
+              updatedAt: Timestamp.now(),
+              quantity: item.quantity,
+              storeId,
+              imageUrl: item.imageUrl,
+              cost: item.totalPrice,
+              unitPrice: item.price,
+              vendorId: "",
+              orderId,
+              note: "",
+              createdById: customer.name,
+              type: "OUT",
+              status: "REJECTED",
+              referenceNumber: "SO-" + v4().substring(0, 8),
+            },
+            storeId,
+            "",
+          );
+        }
       }
     }
 
