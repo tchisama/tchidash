@@ -128,6 +128,13 @@ export default function CreateOrder() {
       },
     };
 
+    // lets delete all the inventory items before creating new ones
+    await getDocs(query(collection(db, "inventoryItems"), where("orderId", "==", order.id))).then((snapshot) => {
+      snapshot.forEach((doc) => {
+        deleteDoc(doc.ref);
+      });
+    });
+
     axios
       .post("/api/orders?storeId=" + storeId + "&update=true", {
         ...orderForUpdate,
