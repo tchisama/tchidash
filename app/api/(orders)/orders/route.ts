@@ -207,12 +207,32 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const order = {
-      ...body,
-      sequence: orderSequence,
-      storeId,
-      createdAt: Timestamp.now(),
-    } as Order;
+    
+    let order;
+    if(update){ 
+      // body but remove createdAt
+      order = {
+        customer: body.customer,
+        items: body.items,
+        shippingInfo: body.shippingInfo,
+        currency: body.currency,
+        subtotal: body.subtotal,
+        totalItems: body.totalItems,
+        totalPrice: body.totalPrice,
+        note: body.note,
+        id: body.id,
+        sequence: orderSequence,
+        storeId,
+      } as Order;
+    }else{
+      order = {
+        ...body,
+        sequence: orderSequence,
+        storeId,
+        updatedAt: Timestamp.now(),
+        createdAt: Timestamp.now(),
+      } as Order;
+    }
 
     validateOrderInputs(order);
 
