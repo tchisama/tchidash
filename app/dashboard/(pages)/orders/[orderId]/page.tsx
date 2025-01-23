@@ -7,6 +7,7 @@ import { Order } from "@/types/order"
 import { useParams } from "next/navigation"
 import { useOrderStore } from "@/store/orders"
 import { useStore } from "@/store/storeInfos"
+import TimeLine from "./components/TimeLine"
 
 
 export default function OrderPage() {
@@ -37,6 +38,12 @@ export default function OrderPage() {
       
   if(!order) return <div>no order found</div>
 
-  return <OrderView order={order} />
+
+  return <div className="flex gap-2">
+    <div className="flex-1">
+      <OrderView order={order} />
+    </div>
+    <TimeLine />
+    </div>
 }
 

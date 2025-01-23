@@ -200,7 +200,7 @@ const OrderItemsTable = ({ items }: { items: OrderItem[] }) => (
 )
 
 const OrderNotes = ({ note }: { note: string }) => (
-  <Card>
+  <Card className="max-w-[400px]">
     <CardHeader>
       <CardTitle>Order Notes</CardTitle>
       <CardDescription>Additional information about this order</CardDescription>

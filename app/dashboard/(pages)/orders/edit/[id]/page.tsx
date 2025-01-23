@@ -169,7 +169,7 @@ export default function CreateOrder() {
         </div>
         {
           order.orderStatus !== "pending" && (
-            <Alert variant="destructive">
+            <Alert variant="destructive" className="bg-red-50">
               <AlertCircle className="h-4 w-4" />
               <AlertTitle>Warning</AlertTitle>
               <AlertDescription>
