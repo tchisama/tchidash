@@ -13,7 +13,7 @@ import { Order } from "@/types/order";
 import { useOrderStore } from "@/store/orders";
 import axios from "axios";
 import { dbAddDoc, dbGetDocs } from "@/lib/dbFuntions/fbFuns";
-import { collection, query, Timestamp, where } from "firebase/firestore";
+import { collection, limit, query, Timestamp, where } from "firebase/firestore";
 import { db } from "@/firebase";
 import { useSession } from "next-auth/react";
 import { AvatarFallback, AvatarImage, Avatar } from "@/components/ui/avatar";
@@ -144,6 +144,7 @@ export function StateChanger({
         where("details.for", "==", "order"),
         where("details.orderId", "==", order.id),
         where("changed", "==", order.orderStatus),
+        limit(1),
       );
       const note = await dbGetDocs(q, storeId, "");
       const noteData = note.docs.map((doc) => doc.data())[0];
@@ -151,6 +152,7 @@ export function StateChanger({
       const q2 = query(
         collection(db, "users"),
         where("email", "==", noteData.creator),
+        limit(1),
       );
       const user = await dbGetDocs(q2, storeId, "");
       return user.docs.map((doc) => doc.data())[0];

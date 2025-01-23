@@ -18,7 +18,7 @@ function TimeLine() {
       if(!currentOrder) return []
       const q = query(collection(db, "notes"),where("details.for","==","order"),where("details.orderId","==",currentOrder?.id),orderBy("createdAt","desc"))
       const notes = await dbGetDocs(q, currentOrder.storeId, "")
-      return notes.docs.map(doc => ({...doc.data(),id:doc.id}) as Note).reverse()
+      return notes.docs.map(doc => ({...doc.data(),id:doc.id}) as Note).reverse().filter(note => note.changed)
     }
   })
   return (
