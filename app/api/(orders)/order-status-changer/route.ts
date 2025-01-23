@@ -26,7 +26,6 @@ export async function POST(req: Request) {
     const {
       items,
       customer,
-      totalPrice,
       orderStatus: oldStatus,
       storeId: orderStoreId,
     } = orderDoc;
@@ -49,19 +48,6 @@ export async function POST(req: Request) {
       "",
     );
 
-    // Log the sale in the "sales" collection
-    await dbSetDoc(
-      doc(db, "sales", orderId),
-      {
-        phoneNumber: customer.phoneNumber,
-        totalPrice,
-        status: newStatus,
-        storeId,
-        updatedAt: Timestamp.now(),
-      },
-      storeId,
-      "",
-    );
 
     const statusEffect = orderStatusValues.find(
       (status) => status.name === newStatus,
