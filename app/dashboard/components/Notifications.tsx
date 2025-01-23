@@ -7,7 +7,7 @@ import { db } from "@/firebase";
 import { useStore } from "@/store/storeInfos";
 import {   useQueryClient } from "@tanstack/react-query";
 import { collection, query, where, orderBy, limit, onSnapshot } from "firebase/firestore";
-import { Bell, BellIcon } from "lucide-react";
+import { Bell, BellIcon, Check } from "lucide-react";
 import { useSession } from "next-auth/react";
 import type { Notification as NotificationType } from "@/types/notification";
 import Image from "next/image";
@@ -15,6 +15,7 @@ import { timeSince } from "@/lib/utils/functions/date";
 import React, { useEffect } from "react";
 import { markNotificationAsRead } from "@/lib/utils/functions/notifications";
 import { usePermission } from "@/hooks/use-permission";
+import Link from "next/link";
 
 
 function Dot({ className }: { className?: string }) {
@@ -105,7 +106,6 @@ useEffect(() => {
 
   const handleNotificationClick = (id: string) => {
     if (!email || !storeId) return;
-    alert("Notification clicked :"+id);
     markNotificationAsRead(id, email); // Assuming markNotificationAsRead is defined elsewhere
   };
 
@@ -160,8 +160,13 @@ useEffect(() => {
             style={{
               opacity: notification.seen.includes(email ?? "") ? 0.7 : 1,
             }}
-            className="rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent"
+            className="rounded-md group relative px-3 py-2 text-sm transition-colors hover:bg-accent"
           >
+            <Button
+             onClick={() => handleNotificationClick(notification.id)}
+             size={"icon"} variant="outline" className="size-7 absolute top-1/2 z-10 hidden group-hover:flex -translate-y-1/2 right-2">
+              <Check className="h-4 w-4" />
+            </Button>
             <div className="relative flex items-start gap-3 pe-3">
               <Image
                 className="size-10 rounded-md bg-slate-100 border"
@@ -171,9 +176,9 @@ useEffect(() => {
                 alt={""}
               />
               <div className="flex-1 space-y-1">
-                <button
+                <div
                   className="text-left text-foreground/80 after:absolute after:inset-0"
-                  onClick={() => handleNotificationClick(notification.id)}
+                  // onClick={() => handleNotificationClick(notification.id)}
                 >
                   <span className=" text-black hover:underline">
                     {notification.user}
@@ -181,12 +186,30 @@ useEffect(() => {
                   <span className="font-medium text-black ">
                   {notification.action}{" "}
                   </span>
-
-                  <span className=" text-slate-700 hover:underline">
-                    {notification.target}
-                  </span>
+<div className="text-slate-700 ">
+  {notification.target
+    .split(/(order:#\d+)/g) // Split the string into parts
+    .map((part, index) => {
+      // Check if the part matches the pattern "order:#id"
+      const match = part.match(/order:#(\d+)/);
+      if (match) {
+        // If it matches, return a link
+        return (
+          <Link
+            key={index}
+            href={`/dashboard/orders/${match[1]}`} // Use the ID without the "#"
+            className=" hover:underline z-10 relative"
+          >
+            Order#{match[1]}
+          </Link>
+        );
+      }
+      // If it doesn't match, return the plain text
+      return part;
+    })}
                   .
-                </button>
+</div>
+                </div>
                 <div className="text-xs text-muted-foreground">{
                   // time passed from createdAt
                   timeSince(notification.createdAt.toDate(), new Date())
