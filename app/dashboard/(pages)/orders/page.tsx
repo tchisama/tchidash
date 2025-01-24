@@ -7,7 +7,6 @@ import {
   PhoneIcon,
   PlusCircle,
   SearchIcon,
-  TicketsIcon,
   UserIcon,
   XIcon,
 } from "lucide-react";
@@ -37,6 +36,7 @@ import { Label } from "@/components/ui/label";
 import Analytic from "./components/analytic";
 import { Input } from "@/components/ui/input";
 import { usePermission } from "@/hooks/use-permission";
+import Actions from "./components/Actions";
 
 export default function Page() {
   const { currentOrder, selectedOrder } = useOrderStore();
@@ -221,12 +221,7 @@ export default function Page() {
             <div className="flex ml-auto flex-col gap-2 min-w-[100px]">
               <div className="flex gap-2 ">
                 {selectedOrder && selectedOrder.length > 0 && (
-                  <Link href="/dashboard/none-layout/tickets">
-                    <Button className="text-sm flex gap-2">
-                      <TicketsIcon className="h-4 w-4" />
-                      Tickets
-                    </Button>
-                  </Link>
+                  <Actions  />
                 )}
                 {hasViewPermission("orders", "create") ? (
                   <Link className="" href="/dashboard/orders/new">
