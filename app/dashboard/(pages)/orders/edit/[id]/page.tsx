@@ -22,6 +22,7 @@ import { toast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { db } from "@/firebase";
 import { StateChanger } from "../../components/StateChanger";
+import { Checkbox } from "@/components/ui/checkbox";
 
 
 
@@ -31,6 +32,8 @@ export default function CreateOrder() {
   const { id } = useParams<{ id: string }>();
   const { storeId, store } = useStore();
   const { data: session } = useSession();
+
+  const [shippedTo, setShippedTo] = useState(false);
 
 
 
@@ -46,6 +49,7 @@ export default function CreateOrder() {
       ).then(async (response) => {
         const data = response.docs.map((doc) => ({ ...doc.data(), id: doc.id }) as Order);
         setOrder(data[0]);
+        if(data[0].isShippedToAnotherPerson) setShippedTo(true);
         return data[0];
       })
       return o;
@@ -178,8 +182,8 @@ export default function CreateOrder() {
             </Alert>
           )
         }
-        <div className="flex max-w-7xl gap-4">
-          <div className="space-y-4 flex-1 max-w-3xl">
+        <div className="flex flex-col max-w-7xl gap-4">
+          <div className="space-y-4 w-full  ">
             <h2 className="text-lg font-bold">Customer Information</h2>
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -214,27 +218,45 @@ export default function CreateOrder() {
                 />
               </div>
             </div>
-            <div>
-              <Label htmlFor="phoneNumber">Phone Number</Label>
-              <Input
-                id="phoneNumber"
-                name="phoneNumber"
-                value={order.customer.phoneNumber}
-                onChange={(e) => {
-                  setOrder({
-                    ...order,
-                    customer: {
-                      ...order.customer,
-                      phoneNumber: e.target.value,
-                    },
-                  } as Order);
-                }}
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="phoneNumber">Phone Number</Label>
+                <Input
+                  id="phoneNumber"
+                  name="phoneNumber"
+                  value={order.customer.phoneNumber}
+                  onChange={(e) => {
+                    setOrder({
+                      ...order,
+                      customer: {
+                        ...order.customer,
+                        phoneNumber: e.target.value,
+                      },
+                    } as Order);
+                  }}
+                />
+              </div>
+              <div>
+                <Label htmlFor="city">City</Label>
+                <Input
+                  id="city"
+                  name="city"
+                  value={order.customer.shippingAddress.city}
+                  onChange={(e) => {
+                    setOrder({
+                      ...order,
+                      customer: {
+                        ...order.customer,
+                        shippingAddress: {
+                          ...order.customer.shippingAddress,
+                          city: e.target.value,
+                        },
+                      },
+                    });
+                  }}
+                />
+              </div>
             </div>
-          </div>
-          <div className="h-[200px] mx-3 w-[1px] bg-slate-200"></div>
-          <div className="space-y-4 max-w-3xl flex-1">
-            <h2 className="text-lg font-bold">Shipping Address</h2>
             <div>
               <Label htmlFor="address">Address</Label>
               <Input
@@ -255,20 +277,130 @@ export default function CreateOrder() {
                 }}
               />
             </div>
+          </div>
+          <div className="flex flex-col">
+
+          <div className="flex gap-2 mb-3">
+            <Checkbox id="ShippedToCustomer" checked={shippedTo} onCheckedChange={(checked) => {
+              setShippedTo(checked as boolean);
+              setOrder({
+                ...order,
+                isShippedToAnotherPerson: checked as boolean
+              })
+              if(checked && !order.shippedTo) {
+                setOrder({
+                  ...order,
+                  shippedTo: {
+                    firstName: "",
+                    lastName: "",
+                    phoneNumber: "",
+                    shippingAddress: {
+                      city: "",
+                      address: ""
+                    }
+                  } as Order["shippedTo"]
+                })
+              }
+            }}
+            />
+            <Label htmlFor="ShippedToCustomer">Shipped To Customer</Label>
+          </div>
+          {
+            shippedTo &&
+            order.shippedTo &&
+          <div className="space-y-4">
+            <h2 className="text-lg mb-5 font-bold">Shipped To</h2>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="firstName">First Name </Label>
+                <Input
+                  id="firstName"
+                  name="firstName"
+                  value={order.shippedTo.firstName}
+                  onChange={(e) => {
+                    if (!order.shippedTo) return;
+                    setOrder({
+                      ...order,
+                      shippedTo: {
+                        ...order.shippedTo,
+                        firstName: e.target.value,
+                      },
+                    });
+                  }}
+                />
+              </div>
+              <div>
+                <Label htmlFor="lastName">Last Name</Label>
+                <Input
+                  id="lastName"
+                  name="lastName"
+                  value={order.shippedTo.lastName}
+                  onChange={(e) => {
+                    if (!order.shippedTo) return;
+                    setOrder({
+                      ...order,
+                      shippedTo: { ...order.shippedTo, lastName: e.target.value },
+                    });
+                  }}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="phoneNumber">Phone Number</Label>
+                <Input
+
+                  id="phoneNumber"
+                  name="phoneNumber"
+                  value={order.shippedTo.phoneNumber}
+                  onChange={(e) => {
+                    setOrder({
+                      ...order,
+                      shippedTo: {
+                        ...order.shippedTo,
+                        phoneNumber: e.target.value,
+                      },
+                    } as Order);
+                  }}
+                />
+              </div>
+              <div>
+                <Label htmlFor="city">City</Label>
+                <Input
+                  id="city"
+                  name="city"
+                  value={order.shippedTo.shippingAddress.city}
+                  onChange={(e) => {
+                    if (!order.shippedTo) return;
+                    setOrder({
+                      ...order,
+                      shippedTo: {
+                        ...order.shippedTo,
+                        shippingAddress: {
+                          ...order.shippedTo.shippingAddress,
+                          city: e.target.value,
+                        },
+                      },
+                    });
+                  }}
+                />
+              </div>
+            </div>
             <div>
-              <Label htmlFor="city">City</Label>
+              <Label htmlFor="address">Address</Label>
               <Input
-                id="city"
-                name="city"
-                value={order.customer.shippingAddress.city}
+                id="address"
+                name="address"
+                value={order.shippedTo.shippingAddress.address}
                 onChange={(e) => {
+                  if (!order.shippedTo) return;
                   setOrder({
                     ...order,
-                    customer: {
-                      ...order.customer,
+                    shippedTo: {
+                      ...order.shippedTo,
                       shippingAddress: {
-                        ...order.customer.shippingAddress,
-                        city: e.target.value,
+                        ...order.shippedTo.shippingAddress,
+                        address: e.target.value,
                       },
                     },
                   });
@@ -276,6 +408,10 @@ export default function CreateOrder() {
               />
             </div>
           </div>
+          }
+          </div>
+        </div>
+        <div>
         </div>
         <ItemsTable />
         <div className="max-w-[800px]">

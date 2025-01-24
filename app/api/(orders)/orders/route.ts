@@ -213,6 +213,8 @@ export async function POST(request: NextRequest) {
       // body but remove createdAt
       order = {
         customer: body.customer,
+        shippedTo: body.shippedTo,
+        isShippedToAnotherPerson: body.isShippedToAnotherPerson,
         items: body.items,
         shippingInfo: body.shippingInfo,
         currency: body.currency,

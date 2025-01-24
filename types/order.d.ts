@@ -91,6 +91,8 @@ export type Order = {
   sequence: number;
   id: string;
   customer: CustomerInfo; // Customer details for the order
+  shippedTo?: CustomerInfo | null;
+  isShippedToAnotherPerson?: boolean;
   items: OrderItem[]; // List of ordered items
   totalItems: number; // Total number of items in the order
   subtotal: number; // Total price without discount and shipping
