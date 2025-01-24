@@ -14,7 +14,7 @@ function Page() {
 
   return (
     <div className="flex flex-col gap-4">
-      <Emplyies />
+      {hasViewPermission("employees", "view") && <Emplyies />}
       <SecuritySettings />
     </div>
   );

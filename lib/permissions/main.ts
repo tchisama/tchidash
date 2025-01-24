@@ -48,7 +48,11 @@ export type Permissions = {
   };
   notifications: {
     dataType: null;
-    action: "view" ;
+    action: "view";
+  };
+  employees: {
+    dataType: null;
+    action: "view" | "create" | "update" | "delete";
   };
 };
 
@@ -57,13 +61,15 @@ export type Role =
   | "admin"
   | "order_manager"
   | "inventory_manager"
-  | "product_manager";
+  | "product_manager"
+  | "employees_manager";
 export const ROLES_NAMES = [
   "super_admin",
   "admin",
   "order_manager",
   "inventory_manager",
   "product_manager",
+  "employees_manager",
 ] as const;
 // make me a enum
 
@@ -93,6 +99,7 @@ const ROLES: RolesWithPermissions = {
     customers: { view: true, create: true, update: true, delete: true },
     settings: { view: true, update: true },
     settings_security: { view: true, update: true },
+    employees: { view: true, create: true, update: true, delete: true },
     settings_integrations: { view: true, update: true },
     settings_advanced: { view: true, update: true },
     notifications: { view: true },
@@ -106,6 +113,7 @@ const ROLES: RolesWithPermissions = {
     customers: { view: true, create: true, update: true, delete: true },
     settings: { view: true, update: true },
     notifications: { view: true },
+    settings_security: { view: true, update: true },
   },
   order_manager: {
     orders: { view: true, create: true, update: true, delete: false },
@@ -115,6 +123,9 @@ const ROLES: RolesWithPermissions = {
   },
   inventory_manager: {
     inventory: { view: true, create: true, update: true, delete: false },
+  },
+  employees_manager: {
+    employees: { view: true, create: true, update: true, delete: true },
   },
 };
 

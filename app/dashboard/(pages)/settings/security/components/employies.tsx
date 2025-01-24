@@ -116,7 +116,7 @@ const Emplyies = () => {
 
   return (
     store && (
-      <Card x-chunk="dashboard-04-chunk-1">
+      <Card >
         <CardHeader>
           <CardTitle>Employees</CardTitle>
           <CardDescription>
@@ -162,7 +162,7 @@ const Emplyies = () => {
                     </Button>
                   </div>
                 </PopoverTrigger>
-                <PopoverContent className="p-1 flex flex-col">
+                <PopoverContent className="p-1 flex relative z-10 flex-col">
                   {ROLES_NAMES.map((role) => (
                     <Button
                       onClick={() => {

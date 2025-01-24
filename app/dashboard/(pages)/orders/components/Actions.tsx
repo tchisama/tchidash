@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from '@/components/ui/button';
-import { ArrowUpRight, Copy, EditIcon, Table, Text, TicketMinus, Trash } from 'lucide-react';
+import { ArrowUpRight, Copy, EditIcon, LayoutGrid, Table, Text, TicketMinus, Trash } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useOrderStore } from '@/store/orders';
 // import { toast } from 'react-hot-toast'; // For showing toast notifications
@@ -94,7 +94,9 @@ address: ${order.customer.shippingAddress.address}
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant={"outline"}>Actions</Button>
+        <Button variant={"outline"}>
+        <LayoutGrid className="mr-2 h-4 w-4"/>
+        Actions</Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         {

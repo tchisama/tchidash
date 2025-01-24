@@ -16,8 +16,17 @@ const PopoverContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content> & {
     showArrow?: boolean;
   }
->(({ className, align = "center", sideOffset = 4, showArrow = false, ...props }, ref) => (
-  <PopoverPrimitive.Portal>
+>(
+  (
+    {
+      className,
+      align = "center",
+      sideOffset = 4,
+      showArrow = false,
+      ...props
+    },
+    ref,
+  ) => (
     <PopoverPrimitive.Content
       ref={ref}
       align={align}
@@ -33,8 +42,8 @@ const PopoverContent = React.forwardRef<
         <PopoverPrimitive.Arrow className="-my-px fill-popover drop-shadow-[0_1px_0_hsl(var(--border))]" />
       )}
     </PopoverPrimitive.Content>
-  </PopoverPrimitive.Portal>
-));
+  ),
+);
 PopoverContent.displayName = PopoverPrimitive.Content.displayName;
 
 export { Popover, PopoverAnchor, PopoverContent, PopoverTrigger };
