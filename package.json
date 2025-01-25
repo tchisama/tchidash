@@ -54,6 +54,7 @@
     "firebase": "^10.14.0",
     "framer-motion": "^11.11.9",
     "html-to-image": "^1.11.11",
+    "html2canvas": "^1.4.1",
     "html2pdf.js": "^0.10.2",
     "input-otp": "^1.2.4",
     "konva": "^9.3.15",

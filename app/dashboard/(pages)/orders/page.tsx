@@ -159,7 +159,7 @@ export default function Page() {
                   <SelectItem value="100">100</SelectItem>
                 </SelectContent>
               </Select>
-              <div className="flex flex-row-reverse">
+              <div className=" hidden md:flex flex-row-reverse">
                 <Button
                 variant={"outline"}
                   onClick={() => {
@@ -236,16 +236,16 @@ export default function Page() {
               </div>
             </div>
           </div>
-          <Card x-chunk="dashboard-05-chunk-3">
+          <Card x-chunk="dashboard-05-chunk-3" className="">
             <CardHeader className="">
               <CardTitle className="text-xl font-medium">Orders</CardTitle>
             </CardHeader>
-            <CardContent>
-              <OrdersTable
-                filter={filter}
-                pageSize={pageSize}
-                setPageSize={setPageSize}
-              />
+            <CardContent className="">
+                <OrdersTable
+                  filter={filter}
+                  pageSize={pageSize}
+                  setPageSize={setPageSize}
+                />
             </CardContent>
           </Card>
         </div>

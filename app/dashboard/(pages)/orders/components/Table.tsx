@@ -43,6 +43,7 @@ import { Button } from "@/components/ui/button";
 import NoteViewer from "./NoteViewer";
 import { Edit2 } from "lucide-react";
 import { Popover , PopoverContent, PopoverTrigger} from "@/components/ui/popover";
+import { OrdersMobileView } from "./OrdersMobileView";
 
 export function OrdersTable({
   filter,
@@ -170,7 +171,8 @@ export function OrdersTable({
 
   if (isLoading)
     return (
-      <div>
+  <>
+      <div className="md:block hidden">
         <Table>
           <TableHeader>
             <TableRow>
@@ -196,6 +198,7 @@ export function OrdersTable({
           </TableBody>
         </Table>
       </div>
+    </>
     );
 
   if (error)
@@ -205,7 +208,13 @@ export function OrdersTable({
 
   return (
     <div>
-      <Table>
+      <div className="md:hidden block">
+      <OrdersMobileView 
+        orders={orders}
+      />
+      </div>
+      <div className="md:block hidden">
+      <Table className="">
         <TableHeader>
           <TableRow>
             <TableHead className="">
@@ -420,6 +429,7 @@ export function OrdersTable({
           </Pagination>
         </TableCaption>
       </Table>
+      </div>
     </div>
   );
 }

@@ -43,7 +43,7 @@ export default function DashboardUiProvider({
       <SideBar />
        * */}
       <div className="flex-col relative flex-1 sm:gap-4 sm:py-4 ">
-        <header className="fixed w-full duration-300 drop-shadow-[0_20px_10px_rgba(16,24,40,0.03)] bg-slate-50/70 backdrop-blur-xl top-0 z-30 flex h-10 items-center gap-4  px-4 sm:py-2  sm:h-auto sm:border-0  ">
+        <header className="fixed w-full duration-300 drop-shadow-[0_20px_10px_rgba(16,24,40,0.03)] bg-slate-50/70 backdrop-blur-xl top-0 z-30 flex h-fit items-center gap-4  px-4 sm:py-2  sm:h-auto sm:border-0  ">
           <div className="flex-1 ">
             <PhoneBar />
             <BreadcrumbCom />
