@@ -4,7 +4,8 @@ import { db } from "@/firebase";
 import { dbGetDoc, dbSetDoc, dbUpdateDoc } from "@/lib/dbFuntions/fbFuns";
 import { v4 } from "uuid";
 import { OrderStatus } from "@/types/order";
-import { orderStatusValues } from "@/lib/datajson/states";
+import { orderStatusValuesWithIcon } from "@/app/dashboard/(pages)/orders/components/StateChanger";
+// import { orderStatusValues } from "@/lib/datajson/states";
 
 interface OrderUpdateRequest {
   orderId: string;
@@ -48,12 +49,11 @@ export async function POST(req: Request) {
       "",
     );
 
-
-    const statusEffect = orderStatusValues.find(
+    const statusEffect = orderStatusValuesWithIcon.find(
       (status) => status.name === newStatus,
     )?.effectStock;
 
-    const statusEffectOld = orderStatusValues.find(
+    const statusEffectOld = orderStatusValuesWithIcon.find(
       (status) => status.name === oldStatus,
     )?.effectStock;
 
@@ -109,10 +109,7 @@ export async function POST(req: Request) {
     }
 
     // Restore stock if the order is cancelled or returned
-    if (
-      statusEffect == false &&
-      statusEffectOld == true
-    ) {
+    if (statusEffect == false && statusEffectOld == true) {
       for (const item of items) {
         const inventoryItemRef = doc(db, "inventoryItems", orderId + item.id);
         const inventoryItemDoc = await getDoc(inventoryItemRef);
@@ -168,3 +165,4 @@ export async function POST(req: Request) {
     );
   }
 }
+

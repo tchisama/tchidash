@@ -9,6 +9,7 @@ export type OrderStatus =
   | "delivered"
   | "scheduled"
   | "cancelled"
+  | "no_reply"
   | "returned";
 
 // Type for shipping status

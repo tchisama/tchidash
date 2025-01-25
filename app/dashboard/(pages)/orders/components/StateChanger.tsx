@@ -30,6 +30,7 @@ import {
   Undo,
   UserRoundCheck,
   UserRoundX,
+  X,
 } from "lucide-react";
 import useNotification from "@/hooks/useNotification";
 
@@ -37,65 +38,72 @@ export const orderStatusValuesWithIcon = [
   {
     name: "pending",
     icon: <Stars className="h-4 w-4" />,
-    color: "#adc178",
+    color: "#72ce27", // Gold: Represents something waiting or in progress
     effectStock: false,
-    next:["confirmed","scheduled","cancelled","fake"]
+    next: ["confirmed", "scheduled", "cancelled", "fake"],
   },
   {
     name: "confirmed",
     icon: <UserRoundCheck className="h-4 w-4" />,
-    color: "#3a86ff",
+    color: "#4361ee", // Green: Represents confirmation and success
     effectStock: true,
-    next:["packed","cancelled","scheduled","pending"]
+    next: ["packed", "cancelled", "scheduled", "pending"],
   },
   {
     name: "packed",
     icon: <PackageCheck className="h-4 w-4" />,
-    color: "#5c374c",
+    color: "#3a0ca3", // Orange: Represents preparation and readiness
     effectStock: true,
-    next:["shipped","cancelled","scheduled","pending"]
+    next: ["shipped", "cancelled", "scheduled", "pending"],
   },
   {
     name: "shipped",
     icon: <Truck className="h-4 w-4" />,
-    color: "#5a189a",
+    color: "#7209b7", // Blue: Represents movement and transit
     effectStock: true,
-    next:["delivered","cancelled","scheduled","pending","returned"]
+    next: ["delivered", "cancelled", "scheduled", "pending", "returned"],
   },
   {
     name: "delivered",
     icon: <MapPinCheckInside className="h-4 w-4" />,
-    color: "#386641",
+    color: "#007f5f", // Light Green: Represents completion and success
     effectStock: true,
-    next:[]
+    next: [],
   },
   {
     name: "scheduled",
     icon: <Clock className="h-4 w-4" />,
-    color: "#f8961e",
+    color: "#fdc700", // Purple: Represents planning and scheduling
     effectStock: true,
-    next:["packed","cancelled"]
+    next: ["packed", "cancelled"],
+  },
+  {
+    name: "no_reply",
+    icon: <PhoneOff className="h-4 w-4" />,
+    color: "#fc7b28", // Bright Red: Represents urgency or lack of response
+    effectStock: false,
+    next: ["confirmed"],
   },
   {
     name: "cancelled",
-    icon: <PhoneOff className="h-4 w-4" />,
-    color: "#fb5607",
+    icon: <X className="h-4 w-4" />,
+    color: "#fa442a", // Red: Represents cancellation or failure
     effectStock: false,
-    next:[]
+    next: [],
   },
   {
     name: "returned",
     icon: <Undo className="h-4 w-4" />,
-    color: "#e63946",
+    color: "#f9172b", // Pink: Represents reversal or return
     effectStock: false,
-    next:[]
+    next: [],
   },
   {
     name: "fake",
     icon: <UserRoundX className="h-4 w-4" />,
-    color: "#6d6a75",
+    color: "#607D8B", // Gray-Blue: Represents something invalid or fake
     effectStock: false,
-    next:["confirmed"]
+    next: ["confirmed"],
   },
 ];
 
@@ -107,6 +115,7 @@ export type OrderStatus =
   | "scheduled"
   | "delivered"
   | "cancelled"
+  | "no_reply"
   | "returned";
 
 export function StateChanger({
@@ -118,10 +127,10 @@ export function StateChanger({
   order: Order;
   showNumberOfCalls?: boolean;
 }) {
-  const { storeId,store } = useStore();
+  const { storeId, store } = useStore();
   const [state, setState] = React.useState<OrderStatus>();
   const { data: session } = useSession();
-  const {sendNotification} = useNotification();
+  const { sendNotification } = useNotification();
   const {
     orders,
     setOrders,
@@ -149,13 +158,14 @@ export function StateChanger({
       );
       const note = await dbGetDocs(q, storeId, "");
       const noteData = note.docs.map((doc) => doc.data())[0];
-      console.log(noteData)
+      console.log(noteData);
       const user = store?.employees?.find(
-        (employee) => employee.email === noteData?.creator)
+        (employee) => employee.email === noteData?.creator,
+      );
 
-      console.table(user)
-      console.log("USER")
-      return user
+      console.table(user);
+      console.log("USER");
+      return user;
     },
   });
 
@@ -183,19 +193,20 @@ export function StateChanger({
               orderStatusValuesWithIcon.find((status) => status.name === state)
                 ?.icon
             }
-            <div className="capitalize">
-            {state}
-            </div>
-            {
-              state == "cancelled" && showNumberOfCalls && order?.numberOfCalls  &&
-              <div className="bg-white/30 border border-red-600/30 w-6 h-5  rounded-full flex justify-center items-center">{
-              order?.numberOfCalls  ?? 0
-                }
-              </div>
-            }
+            <div className="capitalize">{state}</div>
+            {state == "no_reply" &&
+              showNumberOfCalls &&
+              order?.numberOfCalls && (
+                <div className="bg-white/30 border border-red-600/30 w-6 h-5  rounded-full flex justify-center items-center">
+                  {order?.numberOfCalls ?? 0}
+                </div>
+              )}
             {user && (
               <Avatar className="w-6 h-6 border border-[#3335] ">
-                <AvatarImage src={user?.imageUrl ?? ""} alt={user?.name ?? ""} />
+                <AvatarImage
+                  src={user?.imageUrl ?? ""}
+                  alt={user?.name ?? ""}
+                />
                 <AvatarFallback>
                   {user?.name
                     ?.split(" ")
@@ -216,13 +227,14 @@ export function StateChanger({
                 style={{
                   background: status.color + "80",
                   borderColor: status.color + "90",
-                  color:"#000a",
+                  color: "#000a",
                   // opacity: !orderStatusValuesWithIcon.find(
                   //   (s) => s.name === state,
                   // )?.next.includes(status.name) ? "0.3" : "1",
                 }}
                 className="py-1 rounded-sm mt-[1px] cursor-pointer border"
-                disabled={false
+                disabled={
+                  false
                   // !orderStatusValuesWithIcon.find(
                   //   (s) => s.name === state,
                   // )?.next.includes(status.name)
@@ -249,9 +261,9 @@ export function StateChanger({
                     if (!order.storeId) return;
                     // Send notification
                     sendNotification(
-                      'Change order state 🔄',
-                      `of order:#${order.sequence} to ${status.name}`
-                    )
+                      "Change order state 🔄",
+                      `of order:#${order.sequence} to ${status.name}`,
+                    );
 
                     // Add note
                     dbAddDoc(
@@ -290,9 +302,7 @@ export function StateChanger({
                 }}
               >
                 <span className="mr-2">{status.icon}</span>
-                <span className="capitalize">
-                {status.name}
-                </span>
+                <span className="capitalize">{status.name}</span>
               </DropdownMenuItem>
               {(status.name == "delivered" || status.name == "pending") && (
                 <DropdownMenuSeparator className="w-full h-[2px]" />

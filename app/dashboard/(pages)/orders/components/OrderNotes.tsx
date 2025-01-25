@@ -18,7 +18,6 @@ import { db } from "@/firebase";
 import { useSession } from "next-auth/react";
 import { useQuery } from "@tanstack/react-query";
 import { useOrderStore } from "@/store/orders";
-import { orderStatusValues } from "@/lib/datajson/states";
 import { orderStatusValuesWithIcon } from "./StateChanger";
 
 export type Note = {
@@ -115,7 +114,7 @@ function OrderNotes() {
   );
 }
 function Message({ note }: { note: Note }) {
-  const { storeId,store } = useStore();
+  const { storeId, store } = useStore();
   const { data: user, error } = useQuery({
     queryKey: ["user", note.creator, storeId],
     queryFn: async () => {
@@ -136,7 +135,9 @@ function Message({ note }: { note: Note }) {
       //   ),
       // );
       // const u = response[0];
-      const user = store?.employees?.find(employee => employee.email === note.creator);
+      const user = store?.employees?.find(
+        (employee) => employee.email === note.creator,
+      );
       return user;
     },
   });
@@ -162,18 +163,18 @@ function Message({ note }: { note: Note }) {
           </div>
         </div>
         <div
-          className={`flex w-fit border bg-white flex-1 flex-col gap-2 rounded-lg px-3 py-2 text-sm `}
+          style={{
+            background:
+              orderStatusValuesWithIcon.find(
+                (status) => status.name === note?.changed,
+              )?.color + "90",
+            color: "#000a",
+          }}
+          className={`flex w-fit bg-white flex-1 flex-col gap-2 rounded-full px-3 py-[4px] text-sm `}
         >
           <div>
             {note?.content ?? (
-              <div
-                style={{
-                  color: orderStatusValues.find(
-                    (status) => status.name === note?.changed,
-                  )?.color,
-                }}
-                className="font-bold uppercase flex gap-2 items-center"
-              >
+              <div className="font-bold uppercase flex gap-2 items-center">
                 {
                   orderStatusValuesWithIcon.find(
                     (status) => status.name === note?.changed,
