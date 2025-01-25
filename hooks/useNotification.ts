@@ -19,16 +19,11 @@ const useNotification = () => {
     if(!store.employees) return;
     if(!(session.user && session.user.email)) return;
     // get user name
-    const employee = store?.employees?.find(employee => employee.email === session.user?.email);
-    const name = employee?.name
-    const image = employee?.imageUrl
     const notification = {
       storeId,
-      user: name ?? session.user.name ?? "",
       email: session.user.email ?? "",
       action,
       target,
-      image: image ?? session.user.image ?? "",
       id: "", // You can generate an ID here if needed
       createdAt: Timestamp.now(),
       seen: [],

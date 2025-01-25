@@ -5,9 +5,7 @@ export interface Notification {
   storeId: string;
   createdAt: Timestamp;
   action: string;
-  user: string;
   email: string;
   target: string;
-  image: string;
   seen:string[];
 }

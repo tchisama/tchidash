@@ -16,6 +16,7 @@ import React, { useEffect } from "react";
 import { markNotificationAsRead } from "@/lib/utils/functions/notifications";
 import { usePermission } from "@/hooks/use-permission";
 import Link from "next/link";
+import { Employee } from "@/types/store";
 
 
 function Dot({ className }: { className?: string }) {
@@ -104,10 +105,6 @@ useEffect(() => {
     });
   };
 
-  const handleNotificationClick = (id: string) => {
-    if (!email || !storeId) return;
-    markNotificationAsRead(id, email); // Assuming markNotificationAsRead is defined elsewhere
-  };
 
   const hasViewPermission = usePermission();
 
@@ -155,6 +152,52 @@ useEffect(() => {
           :
           notifications &&
         notifications.map((notification) => (
+          <NotificationCard key={notification.id} notification={notification} />
+        ))}
+        <div className="text-center py-2">
+          {
+            notifications && notifications.length > 0 &&
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setNumberOfNotifications((prev) => prev + 5)}
+          >
+            Load more
+          </Button>
+          }
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+
+const NotificationCard = ({ notification }: { notification: NotificationType }) => {
+  const [email, setEmail] = React.useState<string | null>(null);
+  const { store ,storeId} = useStore();
+  const { data: session } = useSession();
+
+  useEffect(() => {
+    if (session?.user?.email) {
+      setEmail(session.user.email);
+    }
+  },[session]);
+  const [employee, setEmployee] = React.useState<Employee | null>(null);
+
+  useEffect(() => {
+    if (storeId && store?.employees) {
+      const employee = store.employees.find((e) => e.email === notification.email);
+      if(!employee) return;
+      setEmployee(employee);
+    }
+  }, [storeId, email, store]);
+
+  const handleNotificationClick = (id: string) => {
+    if (!email || !storeId) return;
+    markNotificationAsRead(id, email); // Assuming markNotificationAsRead is defined elsewhere
+  };
+
+  return (
           <div
             key={notification.id}
             style={{
@@ -173,7 +216,7 @@ useEffect(() => {
             <div className="relative flex items-start gap-3 pe-3">
               <Image
                 className="size-10 rounded-md bg-slate-100 border"
-                src={notification.image}
+                src={employee?.imageUrl ?? ""}
                 width={34}
                 height={34}
                 alt={""}
@@ -184,7 +227,7 @@ useEffect(() => {
                   // onClick={() => handleNotificationClick(notification.id)}
                 >
                   <span className=" text-black hover:underline">
-                    {notification.user}
+                    {employee?.name}
                   </span>{" "}
                   <span className="font-medium text-black ">
                   {notification.action}{" "}
@@ -227,22 +270,8 @@ useEffect(() => {
               )}
             </div>
           </div>
-        ))}
-        <div className="text-center py-2">
-          {
-            notifications && notifications.length > 0 &&
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => setNumberOfNotifications((prev) => prev + 5)}
-          >
-            Load more
-          </Button>
-          }
-        </div>
-      </PopoverContent>
-    </Popover>
-  );
+  )
 }
+          
 
 export { Notification };
