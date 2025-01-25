@@ -213,11 +213,11 @@ export async function POST(request: NextRequest) {
       // body but remove createdAt
       order = {
         customer: body.customer,
-        shippedTo: body.shippedTo,
-        isShippedToAnotherPerson: body.isShippedToAnotherPerson,
+        shippedTo: body?.shippedTo ?? null,
+        isShippedToAnotherPerson: body?.isShippedToAnotherPerson ?? false,
         items: body.items,
         shippingInfo: body.shippingInfo,
-        currency: body.currency,
+        currency: body?.currency ?? "MAD",
         subtotal: body.subtotal,
         totalItems: body.totalItems,
         totalPrice: body.totalPrice,
@@ -226,6 +226,7 @@ export async function POST(request: NextRequest) {
         sequence: orderSequence,
         storeId,
       } as Order;
+      console.log(order)
     }else{
       order = {
         ...body,
