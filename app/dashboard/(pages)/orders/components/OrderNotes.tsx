@@ -115,35 +115,36 @@ function OrderNotes() {
   );
 }
 function Message({ note }: { note: Note }) {
-  const { storeId } = useStore();
+  const { storeId,store } = useStore();
   const { data: user, error } = useQuery({
     queryKey: ["user", note.creator, storeId],
     queryFn: async () => {
       if (!storeId) return;
-      const q = query(
-        collection(db, "users"),
-        where("email", "==", note.creator),
-      );
-      const response = await dbGetDocs(q, storeId, "").then((response) =>
-        response.docs.map(
-          (doc) =>
-            ({ ...doc.data(), id: doc.id }) as {
-              id: string;
-              name: string;
-              email: string;
-              image: string;
-            },
-        ),
-      );
-      const u = response[0];
-      return u;
+      // const q = query(
+      //   collection(db, "users"),
+      //   where("email", "==", note.creator),
+      // );
+      // const response = await dbGetDocs(q, storeId, "").then((response) =>
+      //   response.docs.map(
+      //     (doc) =>
+      //       ({ ...doc.data(), id: doc.id }) as {
+      //         id: string;
+      //         name: string;
+      //         email: string;
+      //         image: string;
+      //       },
+      //   ),
+      // );
+      // const u = response[0];
+      const user = store?.employees?.find(employee => employee.email === note.creator);
+      return user;
     },
   });
   return (
     <div className="flex w-full gap-2">
       {error?.message}
       <Avatar className="h-8 w-8 border bg-white">
-        <AvatarImage src={user?.image} />
+        <AvatarImage src={user?.imageUrl} />
         <AvatarFallback asChild className="">
           <Avvvatars border value={note.creator} style="shape" />
         </AvatarFallback>

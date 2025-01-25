@@ -39,7 +39,7 @@ import {
 } from "lucide-react";
 import { useOrderStore } from "@/store/orders";
 import { db } from "@/firebase";
-import { doc, Timestamp } from "firebase/firestore";
+import { doc } from "firebase/firestore";
 import { motion } from "framer-motion";
 import { dbDeleteDoc } from "@/lib/dbFuntions/fbFuns";
 import { useStore } from "@/store/storeInfos";
@@ -51,9 +51,9 @@ import DetailsOrderView from "./DetailsOrderView";
 import OrderNotes from "./OrderNotes";
 import { useRouter } from "next/navigation";
 import WhatsappCard from "./Whatsapp";
-import { createNotification } from "@/lib/utils/functions/notifications";
 import { useSession } from "next-auth/react";
 import useRenderWhatsappMessage from "@/lib/utils/functions/renderWhatsappMessage";
+import useNotification from "@/hooks/useNotification";
 function OrderView() {
   const { currentOrder, setCurrentOrder } = useOrderStore();
   const { storeId, store } = useStore();
@@ -61,6 +61,7 @@ function OrderView() {
   const router = useRouter();
   const {data:session} = useSession();
   const renderMessage = useRenderWhatsappMessage();
+  const {sendNotification} = useNotification();
 
   const deleteOrder = async (orderId: string) => {
     if (!currentOrder) return;
@@ -72,17 +73,10 @@ function OrderView() {
       dbDeleteDoc(doc(db, "orders", orderId), storeId, "");
       dbDeleteDoc(doc(db, "sales", orderId), storeId, "");
       setCurrentOrder("");
-                          createNotification({
-                            storeId: storeId,
-                            user: session?.user?.name ?? "",
-                            email: session?.user?.email ?? "",
-                            action: `deleted`,
-                            image: session?.user?.image ?? "",
-                            target: `order #${currentOrder.sequence}`,
-                            id:"",
-                            createdAt: Timestamp.now(),
-                            seen:[],
-                          })
+      sendNotification(
+        `deleted 🗑️`,
+        `order #${currentOrder.sequence}`
+      )
       return;
     } else {
       alert("You can't delete an order that is not cancelled or returned");
@@ -143,17 +137,10 @@ function OrderView() {
                           if (!whatsappConfirmMessage) return;
                           if(!storeId) return;
                           if(!session) return;
-                          createNotification({
-                            storeId: storeId,
-                            user: session?.user?.name ?? "",
-                            email: session?.user?.email ?? "",
-                            action: `Sent whatsapp confirmation`,
-                            image: session?.user?.image ?? "",
-                            target: `of order:#${currentOrder?.sequence} `,
-                            id:"",
-                            createdAt: Timestamp.now(),
-                            seen:[],
-                          })
+                          sendNotification(
+                            `Sent whatsapp confirmation 💬`,
+                            `of order:#${currentOrder?.sequence}`
+                          )
                           const message = renderMessage(
                             whatsappConfirmMessage,
                           )

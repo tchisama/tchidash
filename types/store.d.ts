@@ -68,6 +68,7 @@ export type Employee = {
   name: string;
   email: string;
   roles: Role[];
+  imageUrl?: string;
 };
 
 type Integration = digylogIntegration | whatsappNotificationIntegration;

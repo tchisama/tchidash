@@ -1,11 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import {
   Pencil,
   Printer,
   Send,
-  ShoppingCart,
   Trash,
   Download,
 } from "lucide-react";
@@ -18,7 +16,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Table,
@@ -280,7 +277,6 @@ const OrderNotes = ({ note }: { note: string }) => (
 // )
 
 export function OrderView({ order }: { order: Order }) {
-  const [isCartOpen, setIsCartOpen] = useState(false);
   const { currentOrder } = useOrderStore();
 
   return (

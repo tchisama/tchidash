@@ -35,6 +35,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { DialogClose } from "@radix-ui/react-dialog";
+import UploadImageProvider from "@/components/UploadImageProvider";
+import { Upload } from "lucide-react";
 
 
 const Emplyies = () => {
@@ -59,8 +61,9 @@ const Emplyies = () => {
     id: "",
     email: "",
     roles: [],
+    imageUrl: "", // Initialize imageUrl
   });
-  const [showForm, setShowForm] = useState(false); // State to toggle form visibility
+  const [showForm, setShowForm] = useState(false);
 
   const handleSave = () => {
     if (!storeId) return;
@@ -90,33 +93,32 @@ const Emplyies = () => {
         id: "",
         email: "",
         roles: [],
+        imageUrl: "", // Reset imageUrl
       });
-      setShowForm(false); // Hide the form after saving
+      setShowForm(false);
     });
   };
 
   const handleDeleteEmployee = (employeeId: string) => {
-    if (!storeId || !store) return;
-    let updatedEmployees;
-    if (store.employees) {
-      updatedEmployees = store.employees.filter(
-        (employee) => employee.id !== employeeId,
-      );
-      dbUpdateDoc(
-        doc(db, "stores", storeId),
-        {
-          employees: updatedEmployees,
-          employeesEmails: updatedEmployees.map((employee) => employee.email),
-        },
-        storeId,
-        "",
-      );
-    }
+    if (!storeId) return;
+    dbUpdateDoc(
+      doc(db, "stores", storeId),
+      {
+        employees: (store?.employees || []).filter(
+          (employee) => employee.id !== employeeId,
+        ),
+        employeesEmails: (store?.employeesEmails || []).filter(
+          (email) => email !== employeeId,
+        ),
+      },
+      storeId,
+      "",
+    );
   };
 
   return (
     store && (
-      <Card >
+      <Card>
         <CardHeader>
           <CardTitle>Employees</CardTitle>
           <CardDescription>
@@ -132,6 +134,27 @@ const Emplyies = () => {
           {/* Add Employee Form (Conditionally Rendered) */}
           {showForm && (
             <div className="p-4 flex flex-col items-start gap-2 border bg-slate-100 rounded-xl mb-4">
+              {/* Image Upload */}
+              <div className="flex gap-2 items-center flex-row-reverse">
+                <UploadImageProvider
+                  name={newEmployee.name || "employee"}
+                  folder={storeId ?? ""}
+                  callback={(url) => {
+                    setNewEmployee((prev) => ({ ...prev, imageUrl: url }));
+                  }}
+                >
+                  <div className="h-10 w-10 border rounded-md bg-white flex items-center justify-center">
+                    <Upload className="h-4 w-4" />
+                  </div>
+                </UploadImageProvider>
+                {newEmployee.imageUrl && (
+                  <img
+                    src={newEmployee.imageUrl}
+                    alt="Employee"
+                    className="w-16 h-16 rounded-2xl"
+                  />
+                )}
+              </div>
               <Input
                 value={newEmployee.name}
                 placeholder="Name"
@@ -148,16 +171,17 @@ const Emplyies = () => {
                   setNewEmployee({ ...newEmployee, email: e.target.value })
                 }
               />
+              {/* Role Selection */}
               <Popover>
                 <PopoverTrigger>
                   <div className="w-[400px] flex justify-start">
                     <Button variant="outline" className="space-y-1 space-x-1">
                       {newEmployee.roles.length > 0
                         ? newEmployee.roles.map((role) => (
-                            <Badge variant={"outline"} key={role}>
-                              {role}
-                            </Badge>
-                          ))
+                          <Badge variant={"outline"} key={role}>
+                            {role}
+                          </Badge>
+                        ))
                         : "Select Roles"}
                     </Button>
                   </div>
@@ -169,8 +193,8 @@ const Emplyies = () => {
                         setNewEmployee((prev) => ({
                           ...prev,
                           roles: prev.roles.includes(role)
-                            ? prev.roles.filter((r) => r !== role) // Remove role if already selected
-                            : [...prev.roles, role], // Add role if not selected
+                            ? prev.roles.filter((r) => r !== role)
+                            : [...prev.roles, role],
                         }));
                       }}
                       variant="ghost"
@@ -197,7 +221,15 @@ const Emplyies = () => {
                 className="flex px-4 gap-4 items-center p-2 border rounded-xl"
               >
                 <div>
-                  <Avvvatars size={40} value={employee.name} style="shape" />
+                  {employee.imageUrl ? (
+                    <img
+                      src={employee.imageUrl}
+                      alt={employee.name}
+                      className="w-10 h-10 rounded-full"
+                    />
+                  ) : (
+                    <Avvvatars size={40} value={employee.name} style="shape" />
+                  )}
                 </div>
                 <div className="flex-1">
                   <p>{employee.name}</p>
@@ -218,6 +250,9 @@ const Emplyies = () => {
 };
 
 
+
+
+
 const UpdateEmployee = ({
   employee,
   store,
@@ -232,9 +267,8 @@ const UpdateEmployee = ({
 
   const handleRoleChange = (role: Role) => {
     const newRoles = updatedEmployee?.roles?.includes(role)
-      ? updatedEmployee.roles.filter((r) => r !== role) // Remove role
-      : [...updatedEmployee.roles, role]; // Add role
-
+      ? updatedEmployee.roles.filter((r) => r !== role)
+      : [...updatedEmployee.roles, role];
     setUpdatedEmployee((prev) => ({ ...prev, roles: newRoles }));
   };
 
@@ -267,6 +301,26 @@ const UpdateEmployee = ({
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
+            <div className="flex items-center gap-2 justify-start ">
+              {updatedEmployee.imageUrl && (
+                <img
+                  src={updatedEmployee.imageUrl}
+                  alt="Employee"
+                  className="w-16 h-16 rounded-2xl"
+                />
+              )}
+              <UploadImageProvider
+                name={updatedEmployee.name || "employee"}
+                folder={storeId ?? ""}
+                callback={(url) => {
+                  setUpdatedEmployee((prev) => ({ ...prev, imageUrl: url }));
+                }}
+              >
+                <div className="h-10 w-10 border rounded-md bg-white flex items-center justify-center">
+                  <Upload className="h-4 w-4" />
+                </div>
+              </UploadImageProvider>
+            </div>
             <Input
               value={updatedEmployee.name}
               placeholder="Name"
@@ -281,15 +335,17 @@ const UpdateEmployee = ({
                 setUpdatedEmployee({ ...updatedEmployee, email: e.target.value })
               }
             />
+            {/* Image Upload */}
+            {/* Role Selection */}
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="outline" className="w-full justify-start">
                   {updatedEmployee?.roles?.length > 0
                     ? updatedEmployee?.roles?.map((role) => (
-                        <Badge variant={"outline"} key={role} className="mr-1">
-                          {role}
-                        </Badge>
-                      ))
+                      <Badge variant={"outline"} key={role} className="mr-1">
+                        {role}
+                      </Badge>
+                    ))
                     : "Select Roles"}
                 </Button>
               </PopoverTrigger>
@@ -325,4 +381,6 @@ const UpdateEmployee = ({
   );
 };
 
-export { UpdateEmployee, Emplyies };
+
+
+export { Emplyies };

@@ -31,7 +31,7 @@ import {
   UserRoundCheck,
   UserRoundX,
 } from "lucide-react";
-import { createNotification } from "@/lib/utils/functions/notifications";
+import useNotification from "@/hooks/useNotification";
 
 export const orderStatusValuesWithIcon = [
   {
@@ -118,9 +118,10 @@ export function StateChanger({
   order: Order;
   showNumberOfCalls?: boolean;
 }) {
-  const { storeId } = useStore();
+  const { storeId,store } = useStore();
   const [state, setState] = React.useState<OrderStatus>();
   const { data: session } = useSession();
+  const {sendNotification} = useNotification();
   const {
     orders,
     setOrders,
@@ -148,14 +149,13 @@ export function StateChanger({
       );
       const note = await dbGetDocs(q, storeId, "");
       const noteData = note.docs.map((doc) => doc.data())[0];
-      if (!noteData) return;
-      const q2 = query(
-        collection(db, "users"),
-        where("email", "==", noteData.creator),
-        limit(1),
-      );
-      const user = await dbGetDocs(q2, storeId, "");
-      return user.docs.map((doc) => doc.data())[0];
+      console.log(noteData)
+      const user = store?.employees?.find(
+        (employee) => employee.email === noteData?.creator)
+
+      console.table(user)
+      console.log("USER")
+      return user
     },
   });
 
@@ -195,7 +195,7 @@ export function StateChanger({
             }
             {user && (
               <Avatar className="w-6 h-6 border border-[#3335] ">
-                <AvatarImage src={user?.image ?? ""} alt={user?.name ?? ""} />
+                <AvatarImage src={user?.imageUrl ?? ""} alt={user?.name ?? ""} />
                 <AvatarFallback>
                   {user?.name
                     ?.split(" ")
@@ -248,17 +248,11 @@ export function StateChanger({
 
                     if (!order.storeId) return;
                     // Send notification
-                    createNotification({
-                      storeId: order.storeId,
-                      user: session?.user?.name ?? "",
-                      email: session?.user?.email ?? "",
-                      action: `Change order state`,
-                      target: `of order:#${order.sequence} to ${status.name}`,
-                      image: session?.user?.image ?? "",
-                      id:"",
-                      createdAt: Timestamp.now(),
-                      seen:[],
-                    })
+                    sendNotification(
+                      'Change order state 🔄',
+                      `of order:#${order.sequence} to ${status.name}`
+                    )
+
                     // Add note
                     dbAddDoc(
                       collection(db, "notes"),
