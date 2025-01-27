@@ -117,13 +117,6 @@ function OrdersGraph() {
               data={chartData || []}
             >
               <CartesianGrid vertical={false} />
-              <Bar
-                dataKey="orders"
-                fill="var(--color-steps)"
-                radius={10}
-                fillOpacity={0.6}
-                activeBar={<Rectangle fillOpacity={0.8} />}
-              />
               <XAxis
                 dataKey="date"
                 tickLine={true}
@@ -140,12 +133,19 @@ function OrdersGraph() {
                 tickLine={true}
                 axisLine={true}
                 // i want to alignt it to the right
-                orientation="right"
+                orientation="left"
                 width={25}
                 tickMargin={4}
                 tickFormatter={(value) => {
                   return value;
                 }}
+              />
+              <Bar
+                dataKey="orders"
+                fill="var(--color-steps)"
+                radius={10}
+                fillOpacity={0.6}
+                activeBar={<Rectangle fillOpacity={0.8} />}
               />
 
               <ChartTooltip

@@ -27,34 +27,48 @@ import {
 } from "firebase/firestore";
 import { db } from "@/firebase";
 import { useStore } from "@/store/storeInfos";
+import { orderStatusValuesWithIcon } from "../../orders/components/StateChanger";
 
 // Config for your chart colors
-const chartConfig = {
-  pending: {
-    label: "Pending",
-    color: "#534b52",
-  },
-  processing: {
-    label: "Processing",
-    color: "#3d348b",
-  },
-  shipped: {
-    label: "Shipped",
-    color: "#2667ff",
-  },
-  delivered: {
-    label: "Delivered",
-    color: "#43aa8b",
-  },
-  cancelled: {
-    label: "Cancelled",
-    color: "#f8961e",
-  },
-  returned: {
-    label: "Returned",
-    color: "#e63946",
-  },
-} satisfies ChartConfig;
+// const chartConfig = {
+//   pending: {
+//     label: "Pending",
+//     color: "#534b52",
+//   },
+//   processing: {
+//     label: "Processing",
+//     color: "#3d348b",
+//   },
+//   shipped: {
+//     label: "Shipped",
+//     color: "#2667ff",
+//   },
+//   delivered: {
+//     label: "Delivered",
+//     color: "#43aa8b",
+//   },
+//   cancelled: {
+//     label: "Cancelled",
+//     color: "#f8961e",
+//   },
+//   returned: {
+//     label: "Returned",
+//     color: "#e63946",
+//   },
+// } satisfies ChartConfig;
+
+const chartConfig: {
+  [key: string]: {
+    label: string;
+    color: string;
+  };
+} = {};
+orderStatusValuesWithIcon.forEach((status) => {
+  chartConfig[status.name] = {
+    label: status.name,
+    color: status.color,
+  };
+});
 
 type OrderStatus = keyof typeof chartConfig; // Type that matches the keys of chartConfig
 
@@ -65,14 +79,7 @@ export function OrdersDonutChart() {
   const { data: ordersData, isLoading } = useQuery({
     queryKey: ["orders-donut-chart"],
     queryFn: async () => {
-      const statuses: OrderStatus[] = [
-        "pending",
-        "processing",
-        "shipped",
-        "delivered",
-        "cancelled",
-        "returned",
-      ];
+      const statuses: OrderStatus[] = Object.keys(chartConfig) as OrderStatus[];
 
       const statusQueries = statuses.map(async (status) => {
         const ordersQuery = query(

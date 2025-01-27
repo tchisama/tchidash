@@ -22,14 +22,6 @@ export default function page() {
           </div>
         </div>
       </div>
-      <div>
-        <h1 className="text-3xl font-semibold text-gray-800 mt-12 mb-4">
-          Usage and Cost
-        </h1>
-        <div className="flex gap-4">
-          <UsageGraph />
-        </div>
-      </div>
     </div>
   );
 }

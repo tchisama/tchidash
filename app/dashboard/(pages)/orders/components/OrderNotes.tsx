@@ -19,6 +19,7 @@ import { useSession } from "next-auth/react";
 import { useQuery } from "@tanstack/react-query";
 import { useOrderStore } from "@/store/orders";
 import { orderStatusValuesWithIcon } from "./StateChanger";
+import { MentionInput } from "@/components/MentionInput";
 
 export type Note = {
   id: string;
@@ -98,12 +99,7 @@ function OrderNotes() {
           onSubmit={onSubmit}
           className="flex w-full pt-4  items-start space-x-2  border-t"
         >
-          <Textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="Type your message here..."
-            className="flex-1 h-12 bg-slate-50"
-          />
+          <MentionInput input={content} setInput={setContent} />
           <Button disabled={!content} type="submit" size="icon">
             <SendIcon className="h-4 w-4" />
             <span className="sr-only">Send</span>
