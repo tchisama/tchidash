@@ -3,7 +3,6 @@
 import MoroccanMap from "./components/MoroccanMap";
 import { OrdersDonutChart } from "./components/OrdersDonutChart";
 import OrdersGraph from "./components/OrdersGraph";
-import UsageGraph from "./components/UsageGraph";
 
 export default function page() {
   return (

@@ -3,7 +3,6 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { SendIcon } from "lucide-react";
-import { Textarea } from "@/components/ui/textarea";
 import Avvvatars from "avvvatars-react";
 import { dbAddDoc, dbGetDocs } from "@/lib/dbFuntions/fbFuns";
 import { useStore } from "@/store/storeInfos";
