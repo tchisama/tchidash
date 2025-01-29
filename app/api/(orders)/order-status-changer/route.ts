@@ -4,8 +4,55 @@ import { db } from "@/firebase";
 import { dbGetDoc, dbSetDoc, dbUpdateDoc } from "@/lib/dbFuntions/fbFuns";
 import { v4 } from "uuid";
 import { OrderStatus } from "@/types/order";
-import { orderStatusValuesWithIcon } from "@/app/dashboard/(pages)/orders/components/StateChanger";
 // import { orderStatusValues } from "@/lib/datajson/states";
+
+
+export const orderStatusValuesWithIcon = [
+  {
+    name: "pending",
+    effectStock: false,
+  },
+  {
+    name: "confirmed",
+    effectStock: true,
+  },
+  {
+    name: "packed",
+    effectStock: true,
+  },
+  {
+    name: "shipped",
+    effectStock: true,
+  },
+  {
+    name: "delivered",
+    effectStock: true,
+  },
+  {
+    name: "scheduled",
+    effectStock: true,
+  },
+  {
+    name: "no_reply",
+    effectStock: false,
+  },
+  {
+    name: "cancelled",
+    effectStock: false,
+  },
+  {
+    name: "returned",
+    effectStock: false,
+  },
+  {
+    name: "fake",
+    effectStock: false,
+  },
+];
+
+
+
+
 
 interface OrderUpdateRequest {
   orderId: string;

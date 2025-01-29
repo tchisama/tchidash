@@ -148,7 +148,8 @@ export function StateChanger({
   const { data: user } = useQuery({
     queryKey: ["notes", storeId, order.id, state],
     queryFn: async () => {
-      if (!storeId) return;
+      if (!storeId) return null;
+      
       const q = query(
         collection(db, "notes"),
         where("details.for", "==", "order"),
@@ -159,8 +160,9 @@ export function StateChanger({
       const note = await dbGetDocs(q, storeId, "");
       const noteData = note.docs.map((doc) => doc.data())[0];
       console.log(noteData);
+      if(!store) return null
       const user = store?.employees?.find(
-        (employee) => employee.email === noteData?.creator,
+        (employee) => employee.email.trim()== noteData?.creator.trim(),
       );
 
       console.table(user);
@@ -269,7 +271,7 @@ export function StateChanger({
                     dbAddDoc(
                       collection(db, "notes"),
                       {
-                        changed: `${status.name}`,
+                        changed: `${status.name.toLocaleLowerCase()}`,
                         creator: session?.user?.email,
                         createdAt: Timestamp.now(),
                         details: {
