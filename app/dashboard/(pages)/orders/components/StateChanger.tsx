@@ -165,8 +165,6 @@ export function StateChanger({
         (employee) => employee.email.trim()== noteData?.creator.trim(),
       );
 
-      console.table(user);
-      console.log("USER");
       return user;
     },
   });
@@ -222,7 +220,9 @@ export function StateChanger({
         <DropdownMenuContent className="shadow-2xl" align="start" side="right">
           <DropdownMenuLabel>Order Status</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {orderStatusValuesWithIcon.map((status) => (
+          {orderStatusValuesWithIcon
+          .filter((s) => s.name !== state)
+          .map((status) => (
             <>
               <DropdownMenuItem
                 key={status.name}

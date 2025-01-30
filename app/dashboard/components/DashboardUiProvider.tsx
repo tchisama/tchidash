@@ -12,10 +12,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import PhoneBar from "./PhoneBar";
 import { signOut, useSession } from "next-auth/react";
-import Logout from "@/public/images/svgs/icons/logout.svg";
-import Help from "@/public/images/svgs/icons/help.svg";
-import Settings from "@/public/images/svgs/icons/settings.svg";
-import Store from "@/public/images/svgs/icons/shop.svg";
 import BreadcrumbCom from "./Breadcrumb";
 import { useNavbar } from "@/store/navbar";
 import { useRouter } from "next/navigation";
@@ -23,6 +19,7 @@ import useClean from "@/hooks/useClean";
 import BottomBar from "./BottomBar";
 import { useStore } from "@/store/storeInfos";
 import { Notification } from "./Notifications";
+import { InfoIcon, LogOutIcon, SettingsIcon, StoreIcon } from "lucide-react";
 
 export const description =
   "An orders dashboard with a sidebar navigation. The sidebar has icon navigation. The content area has a breadcrumb and search in the header. The main area has a list of recent orders with a filter and export button. The main area also has a detailed view of a single order with order details, shipping information, billing information, customer information, and payment information.";
@@ -94,20 +91,20 @@ export default function DashboardUiProvider({
                     router.push("/dashboard/switch-store");
                   }}
                 >
-                  <Image src={Store} alt="Settings" className="mr-2 h-4 w-4" />
+                  <StoreIcon className="mr-2 h-4 w-4" />
                   Switch Store
                 </DropdownMenuItem>
 
                 <DropdownMenuItem>
-                  <Image
-                    src={Settings}
-                    alt="Settings"
+                  <SettingsIcon
                     className="mr-2 h-4 w-4"
                   />
                   Settings
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Image src={Help} alt="Help" className="mr-2 h-4 w-4" />
+                  <InfoIcon
+                    className="mr-2 h-4 w-4"
+                  />
                   Support
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -117,7 +114,7 @@ export default function DashboardUiProvider({
                     signOut();
                   }}
                 >
-                  <Image src={Logout} alt="Logout" className="mr-2 h-4 w-4" />
+                  <LogOutIcon className="mr-2 h-4 w-4" />
                   Logout
                 </DropdownMenuItem>
               </DropdownMenuContent>

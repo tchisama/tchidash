@@ -191,7 +191,7 @@ function Analytic() {
                   thisWeekProfit > lastWeekProfit && "text-primary",
                 )}
               >
-                {thisWeekProfit} {store.settings.currency.symbol}
+                {thisWeekProfit} Dh
                 {thisWeekProfit > lastWeekProfit && (
                   <ArrowUpRightIcon className="w-8 h-8" />
                 )}
@@ -220,7 +220,7 @@ function Analytic() {
                   thisMonthProfit > lastMonthProfit && "text-primary",
                 )}
               >
-                {thisMonthProfit} {store.settings.currency.symbol}
+                {thisMonthProfit} Dh
                 {thisMonthProfit > lastMonthProfit && (
                   <ArrowUpRightIcon className="w-8 h-8" />
                 )}
