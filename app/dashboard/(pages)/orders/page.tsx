@@ -1,8 +1,6 @@
 "use client";
 import {
-  Check,
   CheckCircle,
-  Filter,
   HashIcon,
   PhoneIcon,
   PlusCircle,
@@ -26,13 +24,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { orderStatusValuesWithIcon } from "./components/StateChanger";
-import { Label } from "@/components/ui/label";
+// import { Label } from "@/components/ui/label";
 import Analytic from "./components/analytic";
 import { Input } from "@/components/ui/input";
 import { usePermission } from "@/hooks/use-permission";
@@ -43,22 +36,11 @@ export default function Page() {
   const [pageSize, setPageSize] = useState(25);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<{
-    status: string[];
+    status: string;
     search: string;
     searchBy: "Name" | "Number" | "Order ID";
   }>({
-    status: [
-      "pending",
-      "confirmed",
-      "packed",
-      "shipped",
-      "delivered",
-      "scheduled",
-      "cancelled",
-      "no_reply",
-      "returned",
-      "fake",
-    ],
+    status: "all",
     search: "",
     searchBy: "Name",
   });
@@ -70,25 +52,11 @@ export default function Page() {
     return <div>You dont have permission to view this page</div>;
   }
 
-  const handleStatusFilterChange = (statusName: string) => {
-    if (statusName === "all") {
-      // If "All" is selected, toggle between selecting all statuses and none
-      setFilter((prevFilter) => ({
-        ...prevFilter,
-        status:
-          prevFilter.status.length === orderStatusValuesWithIcon.length
-            ? []
-            : orderStatusValuesWithIcon.map((status) => status.name),
-      }));
-    } else {
-      // Toggle the selected status
-      setFilter((prevFilter) => ({
-        ...prevFilter,
-        status: prevFilter.status.includes(statusName)
-          ? prevFilter.status.filter((s) => s !== statusName)
-          : [...prevFilter.status, statusName],
-      }));
-    }
+  const handleStatusFilterChange = (selectedStatuses: string) => {
+    setFilter((prevFilter) => ({
+      ...prevFilter,
+      status: selectedStatuses,
+    }))
   };
 
   return (
@@ -103,52 +71,32 @@ export default function Page() {
         <div className="">
           <div className="ml-auto mb-2 flex items-center gap-2">
             <div className="flex gap-2">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button className="" variant={"outline"}>
-                    <Filter className="h-4 w-4 mr-2" />
-                    Filter
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-[150px] flex p-2 gap-1 flex-col">
-                  <div className="p-1 px-2">
-                    <Label>Order Status</Label>
-                  </div>
-                  {/* Add "All" option */}
-                  <Button
-                    onClick={() => handleStatusFilterChange("all")}
-                    size="sm"
-                    variant="outline"
-                    className="w-full gap-2 justify-start text-left shadow-none border font-normal"
-                  >
-                    <CheckCircle className="h-4 w-4" />
-                    All
-                    {filter.status.length ===
-                      orderStatusValuesWithIcon.length && (
-                      <Check className="ml-auto h-4 w-4" />
-                    )}
-                  </Button>
-                  <div className="border-t border-gray-200 my-2"></div>
-                  {[...orderStatusValuesWithIcon].map((status) => (
-                    <Button
-                      key={status.name}
-                      onClick={() => handleStatusFilterChange(status.name)}
-                      style={{
-                        background: status.color + "50",
-                        borderColor: status.color + "30",
-                        color: "#000a",
-                      }}
-                      size="sm"
-                      className="w-full gap-2 justify-start text-left shadow-none border font-normal"
-                    >
-                      {status.icon} {status.name}
-                      {filter.status.includes(status.name) && (
-                        <Check className="ml-auto h-4 w-4" />
-                      )}
-                    </Button>
+              <Select
+                onValueChange={(value) => {
+                  const selectedStatuses = value
+                  handleStatusFilterChange(selectedStatuses);
+                }}
+                value={filter.status}
+                defaultValue="all"
+              >
+                <SelectTrigger className="bg-white">
+                  <SelectValue placeholder="Filter by Status" />
+                </SelectTrigger>
+                <SelectContent className="mt-2 max-w-xs bg-white">
+                  {[{
+                    name: "all",
+                    icon: <CheckCircle className="h-4 w-4" />,
+                    color:"white",
+                  }, ...orderStatusValuesWithIcon].map((status) => (
+                    <SelectItem key={status.name} value={status.name}>
+                      <div className="flex items-center gap-2">
+                        <span className="w-6 h-6 rounded-[8px] flex items-center justify-center" style={{ backgroundColor: status.color + "88" }}
+                        >{status.icon}</span> {status.name}
+                      </div>
+                    </SelectItem>
                   ))}
-                </PopoverContent>
-              </Popover>
+                </SelectContent>
+              </Select>
               <Select
                 onValueChange={(value) => setPageSize(Number(value))}
                 defaultValue={pageSize.toString()}
@@ -156,11 +104,15 @@ export default function Page() {
                 <SelectTrigger className="bg-white">
                   <SelectValue placeholder="Page Size" />
                 </SelectTrigger>
-                <SelectContent className="mt-2 max-w-xs bg-white">
-                  <SelectItem value="25">25</SelectItem>
-                  <SelectItem value="50">50</SelectItem>
-                  <SelectItem value="100">100</SelectItem>
-                </SelectContent>
+                <SelectContent className="mt-2 max-w-xs bg-white">{
+                  [25, 50 ,100 ].map((size) => (
+                    <SelectItem key={size} value={size.toString()}>
+                      {size} {
+                        size === pageSize && " / page"
+                      }
+                    </SelectItem>
+                  ))
+                  }</SelectContent>
               </Select>
               <div className=" hidden md:flex flex-row-reverse">
                 <Button
@@ -240,9 +192,9 @@ export default function Page() {
               </div>
             </div>
           </div>
-          <Card x-chunk="dashboard-05-chunk-3" className="">
+          <Card x-chunk="dashboard-05-chunk-3" className="relative">
             <CardHeader className="">
-              <CardTitle className="text-xl font-medium">Orders</CardTitle>
+              <CardTitle className="text-xl font-medium">Orders {}</CardTitle>
             </CardHeader>
             <CardContent className="">
               <OrdersTable

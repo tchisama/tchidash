@@ -221,7 +221,7 @@ export async function POST(request: NextRequest) {
         subtotal: body.subtotal,
         totalItems: body.totalItems,
         totalPrice: body.totalPrice,
-        note: body.note,
+        note: body.note ?? "",
         id: body.id,
         sequence: orderSequence,
         storeId,

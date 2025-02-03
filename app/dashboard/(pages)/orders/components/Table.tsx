@@ -52,7 +52,7 @@ export function OrdersTable({
 }: {
   pageSize: number;
   setPageSize: React.Dispatch<React.SetStateAction<number>>;
-  filter: { status: string[]; search: string, searchBy: "Name" | "Number" | "Order ID" };
+  filter: { status: string; search: string, searchBy: "Name" | "Number" | "Order ID" };
 }) {
   const { storeId } = useStore();
   const {
@@ -72,8 +72,9 @@ export function OrdersTable({
     queryFn: async () => {
       const wheres: QueryFilterConstraint[] = [];
       wheres.push(where("storeId", "==", storeId));
-      wheres.push(where("orderStatus", "in", filter.status));
-
+      if(filter.status !== "all"){
+        wheres.push(where("orderStatus", "==", filter.status));
+      }
 
 
     if (filter.search) {
@@ -214,6 +215,9 @@ export function OrdersTable({
       />
       </div>
       <div className="md:block hidden">
+        <div className="absolute top-4 right-4 ">
+            <span className="font-semibold">{totalCount}</span> orders
+        </div>
       <Table className="">
         <TableHeader>
           <TableRow>
