@@ -27,8 +27,10 @@ import { db } from "@/firebase";
 import { useStore } from "@/store/storeInfos";
 import { Order } from "@/types/order";
 import ScheduledOrdersTable from "./components/ScheduledOrdersTable";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 
 export default function Page() {
+  const {store} = useStore();
   const { data: session } = useSession();
   const { storeId } = useStore();
   const { data: orders } = useQuery({
@@ -58,9 +60,24 @@ export default function Page() {
     <main className="flex flex-1 flex-col gap-4  md:gap-8 ">
       <h1 className="text-4xl text-slate-800 capitalize font-bold tracking-tight">
         {/* // with emoji of hi */}
+        <span className="flex gap-2 items-center">
+        <Avatar className="rounded-3xl size-20">
+          <AvatarImage src={
+            store?.employees?.find(
+              (emp) => emp.email === session?.user?.email,
+            )?.imageUrl ??""
+          } />
+        </Avatar>
+        <div>
         <span className="text-5xl">Hello</span>
         <br />
-        {session?.user?.name} 👋
+        {
+        store?.employees?.find(
+          (emp) => emp.email === session?.user?.email,
+        )?.name
+        } 👋
+        </div>
+        </span>
       </h1>
       {/* <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
         <Card x-chunk="dashboard-01-chunk-0">

@@ -20,6 +20,7 @@ import BottomBar from "./BottomBar";
 import { useStore } from "@/store/storeInfos";
 import { Notification } from "./Notifications";
 import { InfoIcon, LogOutIcon, SettingsIcon, StoreIcon } from "lucide-react";
+import { Employee } from "@/types/store";
 
 export const description =
   "An orders dashboard with a sidebar navigation. The sidebar has icon navigation. The content area has a breadcrumb and search in the header. The main area has a list of recent orders with a filter and export button. The main area also has a detailed view of a single order with order details, shipping information, billing information, customer information, and payment information.";
@@ -69,11 +70,22 @@ export default function DashboardUiProvider({
                       {store?.name}
                     </span>
                     <span className="font-medium text-xs">
-                      {session?.user?.name}
+                      {
+                        store?.employees?.find(
+                          (employee: Employee) =>
+                            employee.email === session?.user?.email
+                        )?.name ?? ""
+                      }
                     </span>
                   </div>
                   <Image
-                    src={store?.logoUrl ?? session?.user?.image ?? ""}
+                    src={
+                      (store  && 
+                      store.employees?.find(
+                        (employee: Employee) =>
+                          employee.email === session?.user?.email
+                        )?.imageUrl )?? ""
+                    }
                     width={36}
                     height={36}
                     alt="Avatar"
@@ -95,7 +107,11 @@ export default function DashboardUiProvider({
                   Switch Store
                 </DropdownMenuItem>
 
-                <DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    router.push("/dashboard/settings");
+                  }}
+                >
                   <SettingsIcon
                     className="mr-2 h-4 w-4"
                   />
