@@ -142,7 +142,7 @@ function DetailsOrderView() {
             </dl>
           </div>
           <Separator className="my-2" />
-          <h1 className="font-semibold">Shipping Provider</h1>
+          {/* <h1 className="font-semibold">Shipping Provider</h1>
           {store &&
             store.integrations &&
             store?.integrations?.find((i) => i.name === "digylog")?.enabled ==
@@ -216,7 +216,7 @@ function DetailsOrderView() {
                 </div>
               </>
             )}
-          <Separator className="my-4" />
+          <Separator className="my-4" /> */}
           <div className="grid  gap-4">
             <div className="grid gap-3">
               <div className="font-semibold">Shipping Information</div>
@@ -225,10 +225,13 @@ function DetailsOrderView() {
                 <address className="flex-1 grid gap-0.5 not-italic text-muted-foreground">
                   <div className="flex items-center gap-2">
                     <HoverCard>
-                      <HoverCardTrigger className="flex items-center gap-2">
+                      <HoverCardTrigger className="flex w-full items-center gap-2">
+                        <div className="flex items-center w-full gap-2 justify-between">
+                          <span>City</span>
                         <span>
                           {currentOrder.customer.shippingAddress.city}
                         </span>
+                        </div>
                         {currentOrder.cityAi &&
                           currentOrder.cityAi.city.toLowerCase().trim() !=
                             currentOrder.customer.shippingAddress.city
@@ -255,7 +258,10 @@ function DetailsOrderView() {
                       </HoverCardContent>
                     </HoverCard>
                   </div>
+                  <div className="flex justify-between items-center gap-2">
+                    <span>Address</span>
                   <span>{currentOrder.customer.shippingAddress.address}</span>
+                  </div>
                 </address>
                 {
                   //currentOrder.cityAi && currentOrder.cityAi.city && (

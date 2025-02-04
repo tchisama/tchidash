@@ -85,7 +85,9 @@ function OrderView() {
 
   return currentOrder
     ? store && (
-        <motion.div className="h-full">
+      <div className="">
+        <div  onClick={() => setCurrentOrder("")} className="w-screen h-screen bg-[#0003] backdrop-blur-sm fixed top-0 left-0 z-50"></div>
+        <motion.div className="h-fit z-50 rounded-xl fixed shadow-2xl w-full md:w-[700px] overflow-hidden top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2">
           <DigylogDialog />
           <OrderToImage />
           <Tabs defaultValue="details" className=" sticky top-32 h-[83vh] ">
@@ -223,8 +225,8 @@ function OrderView() {
                   </DropdownMenu>
                   <Button
                     size="icon"
-                    variant="outline"
-                    className="h-8 w-8"
+                    variant="secondary"
+                    className="h-8 w-8 hover:bg-slate-300 bg-slate-200"
                     onClick={() => {
                       // close the order view
                       setCurrentOrder("");
@@ -270,6 +272,7 @@ function OrderView() {
             </Card>
           </Tabs>
         </motion.div>
+</div>
       )
     : null;
 }

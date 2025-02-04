@@ -74,10 +74,10 @@ export function MentionInput({
   };
 
   return (
-    <div className="relative w-full max-w-md">
+    <div className="relative w-full ">
       <textarea
         ref={textareaRef}
-        className="w-full p-2 border rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-full p-2 border rounded-md resize-none focus:outline-none focus:ring-2 bg-slate-50 focus:ring-blue-500"
         rows={4}
         value={input}
         onChange={handleInput}

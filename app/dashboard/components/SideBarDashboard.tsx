@@ -1,20 +1,6 @@
-/*
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    plugins: [
-      // ...
-      require('@tailwindcss/forms'),
-    ],
-  }
-  ```
-*/
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Dialog,
   DialogBackdrop,
@@ -23,12 +9,15 @@ import {
 } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/20/solid'
 import { useStore } from '@/store/storeInfos'
-import {  Box, ChartColumn, Folder, Home, Mail, Settings, ShoppingBasket, StarIcon, Truck, UsersIcon } from 'lucide-react'
+import {  Box, ChartColumn, Folder, Home, Mail, Settings, ShoppingBasket, SidebarIcon, StarIcon, Truck, UsersIcon } from 'lucide-react'
 import { Notification } from './Notifications'
 import UserProfileButton from './UserProfileButton'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import BreadcrumbCom from './Breadcrumb'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+import useLocalStorage from '@/hooks/useLocalStorage'
 
 
 
@@ -59,6 +48,21 @@ export default function SideBarDashboard({
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const { store } = useStore();
   const pathname = usePathname();
+  const [desktopOpen, setDesktopOpen] = useLocalStorage("sidebarOpen", true)
+
+
+  useEffect(() => {
+    localStorage.setItem("sidebarOpen", String(desktopOpen));
+  }, [desktopOpen]);
+
+  useEffect(() => {
+    const savedSidebarOpen = localStorage.getItem("sidebarOpen");
+    if (savedSidebarOpen !== null) {
+      setDesktopOpen(JSON.parse(savedSidebarOpen));
+    }else{
+      setDesktopOpen(true)
+    }
+  }, []);
 
   return (
     <>
@@ -151,7 +155,13 @@ export default function SideBarDashboard({
         </Dialog>
 
         {/* Static sidebar for desktop */}
-        <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
+        <div className={
+          cn(
+          "hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col",
+          !desktopOpen && "lg:hidden",
+          )
+          }
+          >
           {/* Sidebar component, swap this element with another sidebar if you like */}
           <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6 pb-4">
             <div className="flex mt-3 gap-2 h-16 shrink-0 items-center">
@@ -212,7 +222,7 @@ export default function SideBarDashboard({
           </div>
         </div>
 
-        <div className="lg:pl-72">
+        <div className={cn(desktopOpen ? "lg:pl-72" : "")}>
           <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
             <button type="button" onClick={() => setSidebarOpen(true)} className="-m-2.5 p-2.5 text-gray-700 lg:hidden">
               <span className="sr-only">Open sidebar</span>
@@ -224,6 +234,14 @@ export default function SideBarDashboard({
 
             <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
               <div className='flex-1 flex h-full items-center'>
+                <Button className='hidden -ml-2 lg:flex mr-4'
+                  size={"icon"}
+                  variant={"outline"}
+                  onClick={() => setDesktopOpen(!desktopOpen)}
+                >
+                  {/* // open side bar */}
+                  <SidebarIcon className="h-5 w-5" />
+                </Button>
                 <BreadcrumbCom />
               </div>
               <div className="flex items-center gap-x-4 lg:gap-x-6">

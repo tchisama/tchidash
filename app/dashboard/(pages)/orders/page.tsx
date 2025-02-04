@@ -63,7 +63,6 @@ export default function Page() {
     <main
       className={cn(
         "grid flex-1 items-start px-0 sm:py-0 gap-8 lg:grid-cols-2 ",
-        currentOrder && "lg:grid-cols-3",
       )}
     >
       <div className="grid duration-200 auto-rows-max items-start gap-4  lg:col-span-2">

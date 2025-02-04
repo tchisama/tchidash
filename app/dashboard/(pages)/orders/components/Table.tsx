@@ -41,9 +41,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import NoteViewer from "./NoteViewer";
-import { Edit2 } from "lucide-react";
+import { ArrowUpRight, Edit2, Expand, Eye } from "lucide-react";
 import { Popover , PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import { OrdersMobileView } from "./OrdersMobileView";
+import { useRouter } from "next/navigation";
 
 export function OrdersTable({
   filter,
@@ -55,6 +56,7 @@ export function OrdersTable({
   filter: { status: string; search: string, searchBy: "Name" | "Number" | "Order ID" };
 }) {
   const { storeId } = useStore();
+  const router = useRouter();
   const {
     orders,
     setOrders,
@@ -66,6 +68,11 @@ export function OrdersTable({
   const [currentPage, setCurrentPage] = React.useState(1);
   const [totalPages, setTotalPages] = React.useState(0);
   const [totalCount, setTotalCount] = React.useState(0);
+
+
+  useEffect(() => {
+    setCurrentOrder("");
+  },[])
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["orders", storeId, currentPage, pageSize, filter],
@@ -247,14 +254,13 @@ export function OrdersTable({
             <TableHead className="">Note</TableHead>
             <TableHead className="">Date</TableHead>
             <TableHead className="text-right">Amount</TableHead>
+            <TableHead className="text-right">Action</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {orders?.map((order) => (
             <TableRow
-              onDoubleClick={() => window.open(`/dashboard/orders/${order?.sequence}`)}
               key={order.id}
-              onClick={() => setCurrentOrder(order.id)}
               className={cn(
                 "cursor-pointer",
                 currentOrder && currentOrder.id === order.id && "bg-muted",
@@ -407,6 +413,30 @@ export function OrdersTable({
               </TableCell>
               <TableCell className="text-right font-bold">
                 {order.totalPrice} Dh
+              </TableCell>
+              <TableCell className="text-right">
+                <Button
+                  size={"icon"}
+                  variant={"ghost"}
+                  className="hover:border-slate-200 border border-slate-50/0 text-slate-400"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentOrder(order.id);
+                  }}
+                >
+                  <Eye className="h-4 w-4" />
+                </Button>
+                <Button 
+                size={"icon"}
+                variant={"ghost"}
+                className="hover:border-slate-200 border border-slate-50/0 text-slate-400"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  router.push(`/dashboard/orders/${order.sequence}`);
+                }}
+                >
+                  <ArrowUpRight className="h-4 w-4" />
+                </Button>
               </TableCell>
             </TableRow>
           ))}
