@@ -86,13 +86,13 @@ function OrderView() {
   return currentOrder
     ? store && (
       <div className="">
-        <div  onClick={() => setCurrentOrder("")} className="w-screen h-screen bg-[#0003] backdrop-blur-sm fixed top-0 left-0 z-50"></div>
-        <motion.div className="h-fit z-50 rounded-xl fixed shadow-2xl w-full md:w-[700px] overflow-hidden top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2">
+        <div  onClick={() => setCurrentOrder("")} className="w-screen h-screen bg-[#0003] fixed top-0 left-0 z-50"></div>
+        <motion.div className="h-fit z-50 rounded-xl fixed shadow-2xl w-full md:w-[700px]  top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2">
           <DigylogDialog />
           <OrderToImage />
           <Tabs defaultValue="details" className=" sticky top-32 h-[83vh] ">
             <Card
-              className=" flex h-full flex-col"
+              className=" flex h-full rounded-xl flex-col"
               x-chunk="dashboard-05-chunk-4"
             >
               <CardHeader className="flex border-b flex-row items-start bg-muted/50">

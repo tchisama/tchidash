@@ -134,9 +134,7 @@ export function StateChanger({
   const {
     orders,
     setOrders,
-    currentOrder,
-    setCurrentOrder,
-    setCurrentOrderData,
+    // setCurrentOrderData,
     actionLoading,
     setActionLoading,
   } = useOrderStore();
@@ -255,10 +253,10 @@ export function StateChanger({
                       },
                     );
                     console.log("Order status updated:", response.data);
-                    setCurrentOrderData({
-                      ...order,
-                      orderStatus: status.name as OrderStatus,
-                    } as Order);
+                    // setCurrentOrderData({
+                    //   ...order,
+                    //   orderStatus: status.name as OrderStatus,
+                    // } as Order);
 
                     if (!order.storeId) return;
                     // Send notification
@@ -295,9 +293,6 @@ export function StateChanger({
                           : o,
                       ),
                     );
-                    if (currentOrder?.id === order.id) {
-                      setCurrentOrder(order.id);
-                    }
                   } finally {
                     setActionLoading(false);
                   }
