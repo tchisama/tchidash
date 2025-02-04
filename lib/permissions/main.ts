@@ -117,15 +117,19 @@ const ROLES: RolesWithPermissions = {
   },
   order_manager: {
     orders: { view: true, create: true, update: true, delete: false },
+    notifications: { view: true },
   },
   product_manager: {
     products: { view: true, create: true, update: true, delete: false },
+    notifications: { view: true },
   },
   inventory_manager: {
     inventory: { view: true, create: true, update: true, delete: false },
+    notifications: { view: true },
   },
   employees_manager: {
     employees: { view: true, create: true, update: true, delete: true },
+    notifications: { view: true },
   },
 };
 
