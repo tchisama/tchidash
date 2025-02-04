@@ -17,7 +17,7 @@ export function OrdersMobileView({
 }: {
   orders: Order[];
 }) {
-  const { currentOrder, setCurrentOrder, selectedOrder, setSelectedOrder } = useOrderStore();
+  const { setCurrentOrder, selectedOrder, setSelectedOrder } = useOrderStore();
 
   return (
     <div className="space-y-4">
@@ -26,8 +26,7 @@ export function OrdersMobileView({
           key={order.id}
           onClick={() => setCurrentOrder(order.id)}
           className={cn(
-            "cursor-pointer p-4 border rounded-lg bg-slate-50 shadow-sm hover:shadow-md transition-shadow",
-            currentOrder?.id === order.id && "outline outline-primary/40"
+            "cursor-pointer p-4 border rounded-lg bg-white shadow-sm  transition-shadow"
           )}
         >
           {/* Order Header */}
@@ -44,7 +43,7 @@ export function OrdersMobileView({
                 }}
               />
               <Link 
-               href={`/dashboard/orders/${order.id}`}
+               href={`/dashboard/orders/${order.sequence}`}
                className="font-medium text-sm">
                Order  #{order?.sequence ?? "-"}
               </Link>
@@ -63,7 +62,7 @@ export function OrdersMobileView({
           {/* Product Images */}
           <div className="mt-3">
             <div className="flex space-x-2">
-              {order.items.slice(0, 3).map((item, index) => (
+              {order.items.slice(0, 5).map((item, index) => (
                 <div
                   key={item.id}
                   className={cn(
@@ -79,9 +78,9 @@ export function OrdersMobileView({
                   />
                 </div>
               ))}
-              {order.items.length > 3 && (
+              {order.items.length > 5 && (
                 <div className="w-10 h-10 rounded-[15px] bg-slate-100 border border-slate-200 flex items-center justify-center text-xs text-slate-500">
-                  +{order.items.length - 3}
+                  +{order.items.length - 5}
                 </div>
               )}
             </div>
