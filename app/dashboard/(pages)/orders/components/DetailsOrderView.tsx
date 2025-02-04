@@ -14,9 +14,9 @@ import { Separator } from "@/components/ui/separator";
 import CustomerShield from "./CustomerShield";
 import Avvvatars from "avvvatars-react";
 import { useStore } from "@/store/storeInfos";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
-import { Badge } from "@/components/ui/badge";
+// import { useQuery } from "@tanstack/react-query";
+// import axios from "axios";
+// import { Badge } from "@/components/ui/badge";
 import {
   HoverCard,
   HoverCardContent,
@@ -28,41 +28,41 @@ import ScheduledOrdersDate from "./ScheduledOrdersDate";
 
 function DetailsOrderView() {
   const { currentOrder } = useOrderStore();
-  const { store, storeId } = useStore();
+  const { store } = useStore();
 
-  const { data: digylogData } = useQuery({
-    queryKey: [
-      "digylog",
-      storeId,
-      currentOrder?.id,
-      currentOrder?.shippingInfo?.trackingNumber,
-    ],
-    queryFn: async () => {
-      if (!store) return null;
-      if (!currentOrder) return null;
+  // const { data: digylogData } = useQuery({
+  //   queryKey: [
+  //     "digylog",
+  //     storeId,
+  //     currentOrder?.id,
+  //     currentOrder?.shippingInfo?.trackingNumber,
+  //   ],
+  //   queryFn: async () => {
+  //     if (!store) return null;
+  //     if (!currentOrder) return null;
 
-      if (!store.integrations) return null;
-      if (!store.integrations.find((i) => i.name === "digylog")?.enabled)
-        return null;
-      if (!storeId) return null;
-      if (!currentOrder?.shippingInfo?.trackingNumber) return null;
+  //     if (!store.integrations) return null;
+  //     if (!store.integrations.find((i) => i.name === "digylog")?.enabled)
+  //       return null;
+  //     if (!storeId) return null;
+  //     if (!currentOrder?.shippingInfo?.trackingNumber) return null;
 
-      const response = await axios.get(
-        //http://localhost:3000/api/integrations/digylog?phone=0644424634)
-        `/api/integrations/digylog`,
-        {
-          params: {
-            traking: currentOrder?.shippingInfo?.trackingNumber,
-            storeId,
-          },
-        },
-      );
-      console.log(response.data);
-      if (response.data.data.length == 0) return null;
-      return response.data.data[0];
-    },
-    staleTime: 1000 * 60 * 1,
-  });
+  //     const response = await axios.get(
+  //       //http://localhost:3000/api/integrations/digylog?phone=0644424634)
+  //       `/api/integrations/digylog`,
+  //       {
+  //         params: {
+  //           traking: currentOrder?.shippingInfo?.trackingNumber,
+  //           storeId,
+  //         },
+  //       },
+  //     );
+  //     console.log(response.data);
+  //     if (response.data.data.length == 0) return null;
+  //     return response.data.data[0];
+  //   },
+  //   staleTime: 1000 * 60 * 1,
+  // });
 
   return (
     store &&

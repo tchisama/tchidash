@@ -41,7 +41,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import NoteViewer from "./NoteViewer";
-import { ArrowUpRight, Edit2, Expand, Eye } from "lucide-react";
+import { ArrowUpRight, Edit2, Eye } from "lucide-react";
 import { Popover , PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import { OrdersMobileView } from "./OrdersMobileView";
 import { useRouter } from "next/navigation";

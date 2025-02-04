@@ -32,7 +32,7 @@ import { usePermission } from "@/hooks/use-permission";
 import Actions from "./components/Actions";
 
 export default function Page() {
-  const { currentOrder, selectedOrder } = useOrderStore();
+  const {  selectedOrder } = useOrderStore();
   const [pageSize, setPageSize] = useState(25);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<{
