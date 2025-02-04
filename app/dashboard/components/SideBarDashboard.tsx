@@ -92,13 +92,17 @@ export default function SideBarDashboard({
               </TransitionChild>
               {/* Sidebar component, swap this element with another sidebar if you like */}
               <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white px-6 pb-4">
-                <div className="flex h-16 shrink-0 items-center">
-                  <img
-                    alt="Your Company"
-                    src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-                    className="h-8 w-auto"
-                  />
-                </div>
+            <div className="flex mt-3 gap-2 h-16 shrink-0 items-center">
+              <img
+                alt="Your Company"
+                src={store?.logoUrl ?? ""}
+                className="size-14  bg-slate-50 rounded-xl border"
+              />
+              <div className=''>
+                <div>{store?.name}</div>
+                <div className='text-xs text-slate-600'>powered by tchidash</div>
+              </div>
+            </div>
                 <nav className="flex flex-1 flex-col">
                   <ul role="list" className="flex flex-1 flex-col gap-y-7">
                     <li>

@@ -183,7 +183,7 @@ export default function Page() {
                   <Link className="" href="/dashboard/orders/new">
                     <Button className=" gap-1 w-[130px] text-sm">
                       <PlusCircle className="h-4 w-4" />
-                      <span className="sr-only sm:not-sr-only">New Order</span>
+                      <span className="">New Order</span>
                     </Button>
                   </Link>
                 ) : (
@@ -192,11 +192,12 @@ export default function Page() {
               </div>
             </div>
           </div>
-          <Card x-chunk="dashboard-05-chunk-3" className="relative">
+          <div className="md:border border-[#3331] rounded-xl ">
+          <Card x-chunk="dashboard-05-chunk-3" className="relative border-none bg-transparent shadow-none md:shadow md:bg-white">
             <CardHeader className="">
               <CardTitle className="text-xl font-medium">Orders {}</CardTitle>
             </CardHeader>
-            <CardContent className="">
+            <CardContent className="p-0 border-none md:p-2">
               <OrdersTable
                 filter={filter}
                 pageSize={pageSize}
@@ -204,6 +205,7 @@ export default function Page() {
               />
             </CardContent>
           </Card>
+          </div>
         </div>
       </div>
 
