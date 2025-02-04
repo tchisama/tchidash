@@ -27,7 +27,7 @@ const OutfitFont = Outfit({
 })
 
 export const metadata: Metadata = {
-  title: "Tchidash",
+  title: "Dashboard",
   description: "Tchidash",
 };
 

@@ -114,7 +114,7 @@ export default function CustomerPage() {
                   <TableCell>{customer.lastName}</TableCell>
                   <TableCell>{customer.email || "N/A"}</TableCell>
                   <TableCell>{customer.phoneNumber}</TableCell>
-                  <TableCell>
+                  <TableCell className="max-w-[300px]">
                     {customer?.address?.street}, {customer?.address?.city}
                   </TableCell>
                   <TableCell>
