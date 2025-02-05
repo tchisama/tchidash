@@ -3,6 +3,7 @@ import { usePermission } from "@/hooks/use-permission";
 import { ShippingCard } from "./components/Shipping";
 import { StoreDetailsCard } from "./components/Store";
 import WhatsappConfirmationMessage from "./components/Whatsapp-confirmation-message";
+import AskForReviewSettings from "./components/Ask-for-review";
 
 export default function Page() {
   // Check if the user has view permission
@@ -17,6 +18,7 @@ export default function Page() {
       <StoreDetailsCard />
       <ShippingCard />
       <WhatsappConfirmationMessage />
+      <AskForReviewSettings />
     </div>
   );
 }

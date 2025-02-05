@@ -25,22 +25,13 @@ function AskForReviewButton({
                           if(!storeId) return;
                           if(!session) return;
                           if(!store) return
+                          const AskForReviewMessage = store.AskReviewMessage ?? "";
                           sendNotification(
-                            `Sent whatsapp confirmation 💬`,
+                            `Sent Ask for review message 💬`,
                             `of order:#${currentOrder?.sequence}`
                           )
                           const message = renderMessage(
-`
-**Bonjour {{name}},**  
-
-Merci d’avoir choisi ${store.name} !  Nous espérons que votre expérience a été à la hauteur de vos attentes.  
-
-Votre avis est très important pour nous et aide d'autres clients à nous faire confiance. Pourriez-vous prendre une minute pour laisser un avis sur Google ?  
-
-Un grand merci pour votre soutien ! 💙  
-
-À bientôt,  
-`
+                            AskForReviewMessage
                           )
                           window.open(
                             `https://wa.me/212${currentOrder?.customer?.phoneNumber}?text=${encodeURIComponent(
