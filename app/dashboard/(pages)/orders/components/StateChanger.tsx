@@ -21,6 +21,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useStore } from "@/store/storeInfos";
 import { cn } from "@/lib/utils";
 import {
+  ArrowUpRight,
   Clock,
   MapPinCheckInside,
   PackageCheck,
@@ -35,6 +36,8 @@ import {
 import useNotification from "@/hooks/useNotification";
 import ScheduledOrdersDate from "./ScheduledOrdersDate";
 import CancelledCalls from "./CancelledCalls";
+import SendWhatsAppConfirmationButton from "./SendWhatsAppConfirmationButton";
+import AskForReviewButton from "./AskForReviewButton";
 
 export const orderStatusValuesWithIcon = [
   {
@@ -120,6 +123,7 @@ export type OrderStatus =
   | "no_reply"
   | "returned";
 
+
 export function StateChanger({
   state: st,
   order,
@@ -166,6 +170,31 @@ export function StateChanger({
       return user;
     },
   });
+
+
+  const stateActions = {
+    pending: [<SendWhatsAppConfirmationButton
+    key={0}
+          currentOrder={order}
+          />],
+    scheduled: [<ScheduledOrdersDate
+    key={0}
+          currentOrder={order}
+          />],
+    no_reply: [<CancelledCalls currentOrder={order} key={0}/>],
+    delivered: [<AskForReviewButton currentOrder={order} key={0}/>,<Button 
+    onClick={
+      ()=>{
+          window.open(
+            `https://wa.me/212${order?.customer?.phoneNumber}`,
+          );
+      }
+    }
+    className="flex items-center gap-1" size={"sm"} variant={"outline"} key={1}>
+      <ArrowUpRight className="w-4 h-4" />
+      Open Whatsapp 
+    </Button>],
+  }
 
   return (
     st && (
@@ -216,19 +245,18 @@ export function StateChanger({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="shadow-2xl" align="start" side="right">
-          {
-            (state == "scheduled" || state == "no_reply" )&&
-            <>
-          <DropdownMenuLabel>State Actions</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          {state == "scheduled" && <ScheduledOrdersDate
-          currentOrder={order}
-          />}
-          {
-            state == "no_reply" && <CancelledCalls currentOrder={order}/>
-          }
-            </>
-          }
+{
+  Object.keys(stateActions).length > 0 && (
+    <>
+      <DropdownMenuLabel>State Actions</DropdownMenuLabel>
+      <DropdownMenuSeparator />
+      <div className="flex gap-1 flex-col">
+      {stateActions[state as keyof typeof stateActions]}
+      </div>
+    </>
+  )
+}
+
           <DropdownMenuLabel>Change Status</DropdownMenuLabel>
           <DropdownMenuSeparator />
           {orderStatusValuesWithIcon

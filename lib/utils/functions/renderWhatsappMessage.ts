@@ -1,7 +1,10 @@
-import { useOrderStore } from "@/store/orders";
+import { Order } from "@/types/order";
 
-const useRenderWhatsappMessage = () => {
-	const { currentOrder } = useOrderStore();
+const useRenderWhatsappMessage = ({
+	currentOrder
+}:{
+	currentOrder:Order
+}) => {
   if(!currentOrder) return (message:string) => message;
 	return (message:string) => message
 		.replaceAll("{{name}}", currentOrder?.customer.name)

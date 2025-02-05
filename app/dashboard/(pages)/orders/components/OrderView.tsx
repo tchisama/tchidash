@@ -54,13 +54,14 @@ import WhatsappCard from "./Whatsapp";
 import { useSession } from "next-auth/react";
 import useRenderWhatsappMessage from "@/lib/utils/functions/renderWhatsappMessage";
 import useNotification from "@/hooks/useNotification";
+import { Order } from "@/types/order";
 function OrderView() {
   const { currentOrder, setCurrentOrder } = useOrderStore();
   const { storeId, store } = useStore();
   const { setDigylogOpen, setOrderToImageOpen } = useDialogs();
   const router = useRouter();
   const {data:session} = useSession();
-  const renderMessage = useRenderWhatsappMessage();
+  const renderMessage = useRenderWhatsappMessage({currentOrder:currentOrder as Order});
   const {sendNotification} = useNotification();
 
   const deleteOrder = async (orderId: string) => {
