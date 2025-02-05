@@ -9,10 +9,15 @@ import { db } from "@/firebase";
 import { Button } from "@/components/ui/button";
 import { useSession } from "next-auth/react";
 import useNotification from "@/hooks/useNotification";
+import { Order } from "@/types/order";
 
-function CancelledCalls() {
+function CancelledCalls({
+  currentOrder
+}:{
+  currentOrder:Order
+}) {
   const { storeId } = useStore();
-  const { currentOrder, setCurrentOrderData } = useOrderStore();
+  const {  setOrders,orders } = useOrderStore();
   const { data:session } = useSession();
   const {sendNotification} = useNotification();
   return (
@@ -47,16 +52,22 @@ function CancelledCalls() {
             storeId,
             "",
           );
-          setCurrentOrderData({
-            ...currentOrder,
-            numberOfCalls: (currentOrder.numberOfCalls || 0) + 1,
-          });
+          // setCurrentOrderData({
+          //   ...currentOrder,
+          //   numberOfCalls: (currentOrder.numberOfCalls || 0) + 1,
+          // });
+          setOrders(
+            orders.map(o=>o.id == currentOrder.id?{
+              ...o,
+              numberOfCalls: (currentOrder.numberOfCalls || 0) + 1,
+            }:o)
+          )
         }}
         size={"sm"}
         variant={"outline"}
       >
         <Phone className="mr-2 h-4 w-4" />
-        {currentOrder?.numberOfCalls ?? 0}
+        {currentOrder?.numberOfCalls ?? 0} Calls
       </Button>
     </div>
   );

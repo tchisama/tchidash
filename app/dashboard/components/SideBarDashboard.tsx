@@ -227,9 +227,9 @@ export default function SideBarDashboard({
                           href={item.href}
                           className={classNames(
                             isLinkActive(item.href, pathname)
-                              ? "bg-primary/10 text-primary"
+                              ? "bg-primary/10 text-primary border border-primary/10"
                               : "text-gray-700 hover:bg-gray-50 hover:text-primary",
-                            "group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6",
+                            "group items-center flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6",
                           )}
                         >
                           <item.icon
@@ -238,11 +238,11 @@ export default function SideBarDashboard({
                               isLinkActive(item.href, pathname)
                                 ? "text-primary"
                                 : "text-gray-400 group-hover:text-primary",
-                              "h-6 w-6 shrink-0",
+                              "size-5 shrink-0",
                             )}
                           />
                           {item.name}
-                          {item.name === "Orders" && totalNewOrders && (
+                          {item.name === "Orders" && ((totalNewOrders??0) > 0) && (
                             <Badge className="ml-auto">{totalNewOrders}</Badge>
                           )}
                         </Link>

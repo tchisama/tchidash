@@ -33,6 +33,8 @@ import {
   X,
 } from "lucide-react";
 import useNotification from "@/hooks/useNotification";
+import ScheduledOrdersDate from "./ScheduledOrdersDate";
+import CancelledCalls from "./CancelledCalls";
 
 export const orderStatusValuesWithIcon = [
   {
@@ -147,7 +149,6 @@ export function StateChanger({
     queryKey: ["notes", storeId, order.id, state],
     queryFn: async () => {
       if (!storeId) return null;
-      
       const q = query(
         collection(db, "notes"),
         where("details.for", "==", "order"),
@@ -162,7 +163,6 @@ export function StateChanger({
       const user = store?.employees?.find(
         (employee) => employee.email.trim()== noteData?.creator.trim(),
       );
-
       return user;
     },
   });
@@ -216,7 +216,20 @@ export function StateChanger({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="shadow-2xl" align="start" side="right">
-          <DropdownMenuLabel>Order Status</DropdownMenuLabel>
+          {
+            (state == "scheduled" || state == "no_reply" )&&
+            <>
+          <DropdownMenuLabel>State Actions</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          {state == "scheduled" && <ScheduledOrdersDate
+          currentOrder={order}
+          />}
+          {
+            state == "no_reply" && <CancelledCalls currentOrder={order}/>
+          }
+            </>
+          }
+          <DropdownMenuLabel>Change Status</DropdownMenuLabel>
           <DropdownMenuSeparator />
           {orderStatusValuesWithIcon
           .filter((s) => s.name !== state)
@@ -282,7 +295,7 @@ export function StateChanger({
                     );
                   } catch (error) {
                     console.error("Error updating order status:", error);
-
+                  } finally {
                     setOrders(
                       orders.map((o) =>
                         o.id === order.id
@@ -293,7 +306,7 @@ export function StateChanger({
                           : o,
                       ),
                     );
-                  } finally {
+
                     setActionLoading(false);
                   }
                 }}

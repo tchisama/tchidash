@@ -1,13 +1,14 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { SendIcon } from "lucide-react";
 import Avvvatars from "avvvatars-react";
-import { dbAddDoc, dbGetDocs } from "@/lib/dbFuntions/fbFuns";
+import { dbAddDoc } from "@/lib/dbFuntions/fbFuns";
 import { useStore } from "@/store/storeInfos";
 import {
   collection,
+  onSnapshot,
   orderBy,
   query,
   Timestamp,
@@ -38,52 +39,60 @@ export type Note = {
 };
 
 function OrderNotes() {
-  const [content, setContent] = React.useState("");
+  const [content, setContent] = useState("");
+  const [notes, setNotes] = useState<Note[]>([]);
   const { storeId } = useStore();
   const { data: session } = useSession();
   const { currentOrder } = useOrderStore();
 
-  const onSubmit = (e: React.FormEvent) => {
+  // Fetch notes in real-time
+  useEffect(() => {
+    if (!storeId || !currentOrder) return;
+
+    const q = query(
+      collection(db, "notes"),
+      where("details.for", "==", "order"),
+      where("details.orderId", "==", currentOrder.id),
+      orderBy("createdAt", "desc")
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const notesData = snapshot.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      })) as Note[];
+      setNotes(notesData);
+    });
+
+    return () => unsubscribe(); // Cleanup listener on unmount
+  }, [storeId, currentOrder]);
+
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!storeId) return;
-    if (!currentOrder) return;
-    dbAddDoc(
+    if (!storeId || !currentOrder || !session?.user?.email) return;
+
+    await dbAddDoc(
       collection(db, "notes"),
       {
         content,
-        creator: session?.user?.email,
+        creator: session.user.email,
         createdAt: Timestamp.now(),
         details: {
           for: "order",
-          orderId: currentOrder?.id,
+          orderId: currentOrder.id,
         },
       },
       storeId,
-      "",
+      ""
     );
-    setContent("");
+
+    setContent(""); // Clear input after submission
   };
-  const { data: notes, error } = useQuery({
-    queryKey: ["notes", storeId, currentOrder?.id],
-    queryFn: async () => {
-      if (!storeId) return;
-      if (!currentOrder) return;
-      const q = query(
-        collection(db, "notes"),
-        where("details.for", "==", "order"),
-        where("details.orderId", "==", currentOrder?.id),
-        orderBy("createdAt", "desc"),
-      );
-      return dbGetDocs(q, storeId, "").then((response) =>
-        response.docs.map((doc) => ({ ...doc.data(), id: doc.id }) as Note),
-      );
-    },
-  });
+
 
   return (
     <Card className="flex m-0 shadow-none p-0 relative border-none  flex-col h-full ">
       <CardContent className=" p-0 overflow-y-auto border-t  py-6 space-y-4 flex-1">
-        {error?.message}
         {notes?.map((note) => {
           return <Message key={note.id} note={note} />;
         })}
@@ -169,13 +178,13 @@ function Message({ note }: { note: Note }) {
         >
           <div>
             {note?.content ?? (
-              <div className="font-bold uppercase flex gap-2 items-center">
+              <div className="font-bold  uppercase flex gap-2 items-center">
                 {
                   orderStatusValuesWithIcon.find(
                     (status) => status.name === note?.changed,
                   )?.icon
                 }
-                {note?.changed}
+                {note?.changed }
               </div>
             )}
           </div>

@@ -86,9 +86,11 @@ function DetailsOrderView() {
                 </PopoverContent>
               </Popover>
               <div className="flex gap-2">
-                {currentOrder.orderStatus == "no_reply" && <CancelledCalls />}
+                {currentOrder.orderStatus == "no_reply" && <CancelledCalls currentOrder={currentOrder}/>}
                 {currentOrder.orderStatus == "scheduled" && (
-                  <ScheduledOrdersDate />
+                  <ScheduledOrdersDate
+                  currentOrder={currentOrder}
+                   />
                 )}
                 <StateChanger
                   showNumberOfCalls={false}

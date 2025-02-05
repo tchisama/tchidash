@@ -17,10 +17,15 @@ import {
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import useNotification from "@/hooks/useNotification";
+import { Order } from "@/types/order";
 
-function ScheduledOrdersDate() {
+function ScheduledOrdersDate({
+  currentOrder
+}:{
+  currentOrder: Order
+}) {
   const { storeId } = useStore();
-  const { currentOrder, setCurrentOrderData } = useOrderStore();
+  const {  setOrders,orders } = useOrderStore();
   const { data: session } = useSession();
 
   const [date, setDate] = React.useState<Date>();
@@ -84,10 +89,14 @@ function ScheduledOrdersDate() {
                 storeId,
                 "",
               );
-              setCurrentOrderData({
-                ...currentOrder,
+              // setCurrentOrderData({
+              //   ...currentOrder,
+              //   scheduledDate: Timestamp.fromDate(date as Date),
+              // });
+              setOrders(orders.map(o=>o.id == currentOrder.id ? {
+                ...o,
                 scheduledDate: Timestamp.fromDate(date as Date),
-              });
+              }:o))
               setDate(date);
             }}
             initialFocus

@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { db } from '@/firebase'
+import { useOrderStore } from '@/store/orders'
 import { Order } from '@/types/order'
 import { doc, updateDoc } from 'firebase/firestore'
 import { CircleSlash, Edit2, Save } from 'lucide-react'
@@ -13,6 +14,7 @@ type Props = {
 function NoteViewer({order}: Props) {
   const [note, setNote] = React.useState<Order["note"] | null>(null)
   const [edit,setEdit] = React.useState(false)
+  const {orders,setOrders} = useOrderStore()
   useEffect(() => {
     setNote(order.note??{
       content:"",
@@ -25,6 +27,7 @@ function NoteViewer({order}: Props) {
       note
     })
     setEdit(false)
+    setOrders(orders.map(o=>o.id===order.id?{...o,note}:o) as Order[])
   }
   return (
     <div >
