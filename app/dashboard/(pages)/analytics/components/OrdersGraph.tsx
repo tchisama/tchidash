@@ -86,7 +86,7 @@ function OrdersGraph() {
 
   return (
     chartData && (
-      <Card className="flex-1" x-chunk="charts-01-chunk-0">
+      <Card className="flex-1">
         <CardHeader className="space-y-0 pb-2">
           <CardDescription>Last {10} Days</CardDescription>
           <CardTitle className="text-4xl tabular-nums">
@@ -100,7 +100,7 @@ function OrdersGraph() {
         </CardHeader>
         <CardContent>
           <ChartContainer
-            className="h-[300px] w-full"
+            className="w-full md:h-[350px]"
             config={{
               steps: {
                 label: "orders",

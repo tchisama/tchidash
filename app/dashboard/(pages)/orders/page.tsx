@@ -26,13 +26,12 @@ import {
 } from "@/components/ui/select";
 import { orderStatusValuesWithIcon } from "./components/StateChanger";
 // import { Label } from "@/components/ui/label";
-import Analytic from "./components/analytic";
 import { Input } from "@/components/ui/input";
 import { usePermission } from "@/hooks/use-permission";
 import Actions from "./components/Actions";
 
 export default function Page() {
-  const {  selectedOrder } = useOrderStore();
+  const { selectedOrder } = useOrderStore();
   const [pageSize, setPageSize] = useState(25);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<{
@@ -56,7 +55,7 @@ export default function Page() {
     setFilter((prevFilter) => ({
       ...prevFilter,
       status: selectedStatuses,
-    }))
+    }));
   };
 
   return (
@@ -66,13 +65,12 @@ export default function Page() {
       )}
     >
       <div className="grid duration-200 auto-rows-max items-start gap-4  lg:col-span-2">
-        <Analytic />
         <div className="">
           <div className="ml-auto mb-2 flex items-center gap-2">
             <div className="flex gap-2">
               <Select
                 onValueChange={(value) => {
-                  const selectedStatuses = value
+                  const selectedStatuses = value;
                   handleStatusFilterChange(selectedStatuses);
                 }}
                 value={filter.status}
@@ -82,15 +80,23 @@ export default function Page() {
                   <SelectValue placeholder="Filter by Status" />
                 </SelectTrigger>
                 <SelectContent className="mt-2 max-w-xs bg-white">
-                  {[{
-                    name: "all",
-                    icon: <CheckCircle className="h-4 w-4" />,
-                    color:"white",
-                  }, ...orderStatusValuesWithIcon].map((status) => (
+                  {[
+                    {
+                      name: "all",
+                      icon: <CheckCircle className="h-4 w-4" />,
+                      color: "white",
+                    },
+                    ...orderStatusValuesWithIcon,
+                  ].map((status) => (
                     <SelectItem key={status.name} value={status.name}>
                       <div className="flex items-center gap-2">
-                        <span className="w-6 h-6 rounded-[8px] flex items-center justify-center" style={{ backgroundColor: status.color + "88" }}
-                        >{status.icon}</span> {status.name}
+                        <span
+                          className="w-6 h-6 rounded-[8px] flex items-center justify-center"
+                          style={{ backgroundColor: status.color + "88" }}
+                        >
+                          {status.icon}
+                        </span>{" "}
+                        {status.name}
                       </div>
                     </SelectItem>
                   ))}
@@ -103,15 +109,13 @@ export default function Page() {
                 <SelectTrigger className="bg-white">
                   <SelectValue placeholder="Page Size" />
                 </SelectTrigger>
-                <SelectContent className="mt-2 max-w-xs bg-white">{
-                  [25, 50 ,100 ].map((size) => (
+                <SelectContent className="mt-2 max-w-xs bg-white">
+                  {[25, 50, 100].map((size) => (
                     <SelectItem key={size} value={size.toString()}>
-                      {size} {
-                        size === pageSize && " / page"
-                      }
+                      {size} {size === pageSize && " / page"}
                     </SelectItem>
-                  ))
-                  }</SelectContent>
+                  ))}
+                </SelectContent>
               </Select>
               <div className=" hidden md:flex flex-row-reverse">
                 <Button
@@ -192,18 +196,21 @@ export default function Page() {
             </div>
           </div>
           <div className="md:border border-[#3331] rounded-xl ">
-          <Card x-chunk="dashboard-05-chunk-3" className="relative border-none bg-transparent shadow-none md:shadow md:bg-white">
-            <CardHeader className="">
-              <CardTitle className="text-xl font-medium">Orders {}</CardTitle>
-            </CardHeader>
-            <CardContent className="p-0 border-none md:p-2">
-              <OrdersTable
-                filter={filter}
-                pageSize={pageSize}
-                setPageSize={setPageSize}
-              />
-            </CardContent>
-          </Card>
+            <Card
+              x-chunk="dashboard-05-chunk-3"
+              className="relative border-none bg-transparent shadow-none md:shadow md:bg-white"
+            >
+              <CardHeader className="">
+                <CardTitle className="text-xl font-medium">Orders {}</CardTitle>
+              </CardHeader>
+              <CardContent className="p-0 border-none md:p-2">
+                <OrdersTable
+                  filter={filter}
+                  pageSize={pageSize}
+                  setPageSize={setPageSize}
+                />
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
@@ -212,3 +219,4 @@ export default function Page() {
     </main>
   );
 }
+

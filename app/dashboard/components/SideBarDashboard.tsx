@@ -62,12 +62,12 @@ export default function SideBarDashboard({
   children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { store } = useStore();
+  const { store, storeId } = useStore();
   const pathname = usePathname();
   const [desktopOpen, setDesktopOpen] = useLocalStorage("sidebarOpen", true);
 
   const { data: totalNewOrders } = useQuery({
-    queryKey: ["totalNewOrders"],
+    queryKey: ["totalNewOrders", storeId],
     queryFn: async () => {
       const q = query(
         collection(db, "orders"),

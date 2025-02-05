@@ -42,7 +42,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import NoteViewer from "./NoteViewer";
 import { ArrowUpRight, Edit2, Eye } from "lucide-react";
-import { Popover , PopoverContent, PopoverTrigger} from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { OrdersMobileView } from "./OrdersMobileView";
 import { useRouter } from "next/navigation";
 
@@ -53,7 +57,11 @@ export function OrdersTable({
 }: {
   pageSize: number;
   setPageSize: React.Dispatch<React.SetStateAction<number>>;
-  filter: { status: string; search: string, searchBy: "Name" | "Number" | "Order ID" };
+  filter: {
+    status: string;
+    search: string;
+    searchBy: "Name" | "Number" | "Order ID";
+  };
 }) {
   const { storeId } = useStore();
   const router = useRouter();
@@ -69,42 +77,40 @@ export function OrdersTable({
   const [totalPages, setTotalPages] = React.useState(0);
   const [totalCount, setTotalCount] = React.useState(0);
 
-
   useEffect(() => {
     setCurrentOrder("");
-  },[])
+  }, []);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["orders", storeId, currentPage, pageSize, filter],
     queryFn: async () => {
       const wheres: QueryFilterConstraint[] = [];
       wheres.push(where("storeId", "==", storeId));
-      if(filter.status !== "all"){
+      if (filter.status !== "all") {
         wheres.push(where("orderStatus", "==", filter.status));
       }
 
-
-    if (filter.search) {
-      if (filter.searchBy === "Name") {
-        wheres.push(or(
-          where("customer.firstName", "==", filter.search),
-          where("customer.lastName", "==", filter.search),
-          where("customer.name", "==", filter.search)
-        ));
-      } else if (filter.searchBy === "Number") {
-        wheres.push(where("customer.phoneNumber", "==", filter.search));
-      } else if (filter.searchBy === "Order ID") {
-        wheres.push(where("sequence", "==", parseInt(filter.search)));
+      if (filter.search) {
+        if (filter.searchBy === "Name") {
+          wheres.push(
+            or(
+              where("customer.firstName", "==", filter.search),
+              where("customer.lastName", "==", filter.search),
+              where("customer.name", "==", filter.search),
+            ),
+          );
+        } else if (filter.searchBy === "Number") {
+          wheres.push(where("customer.phoneNumber", "==", filter.search));
+        } else if (filter.searchBy === "Order ID") {
+          wheres.push(where("sequence", "==", parseInt(filter.search)));
+        }
       }
-    }
-
-
 
       if (!storeId) return null;
       const queryBuilder = query(collection(db, "orders"), and(...wheres));
-      
-      let response
-      if(filter.search){
+
+      let response;
+      if (filter.search) {
         response = await getDocs(queryBuilder).then((snapshot) => ({
           documents: snapshot.docs.map((doc) => {
             return doc.data() as Order;
@@ -114,8 +120,8 @@ export function OrdersTable({
           pageSize: pageSize,
           totalCount: snapshot.docs.length,
         }));
-      }else{
-       response = await getPage(queryBuilder, currentPage, pageSize,storeId)
+      } else {
+        response = await getPage(queryBuilder, currentPage, pageSize, storeId);
       }
       return response;
     },
@@ -179,34 +185,34 @@ export function OrdersTable({
 
   if (isLoading)
     return (
-  <>
-      <div className="md:block hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="">Select</TableHead>
-              <TableHead className="">Product</TableHead>
-              <TableHead>Customer</TableHead>
-              <TableHead className="">Status</TableHead>
-              <TableHead className="">Address</TableHead>
-              <TableHead className="">Date</TableHead>
-              <TableHead className="text-right">Amount</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {new Array(2).fill(0).map((_, j) => (
-              <TableRow key={j}>
-                {new Array(6).fill(0).map((_, i) => (
-                  <TableCell key={i}>
-                    <Skeleton className="h-8 bg-slate-100 w-full" />
-                  </TableCell>
-                ))}
+      <>
+        <div className="md:block hidden">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="">Select</TableHead>
+                <TableHead className="">Product</TableHead>
+                <TableHead>Customer</TableHead>
+                <TableHead className="">Status</TableHead>
+                <TableHead className="">Address</TableHead>
+                <TableHead className="">Date</TableHead>
+                <TableHead className="text-right">Amount</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-    </>
+            </TableHeader>
+            <TableBody>
+              {new Array(2).fill(0).map((_, j) => (
+                <TableRow key={j}>
+                  {new Array(6).fill(0).map((_, i) => (
+                    <TableCell key={i}>
+                      <Skeleton className="h-8 bg-slate-100 w-full" />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </>
     );
 
   if (error)
@@ -217,252 +223,255 @@ export function OrdersTable({
   return (
     <div>
       <div className="md:hidden block">
-      <OrdersMobileView 
-        orders={orders}
-      />
+        <OrdersMobileView orders={orders} />
       </div>
       <div className="md:block hidden">
         <div className="absolute top-4 right-4 ">
-            <span className="font-semibold">{totalCount}</span> orders
+          <span className="font-semibold">{totalCount}</span> orders
         </div>
-      <Table className="">
-        <TableHeader>
-          <TableRow>
-            <TableHead className="">
-              <div className="flex   justify-start items-center">
-                <Checkbox
-                  checked={orders.every((order) =>
-                    selectedOrder.includes(order.id),
-                  )}
-                  onCheckedChange={() => {
-                    if (
-                      orders.every((order) => selectedOrder.includes(order.id))
-                    ) {
-                      setSelectedOrder([]);
-                    } else {
-                      setSelectedOrder(orders.map((order) => order.id));
-                    }
-                  }}
-                />
-              </div>
-            </TableHead>
-            <TableHead className="">Sequence</TableHead>
-            <TableHead className="">Product</TableHead>
-            <TableHead>Customer</TableHead>
-            <TableHead className="">Status</TableHead>
-            <TableHead className="">Address</TableHead>
-            <TableHead className="">Note</TableHead>
-            <TableHead className="">Date</TableHead>
-            <TableHead className="text-right">Amount</TableHead>
-            <TableHead className="text-right">Action</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {orders?.map((order) => (
-            <TableRow
-              key={order.id}
-              className={cn(
-                "cursor-pointer",
-                currentOrder && currentOrder.id === order.id && "bg-muted",
-              )}
-            >
-              <TableCell
-                className="group"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (selectedOrder.includes(order.id)) {
-                    setSelectedOrder(
-                      selectedOrder.filter((id) => id !== order.id),
-                    );
-                  } else {
-                    setSelectedOrder([...selectedOrder, order.id]);
-                  }
-                }}
-              >
+        <Table className="">
+          <TableHeader>
+            <TableRow>
+              <TableHead className="">
                 <div className="flex   justify-start items-center">
                   <Checkbox
-                    className="group-hover:outline outline-primary/30"
-                    checked={selectedOrder.includes(order.id)}
+                    checked={orders.every((order) =>
+                      selectedOrder.includes(order.id),
+                    )}
+                    onCheckedChange={() => {
+                      if (
+                        orders.every((order) =>
+                          selectedOrder.includes(order.id),
+                        )
+                      ) {
+                        setSelectedOrder([]);
+                      } else {
+                        setSelectedOrder(orders.map((order) => order.id));
+                      }
+                    }}
                   />
                 </div>
-              </TableCell>
-              <TableCell>
-                #{order?.sequence ?? "-"} 
-              </TableCell>
-              <TableCell className="w-[130px]">
-                <div className="relative h-10 w-20">
-                  {order.items.slice(0, 2).map((item, i) => {
-                    return (
-                      <div
-                        key={item.id}
-                        className={cn(
-                          "mask absolute top-0 w-10 aspect-auto",
-                          i === 0 && "left-0 ",
-                          i === 1 && "left-8 ",
-                          i === 2 && "left-16 ",
-                        )}
-                      >
-                        <Image
-                          width={50}
-                          height={50}
-                          src={item.imageUrl ?? ""}
-                          alt="Avatar Tailwind CSS Component"
-                          className="w-10 rounded-[15px] bg-slate-100 border border-[#3334] aspect-square  object-cover"
-                        />
-                      </div>
-                    );
-                  })}
-                  {order.items.length > 2 && (
-                    <div className="mask absolute top-0 w-10 aspect-square left-16">
-                      <div className="w-10 h-10 border-[#3334] border bg-slate-100 relative rounded-[15px] flex items-center justify-center">
-                        <Image
-                          width={50}
-                          height={50}
-                          src={order.items[2].imageUrl ?? ""}
-                          alt="Avatar Tailwind CSS Component"
-                          className={cn("w-10  filter opacity-20 rounded-[15px] bg-slate-100  aspect-square   object-cover",
-                            order.items.length - 3 === 0 && "opacity-100",
-                          )}
-                        />
-                        {
-                        order.items.length - 3 > 0 &&
-                        <span className="text-xs font-bold z-10 text-muted-foreground absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                          +{order.items.length - 2}
-                        </span>
-                        }
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </TableCell>
-              <TableCell>
-                <div className="font-medium">
-                  {order.customer.firstName} {order.customer.lastName}
-                </div>
-
-                <div className=" text-sm text-muted-foreground ">
-                  {order.customer.phoneNumber}
-                </div>
-              </TableCell>
-              <TableCell className="">
-                <div
-                  className="w-fit"
+              </TableHead>
+              <TableHead className="">Sequence</TableHead>
+              <TableHead className="">Product</TableHead>
+              <TableHead>Customer</TableHead>
+              <TableHead className="">Status</TableHead>
+              <TableHead className="">Address</TableHead>
+              <TableHead className="">Note</TableHead>
+              <TableHead className="">Date</TableHead>
+              <TableHead className="text-right">Amount</TableHead>
+              <TableHead className="text-right">Action</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {orders?.map((order) => (
+              <TableRow
+                key={order.id}
+                className={cn(
+                  "cursor-pointer",
+                  currentOrder && currentOrder.id === order.id && "bg-muted",
+                )}
+              >
+                <TableCell
+                  className="group"
                   onClick={(e) => {
                     e.stopPropagation();
+                    if (selectedOrder.includes(order.id)) {
+                      setSelectedOrder(
+                        selectedOrder.filter((id) => id !== order.id),
+                      );
+                    } else {
+                      setSelectedOrder([...selectedOrder, order.id]);
+                    }
                   }}
                 >
-                  <StateChanger state={order.orderStatus} order={order} />
-                </div>
-              </TableCell>
-              <TableCell className="">
-                <div className="text-sm">
-                  {order.customer.shippingAddress.city}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {order.customer.shippingAddress.address.slice(0, 40)}
-                  {order.customer.shippingAddress.address.length > 40 && "..."}
-                </div>
-              </TableCell>
-              <TableCell className="">
-                <Popover>
-                  <PopoverTrigger
-                  onClick={(e) => {
-                    e.stopPropagation();
-                  }}
-                  >
-                    {
-                      order.note?.content
-                        ? <div
-                           className="w-fit text-xs"
+                  <div className="flex   justify-start items-center">
+                    <Checkbox
+                      className="group-hover:outline outline-primary/30"
+                      checked={selectedOrder.includes(order.id)}
+                    />
+                  </div>
+                </TableCell>
+                <TableCell>#{order?.sequence ?? "-"}</TableCell>
+                <TableCell className="w-[130px]">
+                  <div className="relative h-10 w-20">
+                    {order.items.slice(0, 2).map((item, i) => {
+                      return (
+                        <div
+                          key={item.id}
+                          className={cn(
+                            "mask top-0 absolute w-10 aspect-auto",
+                            i === 0 && "left-0 ",
+                            i === 1 && "left-8 ",
+                            i === 2 && "left-16 ",
+                          )}
                         >
+                          <Image
+                            width={50}
+                            height={50}
+                            src={item.imageUrl ?? ""}
+                            alt="Avatar Tailwind CSS Component"
+                            className="w-10 rounded-[15px] bg-slate-100 border border-[#3334] aspect-square  object-cover"
+                          />
+                        </div>
+                      );
+                    })}
+                    {order.items.length > 2 && (
+                      <div className="mask absolute top-0 w-10 aspect-square left-16">
+                        <div className="w-10 h-10 border-[#3334] border bg-slate-100 relative rounded-[15px] flex items-center justify-center">
+                          <Image
+                            width={50}
+                            height={50}
+                            src={order.items[2].imageUrl ?? ""}
+                            alt="Avatar Tailwind CSS Component"
+                            className={cn(
+                              "w-10  filter opacity-20 rounded-[15px] bg-slate-100  aspect-square   object-cover",
+                              order.items.length - 3 === 0 && "opacity-100",
+                            )}
+                          />
+                          {order.items.length - 3 > 0 && (
+                            <span className="text-xs font-bold z-10 text-muted-foreground absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                              +{order.items.length - 2}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="font-medium">
+                    {order.customer.firstName} {order.customer.lastName}
+                  </div>
+
+                  <div className=" text-sm text-muted-foreground ">
+                    {order.customer.phoneNumber}
+                  </div>
+                </TableCell>
+                <TableCell className="">
+                  <div
+                    className="w-fit"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                  >
+                    <StateChanger state={order.orderStatus} order={order} />
+                  </div>
+                </TableCell>
+                <TableCell className="">
+                  <div className="text-sm">
+                    {order.customer.shippingAddress.city}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {order.customer.shippingAddress.address.slice(0, 40)}
+                    {order.customer.shippingAddress.address.length > 40 &&
+                      "..."}
+                  </div>
+                </TableCell>
+                <TableCell className="">
+                  <Popover>
+                    <PopoverTrigger
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }}
+                    >
+                      {order.note?.content ? (
+                        <div className="w-fit text-xs">
                           {order.note?.content.slice(0, 40)}
                           {order.note?.content.length > 40 && "..."}
                         </div>
-                        :<Button
-                        size={"icon"}
-                        variant={"ghost"}
-                        className="hover:border-slate-200 border border-slate-50/0 text-slate-400"
-                        ><Edit2 className="h-4 w-4" /></Button>
-                    }
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[400px]">
-                    <NoteViewer order={order} />
-                  </PopoverContent>
-                </Popover>
-              </TableCell>
-              <TableCell className="">
-                <div className="text-sm">
-                  {order.createdAt.toDate().toLocaleDateString("en-US", {
-                    // i want to get the same order as year/month/day
+                      ) : (
+                        <Button
+                          size={"icon"}
+                          variant={"ghost"}
+                          className="hover:border-slate-200 border border-slate-50/0 text-slate-400"
+                        >
+                          <Edit2 className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[400px]">
+                      <NoteViewer order={order} />
+                    </PopoverContent>
+                  </Popover>
+                </TableCell>
+                <TableCell className="">
+                  <div className="text-sm">
+                    {order.createdAt.toDate().toLocaleDateString("en-US", {
+                      // i want to get the same order as year/month/day
 
-                    year: "numeric",
-                    month: "numeric",
-                    day: "numeric",
-                  })}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {order.createdAt.toDate().toLocaleTimeString(
-                    // without seconds
-                    "en-US",
-                    {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    },
-                  )}
-                </div>
-              </TableCell>
-              <TableCell className="text-right font-bold">
-                {order.totalPrice} Dh
-              </TableCell>
-              <TableCell className="text-right">
-                <Button
-                  size={"icon"}
-                  variant={"ghost"}
-                  className="hover:border-slate-200 border border-slate-50/0 text-slate-400"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setCurrentOrder(order.id);
-                  }}
-                >
-                  <Eye className="h-4 w-4" />
-                </Button>
-                <Button 
-                size={"icon"}
-                variant={"ghost"}
-                className="hover:border-slate-200 border border-slate-50/0 text-slate-400"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  router.push(`/dashboard/orders/${order.sequence}`);
-                }}
-                >
-                  <ArrowUpRight className="h-4 w-4" />
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-        <TableCaption className="">
-          <Pagination className=" flex items-end justify-between">
-            <div>
-              Showing {currentPage}-{totalPages} of {totalCount}
-            </div>
+                      year: "numeric",
+                      month: "numeric",
+                      day: "numeric",
+                    })}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {order.createdAt.toDate().toLocaleTimeString(
+                      // without seconds
+                      "en-US",
+                      {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      },
+                    )}
+                  </div>
+                </TableCell>
+                <TableCell className="text-right font-bold">
+                  {order.totalPrice} Dh
+                  <br />
+                  <span className="font-medium text-gray-600">
+                    {order.totalItems} items
+                  </span>
+                </TableCell>
+                <TableCell className="text-right">
+                  <Button
+                    size={"icon"}
+                    variant={"ghost"}
+                    className="hover:border-slate-200 border border-slate-50/0 text-slate-400"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCurrentOrder(order.id);
+                    }}
+                  >
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size={"icon"}
+                    variant={"ghost"}
+                    className="hover:border-slate-200 border border-slate-50/0 text-slate-400"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      router.push(`/dashboard/orders/${order.sequence}`);
+                    }}
+                  >
+                    <ArrowUpRight className="h-4 w-4" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+          <TableCaption className="">
+            <Pagination className=" flex items-end justify-between">
+              <div>
+                Showing {currentPage}-{totalPages} of {totalCount}
+              </div>
 
-            <PaginationContent className="bg-slate-50 mt-2 w-fit border rounded-xl">
-              <PaginationItem>
-                <PaginationPrevious href="#" onClick={handlePreviousPage} />
-              </PaginationItem>
+              <PaginationContent className="bg-slate-50 mt-2 w-fit border rounded-xl">
+                <PaginationItem>
+                  <PaginationPrevious href="#" onClick={handlePreviousPage} />
+                </PaginationItem>
 
-              {renderPageNumbers()}
+                {renderPageNumbers()}
 
-              {totalPages > 5 && <PaginationEllipsis />}
+                {totalPages > 5 && <PaginationEllipsis />}
 
-              <PaginationItem>
-                <PaginationNext href="#" onClick={handleNextPage} />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </TableCaption>
-      </Table>
+                <PaginationItem>
+                  <PaginationNext href="#" onClick={handleNextPage} />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </TableCaption>
+        </Table>
       </div>
     </div>
   );
