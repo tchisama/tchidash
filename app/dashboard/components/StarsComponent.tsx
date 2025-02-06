@@ -92,8 +92,8 @@ export default function StarsComponent() {
           ? (
               ((avgOrdersPerDay30 - avgOrdersPerDay7) / avgOrdersPerDay7) *
               100
-            ).toFixed(1)
-          : "0";
+            )
+          : 0;
 
       return {
         totalRevenue,
@@ -117,8 +117,8 @@ export default function StarsComponent() {
     },
     {
       name: "Average Orders per Day",
-      value: `${data?.avgOrdersPerDay30} Orders`,
-      change: `${data?.percentageChange}% from last week`,
+      value: `${Math.ceil(data?.avgOrdersPerDay30 ?? 0)} Orders`,
+      change: `${Math.ceil(data?.percentageChange ?? 0)}% from last week `,
       changeType: Number(data?.percentageChange) >= 0 ? "positive" : "negative",
     },
     {

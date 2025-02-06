@@ -298,14 +298,9 @@ export default function SideBarDashboard({
                 </Button>
                 <BreadcrumbCom />
               </div>
-              <div className="flex items-center gap-x-4 lg:gap-x-6">
+              <div className="flex items-center gap-x-4 lg:gap-x-4">
                 <Notification />
 
-                {/* Separator */}
-                <div
-                  aria-hidden="true"
-                  className="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-200"
-                />
 
                 {/* Profile dropdown */}
                 <UserProfileButton />

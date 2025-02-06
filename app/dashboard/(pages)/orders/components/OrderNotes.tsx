@@ -91,7 +91,7 @@ function OrderNotes() {
 
 
   return (
-    <Card className="flex m-0 shadow-none p-0 relative border-none  flex-col h-full ">
+    <Card className="flex m-0 shadow-none p-0 relative border-none overflow-y-auto flex-col h-full ">
       <CardContent className=" p-0 overflow-y-auto border-t  py-6 space-y-4 flex-1">
         {notes?.map((note) => {
           return <Message key={note.id} note={note} />;

@@ -49,6 +49,7 @@ import {
 } from "@/components/ui/popover";
 import { OrdersMobileView } from "./OrdersMobileView";
 import { useRouter } from "next/navigation";
+import OrderActions from "./OrderActions";
 
 export function OrdersTable({
   filter,
@@ -446,6 +447,7 @@ export function OrdersTable({
                   >
                     <ArrowUpRight className="h-4 w-4" />
                   </Button>
+                  <OrderActions variant="ghost" currentOrder={order} />
                 </TableCell>
               </TableRow>
             ))}

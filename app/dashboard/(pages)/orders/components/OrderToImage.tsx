@@ -17,22 +17,24 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useOrderStore } from "@/store/orders";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useStore } from "@/store/storeInfos";
 import { Check } from "lucide-react";
 import { useDialogs } from "@/store/dialogs";
+import { Order } from "@/types/order";
 
-export default function OrderToImage() {
-  const { currentOrder } = useOrderStore();
+export default function OrderToImage({
+  currentOrder,
+}: {
+  currentOrder: Order
+}) {
   const componentRef = useRef<HTMLDivElement | null>(null);
   const { OrderToImageOpen: open, setOrderToImageOpen: setOpen } = useDialogs();
   const { store } = useStore();
 
   const handleDownloadImage = async () => {
     if (!componentRef.current) {
-      console.error("Component reference is not set");
       return;
     }
 
@@ -53,7 +55,7 @@ export default function OrderToImage() {
         // Convert canvas to image and trigger download
         const link = document.createElement("a");
         link.href = canvas.toDataURL("image/png");
-        link.download = `${currentOrder.id}.png`;
+        link.download = `${currentOrder.sequence}.png`;
         link.click();
       })
       .catch((err) => {
@@ -66,7 +68,7 @@ export default function OrderToImage() {
       setTimeout(() => {
         handleDownloadImage();
         setOpen(false);
-      }, 4000);
+      }, 1000);
     }
   }, [open]);
 
@@ -76,14 +78,14 @@ export default function OrderToImage() {
 
 
   return (
-    <div className="relative">
+    <div className="relative opacity-0">
       <AlertDialog  open={open} onOpenChange={setOpen}>
         <AlertDialogTrigger asChild>
         </AlertDialogTrigger>
         <AlertDialogContent className="max-w-none opacity-0 w-fit min-w-none bg-transparent border-none">
           <AlertDialogHeader></AlertDialogHeader>
           <Card
-            className="w-full bg-white overflow-hidden rounded-3xl max-w-3xl"
+            className=" w-[600px] bg-white overflow-hidden rounded-3xl max-w-3xl"
             ref={componentRef}
           >
             <CardHeader className="flex bg-white gap-4 flex-row">

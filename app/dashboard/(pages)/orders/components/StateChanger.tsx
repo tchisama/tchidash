@@ -244,18 +244,11 @@ export function StateChanger({
             )}
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="shadow-2xl" align="start" side="right">
-{
-  Object.keys(stateActions).length > 0 && (
-    <>
-      <DropdownMenuLabel>State Actions</DropdownMenuLabel>
-      <DropdownMenuSeparator />
-      <div className="flex gap-1 flex-col">
-      {stateActions[state as keyof typeof stateActions]}
-      </div>
-    </>
-  )
-}
+        <DropdownMenuContent className={cn("shadow-2xl flex flex-col-reverse", 
+        stateActions[state as keyof typeof stateActions] && "grid-cols-2"
+        )} align="start" side="right">
+
+<div>
 
           <DropdownMenuLabel>Change Status</DropdownMenuLabel>
           <DropdownMenuSeparator />
@@ -347,6 +340,23 @@ export function StateChanger({
               )}
             </>
           ))}
+</div>
+          <div>
+
+{
+  Object.keys(stateActions).length > 0
+  && stateActions[state as keyof typeof stateActions]
+   && (
+    <>
+      <DropdownMenuLabel>State Actions</DropdownMenuLabel>
+      <DropdownMenuSeparator />
+      <div className="flex gap-1 flex-col">
+      {stateActions[state as keyof typeof stateActions]}
+      </div>
+    </>
+  )
+}
+          </div>
         </DropdownMenuContent>
       </DropdownMenu>
     )

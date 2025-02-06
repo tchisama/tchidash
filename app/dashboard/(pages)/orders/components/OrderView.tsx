@@ -2,17 +2,6 @@
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuPortal,
-  DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 import {
   Card,
@@ -25,72 +14,28 @@ import {
 import { Button } from "@/components/ui/button";
 import {
   ArrowUpRight,
-  Bike,
   Box,
   Copy,
-  Edit,
   FileText,
-  MoreVertical,
-  Phone,
-  ScrollIcon,
-  Trash2,
-  TruckIcon,
   X,
 } from "lucide-react";
 import { useOrderStore } from "@/store/orders";
-import { db } from "@/firebase";
-import { doc } from "firebase/firestore";
 import { motion } from "framer-motion";
-import { dbDeleteDoc } from "@/lib/dbFuntions/fbFuns";
 import { useStore } from "@/store/storeInfos";
-import OrderToImage from "./OrderToImage";
-import DigylogDialog from "./DigylogDialog";
-import { useDialogs } from "@/store/dialogs";
-import { IconBrandWhatsapp } from "@tabler/icons-react";
 import DetailsOrderView from "./DetailsOrderView";
 import OrderNotes from "./OrderNotes";
 import { useRouter } from "next/navigation";
 import WhatsappCard from "./Whatsapp";
-import { useSession } from "next-auth/react";
-import useRenderWhatsappMessage from "@/lib/utils/functions/renderWhatsappMessage";
-import useNotification from "@/hooks/useNotification";
-import { Order } from "@/types/order";
+import OrderActions from "./OrderActions";
 function OrderView() {
   const { currentOrder, setCurrentOrder } = useOrderStore();
-  const { storeId, store } = useStore();
-  const { setDigylogOpen, setOrderToImageOpen } = useDialogs();
+  const { store } = useStore();
   const router = useRouter();
-  const {data:session} = useSession();
-  const renderMessage = useRenderWhatsappMessage({currentOrder:currentOrder as Order});
-  const {sendNotification} = useNotification();
-
-  const deleteOrder = async (orderId: string) => {
-    if (!currentOrder) return;
-    if (
-      ["cancelled", "returned", "pending"].includes(currentOrder.orderStatus)
-    ) {
-      if (!storeId) return;
-
-      dbDeleteDoc(doc(db, "orders", orderId), storeId, "");
-      dbDeleteDoc(doc(db, "sales", orderId), storeId, "");
-      setCurrentOrder("");
-      sendNotification(
-        `deleted 🗑️`,
-        `order #${currentOrder.sequence}`
-      )
-      return;
-    } else {
-      alert("You can't delete an order that is not cancelled or returned");
-    }
-  };
-
   return currentOrder
     ? store && (
       <div className="">
         <div  onClick={() => setCurrentOrder("")} className="w-screen h-screen bg-[#0003] fixed top-0 left-0 z-50"></div>
         <motion.div className="h-fit z-50 rounded-xl fixed shadow-2xl w-full md:w-[700px]  top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2">
-          <DigylogDialog />
-          <OrderToImage />
           <Tabs defaultValue="details" className=" sticky top-32 h-[83vh] ">
             <Card
               className=" flex h-full rounded-xl flex-col"
@@ -125,105 +70,12 @@ function OrderView() {
                   <Button className="h-8 w-8" variant={"outline"} size="icon" onClick={() => router.push(`/dashboard/orders/${currentOrder?.sequence}`)}>
                       <ArrowUpRight className="h-4 w-4" />
                   </Button>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button size="icon" variant="outline" className="h-8 w-8">
-                        <MoreVertical className="h-3.5 w-3.5" />
-                        <span className="sr-only">More</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-[200px]">
-                      <DropdownMenuItem
-                        onClick={() => {
-                          const whatsappConfirmMessage =
-                            store?.whatsappConfirmationMessage;
-                          if (!whatsappConfirmMessage) return;
-                          if(!storeId) return;
-                          if(!session) return;
-                          sendNotification(
-                            `Sent whatsapp confirmation 💬`,
-                            `of order:#${currentOrder?.sequence}`
-                          )
-                          const message = renderMessage(
-                            whatsappConfirmMessage,
-                          )
-                          window.open(
-                            `https://wa.me/212${currentOrder?.customer?.phoneNumber}?text=${encodeURIComponent(
-                              message,
-                            )}`,
-                          );
-                        }}
-                      >
-                        <IconBrandWhatsapp className="h-3.5 w-3.5 mr-2" />
-                        Confirm Order
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => {
-                          router.push(`/dashboard/orders/edit/${currentOrder?.sequence}`);
-                        }}
-                      >
-                        <Edit className="h-3.5 w-3.5 mr-2" />
-                        Edit Order
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => {
-                          window.open(
-                            `tel:+212${currentOrder?.customer?.phoneNumber}`,
-                          );
-                        }}
-                      >
-                        <Phone className="h-3.5 w-3.5 mr-2" />
-                        Call Customer
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        onClick={() => {
-                          setOrderToImageOpen(true);
-                        }}
-                      >
-                        <ScrollIcon className="h-3.5 w-3.5 mr-2" />
-                        Get Order Receipt
-                      </DropdownMenuItem>
 
-                      <DropdownMenuSub>
-                        <DropdownMenuSubTrigger>
-                          <TruckIcon className="h-3.5 w-3.5 mr-2" />
-                          Shipping Options
-                        </DropdownMenuSubTrigger>
-                        <DropdownMenuPortal>
-                          <DropdownMenuSubContent>
-                            <DropdownMenuItem>
-                              <Bike className="h-3.5 w-3.5 mr-2" />
-                              Manual
-                            </DropdownMenuItem>
-                            {store?.integrations?.find(
-                              (i) => i.name === "digylog",
-                            )?.enabled && (
-                              <DropdownMenuItem
-                                onClick={() => setDigylogOpen(true)}
-                              >
-                                <div className="flex items-center">
-                                  <TruckIcon className="h-3.5 w-3.5 mr-2" />
-                                  Digylog
-                                </div>
-                              </DropdownMenuItem>
-                            )}
-                          </DropdownMenuSubContent>
-                        </DropdownMenuPortal>
-                      </DropdownMenuSub>
-
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        className="text-red-500 bg-red-50"
-                        onClick={() => {
-                          deleteOrder(currentOrder.id);
-                        }}
-                      >
-                        <Trash2 className="h-3.5 w-3.5 mr-2" />
-                        Trash
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <OrderActions
+                    variant="outline"
+                    currentOrder={currentOrder}
+                  />
+                  
                   <Button
                     size="icon"
                     variant="secondary"

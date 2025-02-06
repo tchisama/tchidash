@@ -116,7 +116,7 @@ address: ${order.customer.shippingAddress.address}
             </>
           )
         }
-        <DropdownMenuItem onClick={() => router.push("/dashboard/none-layout/tickets")}>
+        <DropdownMenuItem onClick={() => router.push("/dashboard/tickets")}>
           <TicketMinus className="mr-2 h-4 w-4" />
           Tickets
         </DropdownMenuItem>

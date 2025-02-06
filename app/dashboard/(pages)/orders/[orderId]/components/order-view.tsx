@@ -1,14 +1,6 @@
 "use client";
 
 import {
-  Pencil,
-  Printer,
-  Send,
-  Trash,
-  Download,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
   Card,
   CardContent,
   CardDescription,
@@ -31,6 +23,8 @@ import { StateChanger } from "../../components/StateChanger";
 import CancelledCalls from "../../components/CancelledCalls";
 import ScheduledOrdersDate from "../../components/ScheduledOrdersDate";
 import { useOrderStore } from "@/store/orders";
+import NoteViewer from "../../components/NoteViewer";
+import OrderActions from "../../components/OrderActions";
 
 // const OrderTimeline = ({ estimatedDelivery }: { estimatedDelivery: string }) => (
 //   <Card className="flex-1">
@@ -52,36 +46,6 @@ import { useOrderStore } from "@/store/orders";
 //   </Card>
 // )
 
-const OrderActions = () => (
-  <Card className="flex-1">
-    <CardHeader>
-      <CardTitle>Actions</CardTitle>
-      <CardDescription>Manage this order</CardDescription>
-    </CardHeader>
-    <CardContent className="flex flex-wrap gap-4">
-      <Button variant="outline">
-        <Pencil className="mr-2 h-4 w-4" />
-        Edit Order
-      </Button>
-      <Button variant="outline">
-        <Printer className="mr-2 h-4 w-4" />
-        Print Invoice
-      </Button>
-      <Button variant="outline">
-        <Send className="mr-2 h-4 w-4" />
-        Send Confirmation
-      </Button>
-      <Button variant="outline">
-        <Download className="mr-2 h-4 w-4" />
-        Download PDF
-      </Button>
-      <Button variant="outline" className="text-red-500 hover:text-red-700">
-        <Trash className="mr-2 h-4 w-4" />
-        Cancel Order
-      </Button>
-    </CardContent>
-  </Card>
-);
 
 const CustomerInfo = (order: Order) => {
   const customerName = order.customer.name;
@@ -215,16 +179,14 @@ const OrderItemsTable = ({ items }: { items: OrderItem[] }) => (
   </Card>
 );
 
-const OrderNotes = ({ note }: { note: string }) => (
-  <Card className="max-w-[400px]">
+const OrderNotes = ({ order }: { order: Order }) => (
+  <Card className="md:max-w-[400px]">
     <CardHeader>
       <CardTitle>Order Notes</CardTitle>
       <CardDescription>Additional information about this order</CardDescription>
     </CardHeader>
     <CardContent>
-      <p className="text-sm text-gray-500">
-        {note || "No notes available for this order."}
-      </p>
+      <NoteViewer order={order} />
     </CardContent>
   </Card>
 );
@@ -282,7 +244,7 @@ export function OrderView({ order }: { order: Order }) {
   return (
     currentOrder && (
       <div className="flex flex-col md:flex-row">
-        <div className="flex-1 p-4 space-y-4">
+        <div className="flex-1 p-2 space-y-4">
           <div className="mb-2 flex justify-between items-center">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">
@@ -294,31 +256,29 @@ export function OrderView({ order }: { order: Order }) {
             </div>
 
             <div className="flex gap-2">
-              {currentOrder.orderStatus == "cancelled" && <CancelledCalls />}
-              {currentOrder.orderStatus == "scheduled" && (
-                <ScheduledOrdersDate />
-              )}
+              {currentOrder.orderStatus == "cancelled" && <CancelledCalls currentOrder={currentOrder} />}
+              {currentOrder.orderStatus == "scheduled" && <ScheduledOrdersDate currentOrder={currentOrder} />}
               <StateChanger
                 order={order}
                 state={order.orderStatus}
                 showNumberOfCalls
               />
+              <OrderActions currentOrder={currentOrder} />
             </div>
           </div>
 
-          <div className="flex gap-3 mb-3">
-            {/* <OrderTimeline estimatedDelivery={order.} /> */}
+          {/* <div className="flex gap-3 mb-3">
             <OrderActions />
-          </div>
+          </div> */}
 
           <div className="grid gap-3 md:grid-cols-2">
             <CustomerInfo {...order} />
             <OrderSummary {...order} />
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex gap-3 flex-col md:flex-row">
             <OrderItemsTable items={order.items} />
-            <OrderNotes note={order?.note?.content ?? ""} />
+            <OrderNotes order={order} />
           </div>
         </div>
 
