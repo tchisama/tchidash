@@ -62,7 +62,7 @@ export function OrdersMobileView({
           {/* Product Images */}
           <div className="mt-3">
             <div className="flex space-x-2">
-              {order.items.slice(0, 5).map((item, index) => (
+              {order.items.slice(0, 6).map((item, index) => (
                 <div
                   key={item.id}
                   className={cn(
@@ -78,17 +78,17 @@ export function OrdersMobileView({
                   />
                 </div>
               ))}
-              {order.items.length > 5 && (
+              {order.items.length > 6 && (
                 <div className="w-10 h-10 rounded-[15px] bg-slate-100 border border-slate-200 flex items-center justify-center text-xs text-slate-500">
-                  +{order.items.length - 5}
+                  +{order.items.length - 6}
                 </div>
               )}
             </div>
           </div>
 
-          <div className="flex gap-4 items-center">
+          <div className=" mt-3 flex gap-4 items-center">
           {/* Customer Info */}
-          <div className="mt-3">
+          <div className="">
             <div className="font-medium text-sm">
               {order.customer.firstName} {order.customer.lastName}
             </div>
@@ -97,9 +97,9 @@ export function OrdersMobileView({
             </div>
           </div>
 
-          <div className=" h-[20px] border-l" ></div>
+          <div className=" h-[30px] border-l" ></div>
           {/* Shipping Address */}
-          <div className="mt-2">
+          <div className="">
             <div className="text-xs text-slate-600">
               {order.customer.shippingAddress.city}
             </div>
@@ -112,8 +112,13 @@ export function OrdersMobileView({
 
           {/* Status and Note */}
           <div className="mt-3 flex items-center justify-between">
-            <div className="text-right font-bold text-sm">
-              {order.totalPrice} Dh
+            <div className="text-right items-start flex flex-col font-bold text-sm">
+              <div>
+                {order.totalPrice} Dh
+              </div>
+              <div className="text-xs font-medium">
+                {order.totalItems} Items
+              </div>
             </div>
 
             <Popover>

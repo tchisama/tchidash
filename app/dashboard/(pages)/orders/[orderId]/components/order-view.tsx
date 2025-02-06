@@ -80,7 +80,6 @@ const OrderItemsTable = ({ items }: { items: OrderItem[] }) => (
           <TableRow>
             <TableHead>Image</TableHead>
             <TableHead>Product</TableHead>
-            <TableHead>Price</TableHead>
             <TableHead>Quantity</TableHead>
             <TableHead>Subtotal</TableHead>
           </TableRow>
@@ -94,11 +93,10 @@ const OrderItemsTable = ({ items }: { items: OrderItem[] }) => (
                   alt={item.title}
                   width={75}
                   height={75}
-                  className="object-cover bg-slate-50 border aspect-square rounded-md"
+                  className="object-cover size-10 md:size-12 bg-slate-50 border aspect-square rounded-md"
                 />
               </TableCell>
               <TableCell className="font-medium">{item.title}</TableCell>
-              <TableCell>{item.price.toFixed(2)} Dh</TableCell>
               <TableCell>{item.quantity}</TableCell>
               <TableCell>{item.totalPrice.toFixed(2)} Dh</TableCell>
             </TableRow>
