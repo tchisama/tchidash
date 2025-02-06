@@ -8,7 +8,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Table,
   TableBody,
@@ -25,71 +24,10 @@ import ScheduledOrdersDate from "../../components/ScheduledOrdersDate";
 import { useOrderStore } from "@/store/orders";
 import NoteViewer from "../../components/NoteViewer";
 import OrderActions from "../../components/OrderActions";
-
-// const OrderTimeline = ({ estimatedDelivery }: { estimatedDelivery: string }) => (
-//   <Card className="flex-1">
-//     <CardHeader>
-//       <CardTitle>Order Timeline</CardTitle>
-//       <CardDescription>Estimated delivery by {estimatedDelivery}</CardDescription>
-//     </CardHeader>
-//     <CardContent>
-//       <div className="space-y-4">
-//         <Progress value={75} className="w-full" />
-//         <div className="flex justify-between text-sm">
-//           <span>Order Placed</span>
-//           <span>Processing</span>
-//           <span>Shipped</span>
-//           <span>Delivered</span>
-//         </div>
-//       </div>
-//     </CardContent>
-//   </Card>
-// )
+import { CustomerCardByNumber } from "../../../customers/page";
 
 
-const CustomerInfo = (order: Order) => {
-  const customerName = order.customer.name;
-  const email = order.customer.email;
-  const phone = order.customer.phoneNumber;
-  const shippingAddress = order.customer.shippingAddress.address;
-  const billingAddress = order.customer.shippingAddress.address;
 
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Customer Information</CardTitle>
-        <CardDescription>Details about the customer</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="flex items-center space-x-4">
-          <Avatar className="h-16 w-16">
-            <AvatarImage
-              src={`https://api.dicebear.com/6.x/initials/svg?seed=${customerName}`}
-            />
-            <AvatarFallback>
-              {customerName
-                .split(" ")
-                .map((n) => n[0])
-                .join("")}
-            </AvatarFallback>
-          </Avatar>
-          <div>
-            <h3 className="text-xl font-semibold">{customerName}</h3>
-            <p className="text-sm text-gray-500">{email}</p>
-            <p className="text-sm text-gray-500">{phone}</p>
-          </div>
-        </div>
-        <Separator className="my-4" />
-        <div className="space-y-2">
-          <h4 className="font-semibold">Shipping Address</h4>
-          <p className="text-sm text-gray-500">{shippingAddress}</p>
-          <h4 className="font-semibold">Billing Address</h4>
-          <p className="text-sm text-gray-500">{billingAddress}</p>
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
 
 const OrderSummary = (order: Order) => {
   // const paymentMethod = order.paymentMethod
@@ -105,14 +43,6 @@ const OrderSummary = (order: Order) => {
       </CardHeader>
       <CardContent>
         <div className="space-y-2">
-          {/* <div className="flex justify-between">
-          <span>Payment Method:</span>
-          <span>{paymentMethod}</span>
-        </div>
-        <div className="flex justify-between">
-          <span>Shipping Method:</span>
-          <span>{shippingMethod}</span>
-        </div> */}
           <div className="flex justify-between">
             <span>Total Items:</span>
             <span>{items.reduce((sum, item) => sum + item.quantity, 0)}</span>
@@ -191,52 +121,6 @@ const OrderNotes = ({ order }: { order: Order }) => (
   </Card>
 );
 
-// const OrderCart = ({ isCartOpen, setIsCartOpen, order }: { isCartOpen: boolean, setIsCartOpen: (isOpen: boolean) => void, order: Order }) => (
-//   <div
-//     className={`fixed inset-y-0 right-0 w-96 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${isCartOpen ? "translate-x-0" : "translate-x-full"}`}
-//   >
-//     <div className="flex h-full flex-col">
-//       <div className="flex items-center justify-between p-4 border-b">
-//         <h2 className="text-xl font-semibold">Order Items</h2>
-//         <Button variant="ghost" size="icon" onClick={() => setIsCartOpen(!isCartOpen)}>
-//           <ShoppingCart className="h-6 w-6" />
-//         </Button>
-//       </div>
-//       <ScrollArea className="flex-1">
-//         {order.items.map((item) => (
-//           <div key={item.id} className="p-4 border-b">
-//             <div className="flex justify-between items-center">
-//               <div>
-//                 <h3 className="font-semibold">{item.title}</h3>
-//                 <p className="text-sm text-gray-500">Quantity: {item.quantity}</p>
-//               </div>
-//               <p className="font-semibold">{item.totalPrice.toFixed(2)} Dh</p>
-//             </div>
-//             {/* <p className={`text-sm mt-2 ${getItemStatusColor(item.status)}`}>{item.status}</p> */}
-//           </div>
-//         ))}
-//       </ScrollArea>
-//       <div className="p-4 border-t">
-//         <div className="flex justify-between items-center mb-2">
-//           <span>Subtotal:</span>
-//           <span>${(order.totalPrice - order.shippingInfo.cost).toFixed(2)}</span>
-//         </div>
-//         <div className="flex justify-between items-center mb-2">
-//           <span>Shipping:</span>
-//           <span>{order.shippingInfo.cost} Dh</span>
-//         </div>
-//         <Separator className="my-2" />
-//         <div className="flex justify-between items-center mb-4">
-//           <span className="font-semibold">Total:</span>
-//           <span className="font-semibold text-xl">{
-//             order.shippingInfo.cost
-//           } Dh</span>
-//         </div>
-//         <Button className="w-full">Checkout</Button>
-//       </div>
-//     </div>
-//   </div>
-// )
 
 export function OrderView({ order }: { order: Order }) {
   const { currentOrder } = useOrderStore();
@@ -267,12 +151,11 @@ export function OrderView({ order }: { order: Order }) {
             </div>
           </div>
 
-          {/* <div className="flex gap-3 mb-3">
-            <OrderActions />
-          </div> */}
 
           <div className="grid gap-3 md:grid-cols-2">
-            <CustomerInfo {...order} />
+            <div>
+              <CustomerCardByNumber number={order.customer.phoneNumber??""} />
+            </div>
             <OrderSummary {...order} />
           </div>
 
@@ -282,16 +165,6 @@ export function OrderView({ order }: { order: Order }) {
           </div>
         </div>
 
-        {/* <OrderCart isCartOpen={isCartOpen} setIsCartOpen={setIsCartOpen} order={order} /> */}
-        {/**/}
-        {/* <Button */}
-        {/*   variant="outline" */}
-        {/*   size="icon" */}
-        {/*   className="fixed bottom-4 right-4 h-12 w-12 rounded-full shadow-lg" */}
-        {/*   onClick={() => setIsCartOpen(!isCartOpen)} */}
-        {/* > */}
-        {/*   <ShoppingCart className="h-6 w-6" /> */}
-        {/* </Button> */}
       </div>
     )
   );
