@@ -11,6 +11,7 @@ import NoteViewer from "./NoteViewer";
 import { Edit2 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import Link from "next/link";
+import OrderActions from "./OrderActions";
 
 export function OrdersMobileView({
   orders,
@@ -50,12 +51,13 @@ export function OrdersMobileView({
             </div>
 
             <div
-              className="w-fit"
+              className="w-fit flex gap-2"
               onClick={(e) => {
                 e.stopPropagation();
               }}
             >
             <StateChanger order={order} state={order.orderStatus} />
+            <OrderActions currentOrder={order} />
             </div>
           </div>
 

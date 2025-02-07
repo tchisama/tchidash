@@ -1,7 +1,7 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { File, ListFilter, PlusCircle } from "lucide-react";
+import {  File, ListFilter, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -42,6 +42,8 @@ import { useStore } from "@/store/storeInfos";
 import { ProductLine } from "./components/ProductLine";
 import { dbGetDocs } from "@/lib/dbFuntions/fbFuns";
 import { usePermission } from "@/hooks/use-permission";
+import { exportJson } from "./components/exportJson";
+import ImportProducts from "./components/ImportProductsButton";
 // Sample product data
 
 export default function Page() {
@@ -73,6 +75,8 @@ export default function Page() {
       console.log(data);
     }
   }, [data, setProducts, setCurrentProduct]);
+
+  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
 
   // Check if the user has view permission
   const hasViewPermission = usePermission();
@@ -131,7 +135,6 @@ export default function Page() {
 
 
 
-
   return (
     data && (
       <Tabs defaultValue="all" className="">
@@ -164,12 +167,22 @@ export default function Page() {
                 <DropdownMenuCheckboxItem>Archived</DropdownMenuCheckboxItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button size="sm" variant="outline" className="h-8 gap-1">
+            <ImportProducts />
+            {
+              selectedProducts && selectedProducts.length > 0 &&
+            <Button
+              onClick={() => {
+                  // export json file
+                  console.log("export json file");
+                  exportJson(products.filter((p) => selectedProducts.includes(p.id)), "products");
+              }}
+             size="sm" variant="outline" className="h-8 gap-1">
               <File className="h-3.5 w-3.5" />
               <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
                 Export
               </span>
             </Button>
+            }
             <Button onClick={addProduct} size="sm" className="h-8 gap-1">
               <PlusCircle className="h-3.5 w-3.5" />
               <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
@@ -187,6 +200,7 @@ export default function Page() {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead>Select</TableHead>
                     <TableHead className="hidden w-[100px] sm:table-cell">
                       <span className="sr-only">Image</span>
                     </TableHead>
@@ -213,7 +227,7 @@ export default function Page() {
                 <TableBody>
                   {products &&
                     products.map((product) => (
-                      <ProductLine key={product.id} product={product} />
+                      <ProductLine selected={{selectedProducts, setSelectedProducts}} key={product.id} product={product} />
                     ))}
                 </TableBody>
               </Table>

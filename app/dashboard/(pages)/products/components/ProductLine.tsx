@@ -48,8 +48,12 @@ import { useStore } from "@/store/storeInfos";
 import { getStock } from "@/lib/fetchs/stock";
 import { useQuery } from "@tanstack/react-query";
 import { dbAddDoc, dbUpdateDoc } from "@/lib/dbFuntions/fbFuns";
+import { Checkbox } from "@/components/ui/checkbox";
 
-const ProductLine = ({ product }: { product: Product }) => {
+const ProductLine = ({ product , selected }: { product: Product, selected:{
+  selectedProducts: string[]
+  setSelectedProducts: React.Dispatch<React.SetStateAction<string[]>>
+} }) => {
   const [showVariants, setShowVariants] = useState(false);
   const { setCurrentProduct, setLastUploadedProduct, setProducts, products } =
     useProducts();
@@ -110,7 +114,6 @@ const ProductLine = ({ product }: { product: Product }) => {
     queryKey: ["inventoryStock", product?.id],
     queryFn: () => getStock(store?.id ?? "", product),
   });
-  console.log(stockQuantity);
   if (error) console.error(error);
 
   // a function to get total sales of a product
@@ -139,6 +142,25 @@ const ProductLine = ({ product }: { product: Product }) => {
   return (
     <>
       <TableRow key={product.id} className="group">
+        <TableCell>
+          <Checkbox
+            checked={selected.selectedProducts.includes(product.id)}
+            onCheckedChange={(checked) => {
+              if (checked) {
+                selected.setSelectedProducts([
+                  ...selected.selectedProducts,
+                  product.id,
+                ]);
+              } else {
+                selected.setSelectedProducts(
+                  selected.selectedProducts.filter(
+                    (id) => id !== product.id,
+                  ),
+                );
+              }
+            }}
+          />
+        </TableCell>  
         <TableCell className="hidden sm:table-cell">
           {Array.isArray(product.images) &&
           (product.images[0] || product.variants?.find((v) => v.image)) ? (

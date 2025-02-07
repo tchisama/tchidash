@@ -51,7 +51,7 @@ export default function OrderPage() {
         <CardHeader>
           <CardTitle>Order Notes</CardTitle>
         </CardHeader>
-        <CardContent className="min-h-[500px] max-h-[800px] md:w-[400px] lg:w-[450px]">
+        <CardContent className="min-h-[500px] max-h-[800px]  lg:w-[400px]">
 <Tabs defaultValue="notes" className="max-h-[700px] overflow-auto">
   <TabsList>
     <TabsTrigger value="notes">Notes</TabsTrigger>

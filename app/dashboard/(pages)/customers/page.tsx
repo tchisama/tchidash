@@ -132,7 +132,7 @@ export  function CustomerCard({ customer }:{
       }
     })
   return (
-    <li className="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow">
+    <li className="col-span-1 divide-y border divide-gray-200 rounded-lg bg-white shadow-sm">
       <div className="flex w-full items-center justify-between space-x-6 p-6">
         <Avvvatars
           value={String(customer.phoneNumber)}

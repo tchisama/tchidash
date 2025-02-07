@@ -32,7 +32,6 @@ import { CustomerCardByNumber } from "../../../customers/page";
 const OrderSummary = (order: Order) => {
   // const paymentMethod = order.paymentMethod
   // const shippingMethod = order.shippingInfo.method
-  const items = order.items;
   const total = order.totalPrice;
 
   return (
@@ -44,17 +43,13 @@ const OrderSummary = (order: Order) => {
       <CardContent>
         <div className="space-y-2">
           <div className="flex justify-between">
-            <span>Total Items:</span>
-            <span>{items.reduce((sum, item) => sum + item.quantity, 0)}</span>
-          </div>
-          <div className="flex justify-between">
-            <span>Subtotal:</span>
+            <span className="text-muted-foreground">Subtotal:</span>
             <span>
               {(total - (order.shippingInfo.cost ?? 0)).toFixed(2)} Dh
             </span>
           </div>
           <div className="flex justify-between">
-            <span>Shipping:</span>
+            <span className="text-muted-foreground">Shipping:</span>
             <span>{order.shippingInfo.cost ?? 0} Dh</span>
           </div>
           <Separator />
