@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { doc, setDoc, Timestamp } from 'firebase/firestore';
+import { addDoc, collection, Timestamp } from 'firebase/firestore';
 import { db } from '@/firebase';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -42,8 +42,7 @@ const ImportProducts = () => {
           }
 
           // Add the product to Firebase with the specified ID
-          const productRef = doc(db, 'products', product.id); // 'products' is the collection name
-          await setDoc(productRef, productForUpload);
+          await addDoc(collection(db, 'products'), productForUpload);
           console.log(`Product ${product.id} added successfully.`);
         }
 
