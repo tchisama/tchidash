@@ -59,8 +59,8 @@ export default function Page() {
       if (!storeId) return;
       const response = await dbGetDocs(q, storeId, "");
       const data = response.docs.map((doc) => ({
-        id: doc.id,
         ...doc.data(),
+        id: doc.id,
       }));
       return data;
     },

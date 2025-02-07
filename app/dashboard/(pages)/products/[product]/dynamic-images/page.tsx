@@ -116,13 +116,14 @@ function Page({ params }: { params: { product: string } }) {
       ...currentProduct,
       variants: currentProduct.variants?.map((v) => ({
         ...v,
-        image:
+        images:[
           `https://firebasestorage.googleapis.com/v0/b/tchidash-fd7aa.appspot.com/o/${ids
             .find((i) => i[v.id])
             ?.[v.id].replace(
               /\//g,
               "%2F",
-            )}?alt=media&token=7a7fea2e-50bb-44b1-a887-b8411a96e862` || "", // Ensure image update from ids
+            )}?alt=media&token=7a7fea2e-50bb-44b1-a887-b8411a96e862` || "" + Math.random(), // Ensure image update from ids
+        ]
       })),
     });
 
@@ -152,7 +153,7 @@ function Page({ params }: { params: { product: string } }) {
       ...currentProduct,
       variants: currentProduct.variants?.map((v) => ({
         ...v,
-        image:
+        images:[
           `https://firebasestorage.googleapis.com/v0/b/tchidash-fd7aa.appspot.com/o/${ids
             .find((i) => i[v.id])
             ?.[v.id].replace(
@@ -160,6 +161,7 @@ function Page({ params }: { params: { product: string } }) {
               "%2F",
             )}?alt=media&token=${Math.random().toString().replace(".", "")}` ||
           "",
+        ]
       })),
     });
   };

@@ -37,6 +37,7 @@ import {
   doc,
   getAggregateFromServer,
   query,
+  setDoc,
   sum,
   where,
 } from "firebase/firestore";
@@ -74,6 +75,7 @@ const ProductLine = ({ product , selected }: { product: Product, selected:{
     setProducts([...products, newProduct]);
     dbAddDoc(collection(db, "products"), newProduct, storeId, "");
   };
+
 
   const archiveProduct = () => {
     if (!storeId) return;
@@ -263,6 +265,37 @@ const ProductLine = ({ product , selected }: { product: Product, selected:{
               <DropdownMenuItem onClick={archiveProduct}>
                 <Archive className="h-4 w-4 mr-2" />
                 Archive
+              </DropdownMenuItem>
+              <DropdownMenuItem
+              onClick={() => {
+                const productId = window.prompt(
+                  "Enter the ID "
+                )
+                if(!productId) return
+                alert("Duplicating product..." + productId)
+
+                if (product) {
+                  setDoc(doc(
+                    db,
+                    "products",
+                    productId
+                  ),{
+                    ...product,
+                    variants: product
+                    .variants?.map((variant,index) => {
+                      return {
+                        ...variant,
+                        id: `${productId}-variant-${index}`,
+                        // https://firebasestorage.googleapis.com/v0/b/tchidash-fd7aa.appspot.com/o/dynamicVariantsOptionsImages%2F9Xfftdx2dgKnf1LZAlmJvariant-0.png?alt=media&token=09977803364904789
+                        images:[
+                          "https://firebasestorage.googleapis.com/v0/b/tchidash-fd7aa.appspot.com/o/dynamicVariantsOptionsImages%2F"+productId+"-variant-"+index+"-0.png?alt=media&token=09977803364904789"
+                        ]                      }
+                    })
+                  })
+                }
+              }}
+              >
+                Advance Duplicate
               </DropdownMenuItem>
               <DropdownMenuItem onClick={deleteProduct}>
                 <Trash2 className="h-4 w-4 mr-2" />

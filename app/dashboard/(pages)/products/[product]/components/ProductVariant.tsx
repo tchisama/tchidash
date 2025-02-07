@@ -83,13 +83,13 @@ const ProductVariantsCard = ({}: { saveProduct: () => void }) => {
 
   const correctVariantImages = () => {
     // // set the first image in variant.images as the main image
-    // const variants = productVariants.map((variant) => {
-    //   return {
-    //     ...variant,
-    //     images: [variant.image],
-    //   };
-    // });
-    // setProductVariants(variants);
+    const variants = productVariants.map((variant) => {
+      return {
+        ...variant,
+        images: [variant.image],
+      };
+    });
+    setProductVariants(variants);
     // setCurrentProduct({
     //   ...currentProduct,
     //   variants: variants,
