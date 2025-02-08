@@ -15,6 +15,7 @@ import { useStore } from "@/store/storeInfos";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/firebase";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
 
 const demoData = {
   name: "John",
@@ -29,9 +30,7 @@ function WhatsappConfirmationMessage() {
   const [confirmationMessage, setConfirmationMessage] = React.useState("");
   const { store } = useStore();
   const [saved, setSaved] = React.useState(false);
-
-
-
+  const { data } = useSession();
 
   useEffect(() => {
     if (store) {
@@ -99,6 +98,12 @@ function WhatsappConfirmationMessage() {
                     .replaceAll("{{city}}", demoData.city)
                     .replaceAll("{{total_price}}", demoData.total_price)
                     .replaceAll("{{total_items}}", "2")
+                    .replaceAll(
+                      "{{user}}",
+                      store?.employees?.find(
+                        (e) => e.email === data?.user?.email,
+                      )?.name ?? "",
+                    )
                     .replaceAll("\n", "<br />")
                     // replace **something** with <strong>something</strong>
                     .replaceAll(/\*(.*?)\*/g, "<strong>$1</strong>"),

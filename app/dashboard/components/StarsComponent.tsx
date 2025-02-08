@@ -1,5 +1,6 @@
 "use client";
 import { db } from "@/firebase";
+import { usePermission } from "@/hooks/use-permission";
 import { useStore } from "@/store/storeInfos";
 import { useQuery } from "@tanstack/react-query";
 import { endOfDay } from "date-fns";
@@ -89,10 +90,7 @@ export default function StarsComponent() {
       // Calculate % change from last week
       const percentageChange =
         avgOrdersPerDay7 > 0
-          ? (
-              ((avgOrdersPerDay30 - avgOrdersPerDay7) / avgOrdersPerDay7) *
-              100
-            )
+          ? ((avgOrdersPerDay30 - avgOrdersPerDay7) / avgOrdersPerDay7) * 100
           : 0;
 
       return {
@@ -107,6 +105,13 @@ export default function StarsComponent() {
       };
     },
   });
+
+  // Check if the user has view permission
+  const hasViewPermission = usePermission();
+
+  if (!hasViewPermission("employees", "update")) {
+    return <div></div>;
+  }
 
   const stats = [
     {
