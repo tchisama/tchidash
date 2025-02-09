@@ -217,9 +217,7 @@ const ItemRow = ({ item }: { item: OrderItem }) => {
 
         {/* Total Price */}
         <TableCell className="">
-          <div className="font-medium">
-            {getTotalPriceFromItem(item)} Dh
-          </div>
+          <div className="font-medium">{getTotalPriceFromItem(item)} Dh</div>
         </TableCell>
         <TableCell className="text-right">
           <Button

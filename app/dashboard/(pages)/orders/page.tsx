@@ -29,6 +29,7 @@ import { orderStatusValuesWithIcon } from "./components/StateChanger";
 import { Input } from "@/components/ui/input";
 import { usePermission } from "@/hooks/use-permission";
 import Actions from "./components/Actions";
+import StarsForOrders from "./components/StarsForOrders";
 
 export default function Page() {
   const { selectedOrder } = useOrderStore();
@@ -64,6 +65,9 @@ export default function Page() {
         "grid flex-1 items-start px-0 sm:py-0 gap-8 lg:grid-cols-2 ",
       )}
     >
+      <div className="lg:col-span-2">
+        <StarsForOrders setFilter={setFilter} filter={filter} />
+      </div>
       <div className="grid duration-200 auto-rows-max items-start gap-4  lg:col-span-2">
         <div className="">
           <div className="ml-auto mb-2 flex items-center gap-2">
@@ -219,4 +223,3 @@ export default function Page() {
     </main>
   );
 }
-

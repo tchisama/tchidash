@@ -8,6 +8,7 @@ import { Product, Variant } from "@/types/product";
 import {
   AlertDialog,
   AlertDialogAction,
+  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -50,15 +51,15 @@ function ChooseProductWithVariant({ item }: { item: OrderItem }) {
   const [selectedVariant, setSelectedVariant] = React.useState<string | null>(
     null,
   );
-  useEffect(() => {
-    setSelectedVariant(null);
-  }, [selectedProduct, setSelectedVariant]);
+  // useEffect(() => {
+  //   setSelectedVariant(null);
+  // }, [selectedProduct, setSelectedVariant]);
 
-  useEffect(() => {
-    if (selectedProduct?.variants && selectedProduct.variants.length > 0) {
-      setSelectedVariant(selectedProduct.variants[0].id);
-    }
-  }, [selectedProduct, setSelectedVariant]);
+  // useEffect(() => {
+  //   if (selectedProduct?.variants && selectedProduct.variants.length > 0) {
+  //     setSelectedVariant(selectedProduct.variants[0].id);
+  //   }
+  // }, [selectedProduct, setSelectedVariant]);
 
   const price = () => {
     if (selectedProduct) {
@@ -76,9 +77,19 @@ function ChooseProductWithVariant({ item }: { item: OrderItem }) {
     }
     return 0;
   };
+  useEffect(() => {
+    if (item.productId) {
+      setSelectedProduct(
+        products?.find((product) => product.id === item.productId) as Product,
+      );
+      if (item.variantId) {
+        setSelectedVariant(item.variantId);
+      }
+    }
+  }, [item]);
 
   useEffect(() => {
-    if(!selectedProduct) return;
+    if (!selectedProduct) return;
     // if(!selectedVariant) return;
     setNewOrder({
       ...newOrder,
@@ -172,6 +183,7 @@ function ChooseProductWithVariant({ item }: { item: OrderItem }) {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction>Continue</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

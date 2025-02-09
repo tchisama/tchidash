@@ -19,23 +19,19 @@ import { cn } from "@/lib/utils";
 import useNotification from "@/hooks/useNotification";
 import { Order } from "@/types/order";
 
-function ScheduledOrdersDate({
-  currentOrder
-}:{
-  currentOrder: Order
-}) {
+function ScheduledOrdersDate({ currentOrder }: { currentOrder: Order }) {
   const { storeId } = useStore();
-  const {  setOrders,orders } = useOrderStore();
+  const { setOrders, orders } = useOrderStore();
   const { data: session } = useSession();
 
   const [date, setDate] = React.useState<Date>();
 
   useEffect(() => {
     if (currentOrder?.scheduledDate) {
-      setDate(currentOrder.scheduledDate.toDate());
+      setDate(currentOrder?.scheduledDate?.toDate());
     }
   }, [currentOrder]);
-  const {sendNotification} = useNotification();
+  const { sendNotification } = useNotification();
 
   return (
     <div>
@@ -70,8 +66,8 @@ function ScheduledOrdersDate({
               );
               sendNotification(
                 `scheduled 🕗`,
-                `order #${currentOrder.sequence} to ${format(date as Date, "PPP")}`
-              )
+                `order #${currentOrder.sequence} to ${format(date as Date, "PPP")}`,
+              );
               dbAddDoc(
                 collection(db, "notes"),
                 {
@@ -93,10 +89,16 @@ function ScheduledOrdersDate({
               //   ...currentOrder,
               //   scheduledDate: Timestamp.fromDate(date as Date),
               // });
-              setOrders(orders.map(o=>o.id == currentOrder.id ? {
-                ...o,
-                scheduledDate: Timestamp.fromDate(date as Date),
-              }:o))
+              setOrders(
+                orders.map((o) =>
+                  o.id == currentOrder.id
+                    ? {
+                        ...o,
+                        scheduledDate: Timestamp.fromDate(date as Date),
+                      }
+                    : o,
+                ),
+              );
               setDate(date);
             }}
             initialFocus

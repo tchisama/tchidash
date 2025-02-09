@@ -110,6 +110,7 @@ export type Order = {
   updatedAt?: Timestamp;
   storeId: string;
   note?: Note;
+  assignedTo?: string;
   cityAi?: {
     city: string;
     region: string;
