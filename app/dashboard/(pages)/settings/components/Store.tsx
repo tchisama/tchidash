@@ -144,7 +144,7 @@ const StoreDetailsCard = () => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit}>
-            <div className="flex gap-4 mb-8">
+            <div className="flex flex-col md:flex-row gap-4 mb-8">
               <div className="">
                 <Label htmlFor="storeLogo" className="pb-2 font-medium">
                   Store Logo

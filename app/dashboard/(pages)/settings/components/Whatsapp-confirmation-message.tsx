@@ -66,7 +66,7 @@ function WhatsappConfirmationMessage() {
             ),
           )}
         </div>
-        <div className="flex mt-4 gap-4">
+        <div className="flex flex-col lg:flex-row mt-4 gap-4">
           <Textarea
             className=" flex-1"
             placeholder="Your message here..."

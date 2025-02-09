@@ -2,6 +2,9 @@ import { create } from "zustand";
 
 // Define the store
 interface DialogsState {
+  employeeProfileDialogOpen: boolean;
+  setEmployeeProfileDialogOpen: (open: boolean) => void;
+
   digylogOpen: boolean;
   setDigylogOpen: (open: boolean) => void;
 
@@ -11,6 +14,10 @@ interface DialogsState {
 
 // Create the Zustand store
 export const useDialogs = create<DialogsState>((set) => ({
+  employeeProfileDialogOpen: false,
+  setEmployeeProfileDialogOpen: (open) =>
+    set({ employeeProfileDialogOpen: open }),
+
   digylogOpen: false,
   setDigylogOpen: (open) => set({ digylogOpen: open }),
 
