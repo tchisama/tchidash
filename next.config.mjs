@@ -21,6 +21,8 @@ const nextConfig = {
   experimental: {
     esmExternals: "loose",
   },
+  // crossOrigin set to "anonymous" to avoid CORS issues
+  crossOrigin: "anonymous",
   // add images
   images: {
     domains: ["localhost", "lh3.googleusercontent.com"],
