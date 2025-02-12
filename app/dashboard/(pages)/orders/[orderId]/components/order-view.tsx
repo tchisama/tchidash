@@ -26,9 +26,6 @@ import NoteViewer from "../../components/NoteViewer";
 import OrderActions from "../../components/OrderActions";
 import { CustomerCardByNumber } from "../../../customers/page";
 
-
-
-
 const OrderSummary = (order: Order) => {
   // const paymentMethod = order.paymentMethod
   // const shippingMethod = order.shippingInfo.method
@@ -43,7 +40,11 @@ const OrderSummary = (order: Order) => {
       <CardContent>
         <div className="space-y-2">
           <div className="flex justify-between">
+<<<<<<< Updated upstream
             <span className="text-muted-foreground">Subtotal:</span>
+=======
+            <span>Subtotal:</span>
+>>>>>>> Stashed changes
             <span>
               {(total - (order.shippingInfo.cost ?? 0)).toFixed(2)} Dh
             </span>
@@ -114,7 +115,6 @@ const OrderNotes = ({ order }: { order: Order }) => (
   </Card>
 );
 
-
 export function OrderView({ order }: { order: Order }) {
   const { currentOrder } = useOrderStore();
 
@@ -133,8 +133,12 @@ export function OrderView({ order }: { order: Order }) {
             </div>
 
             <div className="flex gap-2">
-              {currentOrder.orderStatus == "cancelled" && <CancelledCalls currentOrder={currentOrder} />}
-              {currentOrder.orderStatus == "scheduled" && <ScheduledOrdersDate currentOrder={currentOrder} />}
+              {currentOrder.orderStatus == "cancelled" && (
+                <CancelledCalls currentOrder={currentOrder} />
+              )}
+              {currentOrder.orderStatus == "scheduled" && (
+                <ScheduledOrdersDate currentOrder={currentOrder} />
+              )}
               <StateChanger
                 order={order}
                 state={order.orderStatus}
@@ -144,10 +148,9 @@ export function OrderView({ order }: { order: Order }) {
             </div>
           </div>
 
-
           <div className="grid gap-3 md:grid-cols-2">
             <div>
-              <CustomerCardByNumber number={order.customer.phoneNumber??""} />
+              <CustomerCardByNumber number={order.customer.phoneNumber ?? ""} />
             </div>
             <OrderSummary {...order} />
           </div>
@@ -157,9 +160,7 @@ export function OrderView({ order }: { order: Order }) {
             <OrderNotes order={order} />
           </div>
         </div>
-
       </div>
     )
   );
 }
-
