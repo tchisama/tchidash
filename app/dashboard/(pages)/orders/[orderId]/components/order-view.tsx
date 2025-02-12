@@ -40,11 +40,7 @@ const OrderSummary = (order: Order) => {
       <CardContent>
         <div className="space-y-2">
           <div className="flex justify-between">
-<<<<<<< Updated upstream
             <span className="text-muted-foreground">Subtotal:</span>
-=======
-            <span>Subtotal:</span>
->>>>>>> Stashed changes
             <span>
               {(total - (order.shippingInfo.cost ?? 0)).toFixed(2)} Dh
             </span>
