@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import { Timestamp } from "firebase/firestore";
 
 export const daysLeftTextBadge = (date: Date) => {
   const days = daysLeft(date);
@@ -17,16 +18,6 @@ export const daysLeftTextBadge = (date: Date) => {
 export const daysLeft = (date: Date) => {
   return Math.ceil((date.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
 };
-
-
-
-
-
-
-
-
-
-
 
 export function timeSince(startDate: Date, endDate: Date): string {
   // Calculate the difference in milliseconds
@@ -57,4 +48,18 @@ export function timeSince(startDate: Date, endDate: Date): string {
   return "Just now";
 }
 
+export const parseObjectTimestamptoDate = <T extends Record<string, unknown>>(
+  data: T,
+): T => {
+  const rest = { ...data };
 
+  Object.keys(rest).forEach((key) => {
+    if (rest[key] instanceof Timestamp) {
+      (rest as Record<string, unknown>)[key] = (
+        rest[key] as Timestamp
+      ).toDate();
+    }
+  });
+
+  return rest;
+};

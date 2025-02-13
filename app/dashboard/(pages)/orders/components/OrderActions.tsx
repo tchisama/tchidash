@@ -1,9 +1,9 @@
 "use client";
 import React from "react";
 import { useDialogs } from "@/store/dialogs";
-import { dbDeleteDoc } from "@/lib/dbFuntions/fbFuns";
+import { dbAddDoc, dbDeleteDoc } from "@/lib/dbFuntions/fbFuns";
 import { db } from "@/firebase";
-import { doc, updateDoc } from "firebase/firestore";
+import { collection, doc, Timestamp, updateDoc } from "firebase/firestore";
 import {
   Bike,
   MoreVertical,
@@ -15,6 +15,7 @@ import {
   Stars,
   Copy,
   Ticket,
+  ArrowUpRight,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -41,6 +42,7 @@ import OrderToImage from "./OrderToImage";
 import axios from "axios";
 import { useOrderStore } from "@/store/orders";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { Note } from "./OrderNotes";
 
 type Props = {
   currentOrder: Order;
@@ -93,14 +95,38 @@ function OrderActions({ currentOrder, variant }: Props) {
         <DropdownMenuContent align="end" className="w-[200px] shadow-xl">
           <DropdownMenuItem
             onClick={() => {
+              window.open(`/dashboard/orders/${currentOrder?.sequence}`);
+            }}
+          >
+            <ArrowUpRight className="h-3.5 w-3.5 mr-2" />
+            Open in New Tab
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => {
               const whatsappConfirmMessage = store?.whatsappConfirmationMessage;
               if (!whatsappConfirmMessage) return;
               if (!storeId) return;
               if (!session) return;
+              if (!currentOrder) return;
               sendNotification(
                 `Sent whatsapp confirmation 💬`,
                 `of order:#${currentOrder?.sequence}`,
               );
+              dbAddDoc(
+                collection(db, "notes"),
+                {
+                  creator: session.user?.email ?? "",
+                  content: "Sent Whatsapp Confirmation 💬",
+                  createdAt: Timestamp.now(),
+                  details: {
+                    for: "order",
+                    orderId: currentOrder.id,
+                  },
+                } as Note,
+                currentOrder.storeId,
+                "",
+              );
+
               const message = renderMessage(whatsappConfirmMessage);
               window.open(
                 `https://wa.me/212${currentOrder?.customer?.phoneNumber}?text=${encodeURIComponent(
@@ -285,4 +311,3 @@ function OrderActions({ currentOrder, variant }: Props) {
 }
 
 export default OrderActions;
-

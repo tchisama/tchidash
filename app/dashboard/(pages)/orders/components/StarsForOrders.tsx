@@ -82,29 +82,29 @@ export default function StarsForOrders({
     return <div></div>;
   }
 
-  const iconClassName = "h-6 w-6 text-gray-400";
+  const iconClassName = "h-5 w-5 text-gray-400";
 
   const stats = [
     {
-      name: "Pending Orders",
+      name: "Pending",
       status: "pending",
       value: data?.pendingOrdersCount || 0,
       icon: <Stars className={iconClassName} />,
     },
     {
-      name: "Shipped Orders",
+      name: "Shipped",
       status: "shipped",
       value: data?.shippedOrdersCount || 0,
       icon: <Truck className={iconClassName} />,
     },
     {
-      name: "No Reply Orders",
+      name: "No Reply",
       status: "no_reply",
       value: data?.noReplyOrdersCount || 0,
       icon: <PhoneOff className={iconClassName} />,
     },
     {
-      name: "Scheduled Orders",
+      name: "Scheduled",
       status: "scheduled",
       value: data?.scheduledOrdersCount || 0,
       icon: <Clock className={iconClassName} />,
@@ -131,7 +131,7 @@ export default function StarsForOrders({
                 {stat.name}
               </dt>
             </div>
-            <dd className="text-2xl font-semibold leading-7 text-gray-900">
+            <dd className="text-xl font-semibold leading-7 text-gray-900">
               {stat.value}
             </dd>
           </button>
