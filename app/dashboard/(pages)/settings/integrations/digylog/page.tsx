@@ -18,18 +18,26 @@ import { digylogIntegration } from "@/types/store";
 import { dbUpdateDoc } from "@/lib/dbFuntions/fbFuns";
 import { doc } from "firebase/firestore";
 import { db } from "@/firebase";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from "@/components/ui/select";
+
+import axios from "axios";
 
 export default function IntegrationConfig() {
-  const [number, setNumber] = useState("");
-  const [password, setPassword] = useState("");
-  const [authKey, setAuthKey] = useState("");
+  const [token, setToken] = useState("");
+
+  const [Dstore, setDStore] = useState("");
+  const [network, setNetwork] = useState("");
 
   const { store, setStore } = useStore();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Here you would typically send the data to your backend
-    console.log("Form submitted:", { number, password, authKey });
     if (!store) return;
     if (!store.integrations) return;
     setStore({
@@ -37,12 +45,11 @@ export default function IntegrationConfig() {
       integrations: store.integrations.map((i) =>
         i.name === "digylog"
           ? {
-              ...i,
-              phoneNumber: number,
-              password,
-              headers: {
-                authorization: authKey,
-              },
+              name: "digylog",
+              enabled: true,
+              token,
+              network,
+              store: Dstore,
             }
           : i,
       ),
@@ -53,12 +60,11 @@ export default function IntegrationConfig() {
         integrations: store.integrations.map((i) =>
           i.name === "digylog"
             ? {
-                ...i,
-                phoneNumber: number,
-                password,
-                headers: {
-                  authorization: authKey,
-                },
+                name: "digylog",
+                enabled: true,
+                token,
+                network,
+                store: Dstore,
               }
             : i,
         ),
@@ -68,18 +74,49 @@ export default function IntegrationConfig() {
     );
   };
 
+  const [showPassword, setShowPassword] = useState(false);
+
+  const [Dstores, setDStores] = useState<string[]>([]);
+  const [networks, setNetworks] = useState<
+    {
+      name: string;
+      id: string;
+    }[]
+  >([]);
+
+  const checkToken = async () => {
+    if (!token) return;
+    await axios
+      .get("/api/integrations/digylog/stores?token=" + token)
+      .then((res) => {
+        setDStores(res.data.data.map((s: { name: string }) => s.name));
+      });
+    await axios
+      .get("/api/integrations/digylog/networks?token=" + token)
+      .then((res) => {
+        setNetworks(res.data.data);
+      });
+  };
+
   useEffect(() => {
     if (!store) return;
     if (!store.integrations) return;
     if (!store.integrations.find((i) => i.name === "digylog")) return;
-    const { phoneNumber, password, headers } = store.integrations.find(
+    const {
+      store: Dstore,
+      token,
+      network,
+    } = store.integrations.find(
       (i) => i.name === "digylog",
     ) as digylogIntegration;
-    setNumber(phoneNumber ?? "");
-    setPassword(password ?? "");
-    setAuthKey(headers?.authorization ?? "");
+    setToken(token);
+    setNetwork(network);
+    setDStore(Dstore);
   }, [store]);
-  const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    checkToken();
+  }, [token]);
 
   return (
     store && (
@@ -98,59 +135,74 @@ export default function IntegrationConfig() {
           <CardContent>
             <Alert className="mb-6 ">
               <ShieldCheck className="w-5 h-5 text-green-500" />
-              <AlertTitle>Secure Storage</AlertTitle>
+              <AlertTitle>Get Token</AlertTitle>
               <AlertDescription>
-                All credentials are encrypted and stored safely. We prioritize
-                the security of your sensitive information.
+                You can get your token from your Digylog account
               </AlertDescription>
             </Alert>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="number">Number</Label>
-                <Input
-                  id="number"
-                  type="text"
-                  placeholder="Enter your number"
-                  value={number}
-                  onChange={(e) => setNumber(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <div className="flex gap-2 ">
+                <Label htmlFor="token">Token</Label>
+                <div className="flex">
                   <Input
-                    id="password"
+                    id="token"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={token}
+                    onChange={(e) => setToken(e.target.value)}
                     required
+                    name="token"
+                    className=" rounded-r-none border-r-0"
                   />
-                  <Button
-                    variant="outline"
-                    size={"icon"}
-                    onClick={() => setShowPassword((p) => !p)}
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className=" bg-white border rounded-xl rounded-l-none inset-y-0 right-0 flex items-center px-3"
                   >
-                    {showPassword ? (
-                      <EyeOff className="w-4 h-4" />
-                    ) : (
-                      <Eye className="w-4 h-4" />
-                    )}
-                  </Button>
+                    {showPassword ? <EyeOff /> : <Eye />}
+                  </button>
                 </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="authKey">Authorized Key</Label>
-                <Input
-                  id="authKey"
-                  type="text"
-                  placeholder="Enter your authorized key"
-                  value={authKey}
-                  onChange={(e) => setAuthKey(e.target.value)}
-                  required
-                />
-              </div>
+
+              <div className="border-t border-gray-200 dark:border-gray-700 my-6"></div>
+
+              {Dstores.length > 0 ? (
+                <div className="space-y-2">
+                  <Label htmlFor="store">Store</Label>
+                  <Select
+                    value={Dstore}
+                    onValueChange={(value) => setDStore(value)}
+                    required
+                  >
+                    <SelectTrigger>{Dstore || "Select Store"}</SelectTrigger>
+                    <SelectContent>
+                      {Dstores.map((store) => (
+                        <SelectItem key={store} value={store}>
+                          {store}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              ) : null}
+              {networks.length > 0 ? (
+                <div className="space-y-2">
+                  <Label htmlFor="network">Network</Label>
+                  <Select
+                    value={network}
+                    onValueChange={(value) => setNetwork(value)}
+                    required
+                  >
+                    <SelectTrigger>{network || "Select Network"}</SelectTrigger>
+                    <SelectContent>
+                      {networks.map((network) => (
+                        <SelectItem key={network.id} value={network.id}>
+                          {network.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              ) : null}
             </form>
           </CardContent>
         </Card>

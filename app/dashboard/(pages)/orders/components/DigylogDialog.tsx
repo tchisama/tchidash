@@ -27,14 +27,18 @@ type City = {
   id: number;
 };
 
-export default function DigylogDialog() {
+export default function DigylogDialog({
+  currentOrder,
+}: {
+  currentOrder: Order;
+}) {
   const [selectedCity, setSelectedCity] = useState<City | null>(null);
   const [note, setNote] = useState("");
   const [price, setPrice] = useState("");
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
   const [phone, setPhone] = useState("");
-  const { currentOrder, setCurrentOrderData } = useOrderStore();
+  const { setCurrentOrderData } = useOrderStore();
   const { digylogOpen: open, setDigylogOpen: setOpen } = useDialogs();
   const [, setLoading] = useState(false);
 
@@ -59,96 +63,88 @@ export default function DigylogDialog() {
     setLoading(true);
     if (!selectedCity) return;
     if (!currentOrder) return;
-    console.log("Order details:", {
-      city: selectedCity.name,
-      note,
-      price,
-    });
     setOpen(false);
 
     const data = {
-      num: "771AAC",
-      numberOfOrders: 1,
-      price: price,
-      name: currentOrder.customer.name,
-      address: currentOrder.customer.shippingAddress.address,
-      sector: null,
-      city: selectedCity.id,
-      phone: currentOrder.customer.phoneNumber,
-      port: 1,
-      openproduct: 1,
-      type: 1,
-      note: note,
-      store: 14575,
-      orderType: 1,
-      refs: [
+      mode: 1,
+      status: 0,
+      orders: [
         {
-          id: 582707,
-          ref: "6B7B53",
-          designation: "cactus",
-          quantity: 1,
+          num: "commande " + currentOrder.sequence,
+          type: 1,
+          name: name,
+          phone: phone,
+          address: address,
+          city: selectedCity.name,
+          note: note,
+          refs: [
+            {
+              designation: "test designation",
+              quantity: currentOrder.totalItems,
+            },
+          ],
+          price: Number(price),
+          port: 1,
+          openproduct: 1,
         },
       ],
-      contrecheque: 0,
-      contrebl: "",
-      contretraite: 0,
-      network: 14,
     };
 
+    console.log("Data to send to Digylog", data);
     axios
       // i want to send data as well as paramas
-      .post("/api/integrations/digylog", data, {
+      .post("/api/integrations/digylog/orders", data, {
         params: {
           storeId: currentOrder.storeId,
         },
       })
-      .then(async (response) => {
-        console.log("Response from Digylog", response.data);
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        const get = await axios.get("/api/integrations/digylog", {
-          params: {
-            phone: currentOrder.customer.phoneNumber,
-            storeId: currentOrder.storeId,
-          },
-        });
-        if (get.data !== "success") {
-          console.log("Error while fetching data from Digylog");
-        }
-        let trackingNumber = "";
-        let cost = 0;
-        if (get.data.data.length > 0) {
-          trackingNumber = get.data.data[0].traking;
-          cost = Number(get.data.data[0].delivery_cost);
-        }
-        console.log("Tracking number from Digylog", trackingNumber);
-
-        if (!trackingNumber.includes(response.data.data[0])) {
-          console.log("ids are not equal");
-        }
-
-        if (response.data.status === "success") {
-          dbUpdateDoc(
-            doc(db, "orders", currentOrder.id),
-            {
-              shippingInfo: {
-                trackingNumber: trackingNumber,
-                shippingProvider: "Digylog",
-                shippingCost: cost,
-              },
-            },
-            currentOrder.id,
-            "",
-          );
-          setCurrentOrderData({
-            ...currentOrder,
-            shippingInfo: {
-              trackingNumber: trackingNumber,
-              shippingProvider: "Digylog",
-              shippingCost: cost,
-            },
-          } as Order);
-        }
-      })
+      // .then(async (response) => {
+      // console.log("Response from Digylog", response.data);
+      // await new Promise((resolve) => setTimeout(resolve, 2000));
+      // const get = await axios.get("/api/integrations/digylog", {
+      //   params: {
+      //     phone: currentOrder.customer.phoneNumber,
+      //     storeId: currentOrder.storeId,
+      //   },
+      // });
+      // if (get.data !== "success") {
+      //   console.log("Error while fetching data from Digylog");
+      // }
+      // let trackingNumber = "";
+      // let cost = 0;
+      // if (get.data.data.length > 0) {
+      //   trackingNumber = get.data.data[0].traking;
+      //   cost = Number(get.data.data[0].delivery_cost);
+      // }
+      // console.log("Tracking number from Digylog", trackingNumber);
+      //
+      // if (!trackingNumber.includes(response.data.data[0])) {
+      //   console.log("ids are not equal");
+      // }
+      //
+      // if (response.data.status === "success") {
+      //   dbUpdateDoc(
+      //     doc(db, "orders", currentOrder.id),
+      //     {
+      //       shippingInfo: {
+      //         trackingNumber: trackingNumber,
+      //         shippingProvider: "Digylog",
+      //         shippingCost: cost,
+      //       },
+      //     },
+      //     currentOrder.id,
+      //     "",
+      //   );
+      //   setCurrentOrderData({
+      //     ...currentOrder,
+      //     shippingInfo: {
+      //       trackingNumber: trackingNumber,
+      //       shippingProvider: "Digylog",
+      //       shippingCost: cost,
+      //     },
+      //   } as Order);
+      // }
+      // })
       .catch((error) => {
         console.error(
           "Error:",

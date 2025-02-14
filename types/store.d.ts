@@ -61,7 +61,7 @@ export type Store = {
   sequences?: {
     orders?: number;
     products?: number;
-  }
+  };
 };
 
 export type Employee = {
@@ -77,11 +77,9 @@ type Integration = digylogIntegration | whatsappNotificationIntegration;
 type digylogIntegration = {
   name: "digylog";
   enabled: boolean;
-  phoneNumber: string;
-  password: string;
-  headers: {
-    authorization: string;
-  };
+  token: string;
+  store: string;
+  network: string;
 };
 
 type whatsappNotificationIntegration = {

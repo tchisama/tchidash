@@ -1,12 +1,12 @@
 import axios from "axios";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 const baseUrl = "https://api.digylog.com/api/v2/seller";
 const referer = "https://apiseller.digylog.com";
-const bearerToken =
-  "YTk2MDA3Mzc0NjQyZjQxNmI2MjI4ZDQ1MTI0OGJjYjk4YWM1NjcxMGE2NTAyNDc5ODFiOWZjYWMzNjcwNjcyOQ";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const bearerToken = request.nextUrl.searchParams.get("token");
+
   try {
     const response = await axios
       .get(`${baseUrl}/stores`, {

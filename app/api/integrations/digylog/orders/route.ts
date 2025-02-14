@@ -5,10 +5,11 @@ import axios from "axios";
 import { doc } from "firebase/firestore";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(request: NextRequest) {
-  // const storeId = request.nextUrl.searchParams.get("storeId");
+export async function GET() {
   // const traking = request.nextUrl.searchParams.get("traking");
   // const phone = request.nextUrl.searchParams.get("phone");
+  //
+  // const storeId = request.nextUrl.searchParams.get("storeId");
   //
   // if (!storeId) {
   //   return NextResponse.json({ status: "no storeId" });
@@ -46,14 +47,52 @@ export async function GET(request: NextRequest) {
 
 const baseUrl = "https://api.digylog.com/api/v2/seller";
 const referer = "https://apiseller.digylog.com";
-const bearerToken =
-  "YTk2MDA3Mzc0NjQyZjQxNmI2MjI4ZDQ1MTI0OGJjYjk4YWM1NjcxMGE2NTAyNDc5ODFiOWZjYWMzNjcwNjcyOQ";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
 
+  const storeId = request.nextUrl.searchParams.get("storeId");
+  console.log(storeId);
+
+  if (!storeId) {
+    return NextResponse.json({ status: "no storeId" });
+  }
+  const currentStore = (await dbGetDoc(
+    doc(db, "stores", storeId),
+    storeId,
+    "",
+  )) as Store;
+
+  if (!currentStore) {
+    return NextResponse.json({ status: "no store by that id" });
+  }
+  if (!currentStore.integrations) {
+    return NextResponse.json({ status: "no integrations" });
+  }
+  if (
+    !currentStore.integrations.find(
+      (i: { name: string }) => i.name === "digylog",
+    )?.enabled
+  ) {
+    return NextResponse.json({ status: "integration not enabled" });
+  }
+  const { token, store, network } = currentStore.integrations.find(
+    (i: { name: string }) => i.name === "digylog",
+  ) as digylogIntegration;
+
+  if (!token) {
+    return NextResponse.json({ status: "no token" });
+  }
+  if (!store) {
+    return NextResponse.json({ status: "no store" });
+  }
+  if (!network) {
+    return NextResponse.json({ status: "no network" });
+  }
+
   try {
-    const { network, store, mode, status, orders } = body;
+    const { mode, status, orders } = body;
+    console.log(token, store, network, mode, status, orders);
 
     const response = await axios
       .post(
@@ -70,7 +109,7 @@ export async function POST(request: NextRequest) {
             "Content-Type": "application/json",
             Accept: "application/json",
             Referer: referer,
-            Authorization: `Bearer ${bearerToken}`,
+            Authorization: `Bearer ${token}`,
           },
         },
       )
@@ -79,6 +118,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ status: "success", data: response });
   } catch (error) {
     console.error("Error sending data to Digylog");
+    console.log(JSON.stringify(error, null, 2));
     return NextResponse.json({ status: error }, { status: 500 });
   }
 }

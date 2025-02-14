@@ -79,7 +79,7 @@ function OrderActions({ currentOrder, variant }: Props) {
 
   return (
     <div className="inline-block">
-      <DigylogDialog />
+      <DigylogDialog currentOrder={currentOrder} />
       <OrderToImage currentOrder={currentOrder} />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
