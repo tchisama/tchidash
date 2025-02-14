@@ -1,3 +1,4 @@
+import { initAdmin } from "@/firebaseAdmin";
 import {
   getFirestore,
   Query,
@@ -21,46 +22,42 @@ interface QueryOptions {
 
 export async function fetchFirestoreDocs(
   collectionName: string,
-  docStructure: Record<string, unknown>,
   options: QueryOptions = {},
 ): Promise<DocumentData[]> {
-  const db = getFirestore();
-  let query: Query = db.collection(collectionName);
+  await initAdmin();
+  const firestore = getFirestore();
+  let query: Query = firestore.collection(collectionName);
 
   const {
     filters = [],
     searchField,
     searchValue,
     limit,
-    orderBy,
-    orderDirection = "asc",
+    // orderBy,
+    // orderDirection = "asc",
     startAfter,
   } = options;
 
   // ✅ Apply filters dynamically, ensuring they exist in docStructure
   filters.forEach(({ field, operator, value }) => {
-    if (docStructure[field]) {
-      query = query.where(field, operator, value);
-    }
+    query = query.where(field, operator, value);
   });
 
   // ✅ Apply search (supports both string and array-contains search)
-  if (searchField && searchValue && docStructure[searchField]) {
-    query = query.where(
-      searchField,
-      Array.isArray(searchValue) ? "array-contains" : "==",
-      searchValue,
-    );
+  if (searchField && searchValue) {
+    query = query
+      .where("title", ">=", searchValue)
+      .where("title", "<", searchValue + "\uf8ff");
   }
 
   // ✅ Apply sorting
-  if (orderBy && docStructure[orderBy]) {
-    query = query.orderBy(orderBy, orderDirection);
-  }
+  // if (orderBy) {
+  //   query = query.orderBy(orderBy, orderDirection);
+  // }
 
   // ✅ Apply pagination
   if (startAfter) {
-    const startAfterDoc = await db
+    const startAfterDoc = await firestore
       .collection(collectionName)
       .doc(startAfter)
       .get();
@@ -77,4 +74,38 @@ export async function fetchFirestoreDocs(
   // ✅ Execute query and return results
   const snapshot: QuerySnapshot = await query.get();
   return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+}
+
+export function generateFilterOptions(docStructure: Record<string, unknown>) {
+  const filters = Object.entries(docStructure).map(([field, type]) => {
+    let operators: string[] = [];
+
+    switch (type) {
+      case "string":
+        operators = ["=="]; // Exact match only
+        break;
+      case "number":
+        operators = ["==", "!=", ">", "<", ">=", "<="]; // Numeric comparisons
+        break;
+      case "boolean":
+        operators = ["=="]; // True or false
+        break;
+      case "array":
+        operators = ["array-contains"]; // Checking if an array contains a value
+        break;
+      case "date":
+      case "timestamp":
+        operators = ["==", ">", "<", ">=", "<="]; // Date comparisons
+        break;
+      default:
+        operators = ["=="]; // Default fallback
+    }
+
+    return {
+      name: field,
+      operators,
+    };
+  });
+
+  return { filters };
 }

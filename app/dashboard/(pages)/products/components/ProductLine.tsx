@@ -37,7 +37,6 @@ import {
   doc,
   getAggregateFromServer,
   query,
-  setDoc,
   sum,
   where,
 } from "firebase/firestore";
@@ -51,10 +50,16 @@ import { useQuery } from "@tanstack/react-query";
 import { dbAddDoc, dbUpdateDoc } from "@/lib/dbFuntions/fbFuns";
 import { Checkbox } from "@/components/ui/checkbox";
 
-const ProductLine = ({ product , selected }: { product: Product, selected:{
-  selectedProducts: string[]
-  setSelectedProducts: React.Dispatch<React.SetStateAction<string[]>>
-} }) => {
+const ProductLine = ({
+  product,
+  selected,
+}: {
+  product: Product;
+  selected: {
+    selectedProducts: string[];
+    setSelectedProducts: React.Dispatch<React.SetStateAction<string[]>>;
+  };
+}) => {
   const [showVariants, setShowVariants] = useState(false);
   const { setCurrentProduct, setLastUploadedProduct, setProducts, products } =
     useProducts();
@@ -75,7 +80,6 @@ const ProductLine = ({ product , selected }: { product: Product, selected:{
     setProducts([...products, newProduct]);
     dbAddDoc(collection(db, "products"), newProduct, storeId, "");
   };
-
 
   const archiveProduct = () => {
     if (!storeId) return;
@@ -155,14 +159,12 @@ const ProductLine = ({ product , selected }: { product: Product, selected:{
                 ]);
               } else {
                 selected.setSelectedProducts(
-                  selected.selectedProducts.filter(
-                    (id) => id !== product.id,
-                  ),
+                  selected.selectedProducts.filter((id) => id !== product.id),
                 );
               }
             }}
           />
-        </TableCell>  
+        </TableCell>
         <TableCell className="hidden sm:table-cell">
           {Array.isArray(product.images) &&
           (product.images[0] || product.variants?.find((v) => v.image)) ? (
@@ -196,7 +198,6 @@ const ProductLine = ({ product , selected }: { product: Product, selected:{
             <b>{product.title}</b>
           </Link>
         </TableCell>
-        <TableCell>{product.variants?.length || 1} Variants</TableCell>
         <TableCell>
           <Badge
             variant={
@@ -218,10 +219,10 @@ const ProductLine = ({ product , selected }: { product: Product, selected:{
               " - " +
               Math.max(...product.variants.map((v) => v.price))
             : product.price}{" "}
-          {store?.settings.currency.symbol ?? "Dh"}
+          Dh
         </TableCell>
         <TableCell className="hidden md:table-cell">
-          <div>{stockQuantity} Items</div>
+          <div>{stockQuantity} </div>
         </TableCell>
         <TableCell className="hidden md:table-cell">
           <div className="flex items-center">
@@ -234,9 +235,6 @@ const ProductLine = ({ product , selected }: { product: Product, selected:{
             Sales
             <ShoppingCartIcon className="h-4 w-4 ml-2" />
           </div>
-        </TableCell>
-        <TableCell className="hidden md:table-cell">
-          {product.createdAt.toDate().toLocaleDateString()}
         </TableCell>
         <TableCell className="flex justify-end items-center h-full mt-2">
           <DropdownMenu>
@@ -265,37 +263,6 @@ const ProductLine = ({ product , selected }: { product: Product, selected:{
               <DropdownMenuItem onClick={archiveProduct}>
                 <Archive className="h-4 w-4 mr-2" />
                 Archive
-              </DropdownMenuItem>
-              <DropdownMenuItem
-              onClick={() => {
-                const productId = window.prompt(
-                  "Enter the ID "
-                )
-                if(!productId) return
-                alert("Duplicating product..." + productId)
-
-                if (product) {
-                  setDoc(doc(
-                    db,
-                    "products",
-                    productId
-                  ),{
-                    ...product,
-                    variants: product
-                    .variants?.map((variant,index) => {
-                      return {
-                        ...variant,
-                        id: `${productId}-variant-${index}`,
-                        // https://firebasestorage.googleapis.com/v0/b/tchidash-fd7aa.appspot.com/o/dynamicVariantsOptionsImages%2F9Xfftdx2dgKnf1LZAlmJvariant-0.png?alt=media&token=09977803364904789
-                        images:[
-                          "https://firebasestorage.googleapis.com/v0/b/tchidash-fd7aa.appspot.com/o/dynamicVariantsOptionsImages%2F"+productId+"-variant-"+index+"-0.png?alt=media&token=09977803364904789"
-                        ]                      }
-                    })
-                  })
-                }
-              }}
-              >
-                Advance Duplicate
               </DropdownMenuItem>
               <DropdownMenuItem onClick={deleteProduct}>
                 <Trash2 className="h-4 w-4 mr-2" />
