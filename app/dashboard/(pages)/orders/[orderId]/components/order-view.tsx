@@ -60,6 +60,51 @@ const OrderSummary = (order: Order) => {
   );
 };
 
+const DeliveryInfo = ({ order }: { order: Order }) => (
+  // delivery info
+  // provider , cost , status , tracking number ,
+  <Card className="relative">
+    <CardHeader>
+      <CardTitle>Delivery Information</CardTitle>
+      <CardDescription>
+        Details about the delivery of this order
+      </CardDescription>
+    </CardHeader>
+    <CardContent>
+      <div className="space-y-2">
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Provider:</span>
+          <span className="flex items-center">
+            <Image
+              src={
+                order.shippingInfo.shippingProvider === "Digylog"
+                  ? "https://firebasestorage.googleapis.com/v0/b/tchidash-fd7aa.appspot.com/o/294424033_375002151434645_2765565352434267578_n%201.png?alt=media&token=99502b5f-b5c9-4ba0-acf5-a810eb4e3a34"
+                  : ""
+              }
+              width={20}
+              height={20}
+              alt=""
+            />
+            {order.shippingInfo.shippingProvider}
+          </span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Cost:</span>
+          <span>{order.shippingInfo.cost ?? 0} Dh</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Status:</span>
+          <span>{order.shippingInfo.shippingStatus}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Tracking Number:</span>
+          <span>{order.shippingInfo.trackingNumber}</span>
+        </div>
+      </div>
+    </CardContent>
+  </Card>
+);
+
 const OrderItemsTable = ({ items }: { items: OrderItem[] }) => (
   <Card className="flex-1">
     <CardHeader>
@@ -100,7 +145,7 @@ const OrderItemsTable = ({ items }: { items: OrderItem[] }) => (
 );
 
 const OrderNotes = ({ order }: { order: Order }) => (
-  <Card className="md:max-w-[400px]">
+  <Card className="h-full">
     <CardHeader>
       <CardTitle>Order Notes</CardTitle>
       <CardDescription>Additional information about this order</CardDescription>
@@ -151,9 +196,19 @@ export function OrderView({ order }: { order: Order }) {
             <OrderSummary {...order} />
           </div>
 
+          {/* {order.shippingInfo && order.shippingInfo.shippingProvider && ( */}
           <div className="flex gap-3 flex-col md:flex-row">
+            <div className="flex-1">
+              <DeliveryInfo order={order} />
+            </div>
+            <div className="flex-1 ">
+              <OrderNotes order={order} />
+            </div>
+          </div>
+          {/* )} */}
+
+          <div className="">
             <OrderItemsTable items={order.items} />
-            <OrderNotes order={order} />
           </div>
         </div>
       </div>

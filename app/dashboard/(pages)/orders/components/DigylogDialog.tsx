@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { useDialogs } from "@/store/dialogs";
 import axios from "axios";
 import { dbUpdateDoc } from "@/lib/dbFuntions/fbFuns";
-import { doc } from "firebase/firestore";
+import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/firebase";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Order } from "@/types/order";
@@ -90,7 +90,6 @@ export default function DigylogDialog({
       ],
     };
 
-    console.log("Data to send to Digylog", data);
     axios
       // i want to send data as well as paramas
       .post("/api/integrations/digylog/orders", data, {
@@ -98,6 +97,30 @@ export default function DigylogDialog({
           storeId: currentOrder.storeId,
         },
       })
+      .then((response) => {
+        console.log("Response from Digylog", response.data);
+        if (response.data.status == "success") {
+          const trackingNumber = response.data.data[0].traking;
+          console.log("Tracking number from Digylog", trackingNumber);
+          console.log("currentOrder", currentOrder.id);
+          updateDoc(doc(db, "orders", currentOrder.id), {
+            shippingInfo: {
+              trackingNumber: trackingNumber,
+              shippingProvider: "Digylog",
+              shippingCost: 0,
+            },
+          });
+          setCurrentOrderData({
+            ...currentOrder,
+            shippingInfo: {
+              trackingNumber: trackingNumber,
+              shippingProvider: "Digylog",
+              shippingCost: 0,
+            },
+          } as Order);
+        }
+      })
+
       // .then(async (response) => {
       // console.log("Response from Digylog", response.data);
       // await new Promise((resolve) => setTimeout(resolve, 2000));
