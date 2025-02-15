@@ -203,6 +203,7 @@ const NotificationCard = ({
   const [employee, setEmployee] = React.useState<Employee | null>(null);
 
   useEffect(() => {
+    if (notification.email === "digylog") return;
     if (storeId && store?.employees) {
       const employee = store.employees.find(
         (e) => e.email === notification.email,

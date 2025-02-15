@@ -5,6 +5,10 @@ import {
   getDigylogCredantials,
 } from "../orders/route";
 import axios from "axios";
+import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
+import { db } from "@/firebase";
+import { Order } from "@/types/order";
+import { Timestamp } from "firebase/firestore";
 // register new webhook
 //
 
@@ -73,12 +77,34 @@ export async function PUT(request: NextRequest) {
       updatedAt: body.updatedAt,
     });
 
+    const q = query(
+      collection(db, "orders"),
+      where("shippingInfo.trackingNumber", "==", body.traking),
+    );
+
+    const order = (await getDocs(q).then((res) => res.docs[0].data())) as Order;
+
+    if (order) {
+      if (!order.storeId) return;
+      const notification = {
+        id: "",
+        storeId: order.storeId,
+        createdAt: Timestamp.now(),
+        action: "changed State",
+        email: "Digylog",
+        target: `of Order#${order.sequence} to ${body.status}`,
+        seen: [],
+      };
+      console.log("Notification:", notification);
+      await addDoc(collection(db, "notifications"), notification);
+    }
+
     // Return a success response
     return NextResponse.json({ status: "success" });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error processing webhook:", error);
     return NextResponse.json(
-      { status: "error", message: "Invalid JSON or unexpected error" },
+      { status: "error", message: error },
       { status: 500 },
     );
   }

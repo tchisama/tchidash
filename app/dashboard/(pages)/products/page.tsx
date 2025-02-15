@@ -123,6 +123,7 @@ export default function Page() {
               ]}
               docStructure={{
                 status: "string",
+                createdAt: "date",
               }}
               searchField="title"
               callback={(data) => {
