@@ -74,6 +74,13 @@ export type Employee = {
 
 type Integration = digylogIntegration | whatsappNotificationIntegration;
 
+
+export enum DigylogENUM  {
+  digylog: "digylog",
+  whatsapp: "whatsapp",
+  whatsappUser: "whatsapp-user",
+};
+
 type digylogIntegration = {
   name: "digylog";
   enabled: boolean;
@@ -89,7 +96,7 @@ type whatsappNotificationIntegration = {
 
 export type whatsappUser = {
   id: string;
-  name: string;
+  name: "whatsapp-user";
   whatsappNumber: string;
   active: boolean;
   storeId: string;

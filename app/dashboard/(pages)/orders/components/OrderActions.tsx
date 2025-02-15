@@ -34,7 +34,6 @@ import { IconBrandWhatsapp } from "@tabler/icons-react";
 
 import { useSession } from "next-auth/react";
 import useRenderWhatsappMessage from "@/lib/utils/functions/renderWhatsappMessage";
-import useNotification from "@/hooks/useNotification";
 import { Order } from "@/types/order";
 import { useRouter } from "next/navigation";
 import DigylogDialog from "./DigylogDialog";
@@ -43,6 +42,8 @@ import axios from "axios";
 import { useOrderStore } from "@/store/orders";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Note } from "./OrderNotes";
+import useNotification from "@/hooks/useNotification";
+import { useIntegrations } from "@/hooks/use-integrations";
 
 type Props = {
   currentOrder: Order;
@@ -74,6 +75,43 @@ function OrderActions({ currentOrder, variant }: Props) {
       return;
     } else {
       alert("You can't delete an order that is not cancelled or returned");
+    }
+  };
+  const integrations = useIntegrations();
+
+  const handleDownloadLabel = async () => {
+    try {
+      // Make a GET or POST request to the API endpoint
+      const response = await axios.post(
+        "/api/integrations/digylog/labels",
+        {
+          orders: [currentOrder?.shippingInfo.trackingNumber],
+          format: 1,
+          storeId: storeId,
+        },
+        {
+          responseType: "blob", // Important: Set the response type to 'blob' for file downloads
+        },
+      );
+
+      // Create a URL for the blob
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+
+      // Create a temporary anchor element to trigger the download
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "labels.pdf"); // Set the file name
+      document.body.appendChild(link);
+
+      // Trigger the download
+      link.click();
+
+      // Clean up
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error downloading labels:", error);
+      alert("Failed to download labels. Please try again.");
     }
   };
 
@@ -243,6 +281,18 @@ function OrderActions({ currentOrder, variant }: Props) {
             <Ticket className="h-3.5 w-3.5 mr-2" />
             Get Ticket
           </DropdownMenuItem>
+          {integrations("digylog")?.enabled &&
+            currentOrder?.shippingInfo?.trackingNumber && (
+              <DropdownMenuItem
+                onClick={() => {
+                  handleDownloadLabel();
+                }}
+              >
+                {" "}
+                <Ticket className="h-3.5 w-3.5 mr-2" />
+                Digylog Label{" "}
+              </DropdownMenuItem>
+            )}
 
           <DropdownMenuItem
             onClick={() => {
