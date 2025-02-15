@@ -55,7 +55,31 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function PUT() {
+export async function PUT(request: NextRequest) {
   console.log("PUT /webhook");
-  return NextResponse.json({ status: "success" });
+
+  try {
+    const body = await request.json();
+    console.log("Received body:", body);
+
+    // Process the data (e.g., update order status in your database)
+    // For now, we'll just log the data
+    console.log("Processing order update:", {
+      traking: body.traking,
+      status: body.status,
+      idStatus: body.idStatus,
+      motif: body.motif,
+      postponedTo: body.postponedTo,
+      updatedAt: body.updatedAt,
+    });
+
+    // Return a success response
+    return NextResponse.json({ status: "success" });
+  } catch (error) {
+    console.error("Error processing webhook:", error);
+    return NextResponse.json(
+      { status: "error", message: "Invalid JSON or unexpected error" },
+      { status: 500 },
+    );
+  }
 }
