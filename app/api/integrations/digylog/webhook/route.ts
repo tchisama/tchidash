@@ -64,31 +64,26 @@ export async function PUT(request: NextRequest) {
 
   try {
     const body = await request.json();
-    console.log("Received body:", body);
 
-    // Process the data (e.g., update order status in your database)
-    // For now, we'll just log the data
-    console.log("Processing order update:", {
-      traking: body.traking,
-      status: body.status,
-      idStatus: body.idStatus,
-      motif: body.motif,
-      postponedTo: body.postponedTo,
-      updatedAt: body.updatedAt,
-    });
+    if (!body?.traking) return;
 
     const q = query(
       collection(db, "orders"),
       where("shippingInfo.trackingNumber", "==", body.traking),
     );
 
-    const order = (await getDocs(q).then((res) => res.docs[0].data())) as Order;
+    const orders = await getDocs(q).then((res) => res.docs);
+    let order;
+    if (orders.length > 0) {
+      order = orders[0].data() as Order;
+    }
 
     if (order) {
-      if (!order.storeId) return;
+      if (!order?.storeId) return;
+      if (!body?.status) return;
       const notification = {
         id: "",
-        storeId: order.storeId,
+        storeId: order.storeId ?? null,
         createdAt: Timestamp.now(),
         action: "changed State",
         email: "Digylog",
