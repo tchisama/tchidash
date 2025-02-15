@@ -25,6 +25,13 @@ import { useOrderStore } from "@/store/orders";
 import NoteViewer from "../../components/NoteViewer";
 import OrderActions from "../../components/OrderActions";
 import { CustomerCardByNumber } from "../../../customers/page";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "@/firebase";
+import { useDialogs } from "@/store/dialogs";
+import { Button } from "@/components/ui/button";
+import { Truck } from "lucide-react";
 
 const OrderSummary = (order: Order) => {
   // const paymentMethod = order.paymentMethod
@@ -60,50 +67,91 @@ const OrderSummary = (order: Order) => {
   );
 };
 
-const DeliveryInfo = ({ order }: { order: Order }) => (
+const DeliveryInfo = ({ order }: { order: Order }) => {
   // delivery info
   // provider , cost , status , tracking number ,
-  <Card className="relative">
-    <CardHeader>
-      <CardTitle>Delivery Information</CardTitle>
-      <CardDescription>
-        Details about the delivery of this order
-      </CardDescription>
-    </CardHeader>
-    <CardContent>
-      <div className="space-y-2">
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Provider:</span>
-          <span className="flex items-center">
-            <Image
-              src={
-                order.shippingInfo.shippingProvider === "Digylog"
-                  ? "https://firebasestorage.googleapis.com/v0/b/tchidash-fd7aa.appspot.com/o/294424033_375002151434645_2765565352434267578_n%201.png?alt=media&token=99502b5f-b5c9-4ba0-acf5-a810eb4e3a34"
-                  : ""
-              }
-              width={20}
-              height={20}
-              alt=""
-            />
-            {order.shippingInfo.shippingProvider}
-          </span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Cost:</span>
-          <span>{order.shippingInfo.cost ?? 0} Dh</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Status:</span>
-          <span>{order.shippingInfo.shippingStatus}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Tracking Number:</span>
-          <span>{order.shippingInfo.trackingNumber}</span>
-        </div>
-      </div>
-    </CardContent>
-  </Card>
-);
+
+  const traking = order.shippingInfo.trackingNumber;
+  const { setDigylogOpen } = useDialogs();
+  const { data: DeliveryInfo } = useQuery({
+    queryKey: ["deliveryInfo", traking],
+    queryFn: async () => {
+      if (!traking) return null;
+
+      const response = await axios
+        .get("/api/integrations/digylog/orders", {
+          params: {
+            traking: traking,
+            storeId: order.storeId,
+          },
+        })
+        .then((res) => res.data);
+      if (response.status === "success") {
+        updateDoc(doc(db, "orders", order.id), {
+          shippingInfo: {
+            ...order.shippingInfo,
+            status: response.data.status,
+            deliveryCost: response.data.deliveryCost,
+          },
+        });
+      }
+      return response.data;
+    },
+  });
+
+  return (
+    <Card className="relative">
+      <CardHeader>
+        <CardTitle>Delivery Information</CardTitle>
+        <CardDescription>
+          Details about the delivery of this order
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {!traking && (
+          <div className="text-muted-foreground">
+            No tracking number available <br />
+            <Button onClick={() => setDigylogOpen(true)} className="mt-4">
+              Push to Digylog <Truck size={16} className="ml-2" />
+            </Button>
+          </div>
+        )}
+        {traking && DeliveryInfo && (
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Provider:</span>
+              <span className="flex items-center">
+                <Image
+                  src={
+                    order.shippingInfo.shippingProvider === "Digylog"
+                      ? "https://firebasestorage.googleapis.com/v0/b/tchidash-fd7aa.appspot.com/o/294424033_375002151434645_2765565352434267578_n%201.png?alt=media&token=99502b5f-b5c9-4ba0-acf5-a810eb4e3a34"
+                      : ""
+                  }
+                  width={20}
+                  height={20}
+                  alt=""
+                />
+                {order.shippingInfo.shippingProvider}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Cost:</span>
+              <span>{DeliveryInfo.deliveryCost} Dh</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Status:</span>
+              <span>{DeliveryInfo.status}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Tracking Number:</span>
+              <span>{order.shippingInfo.trackingNumber}</span>
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
 
 const OrderItemsTable = ({ items }: { items: OrderItem[] }) => (
   <Card className="flex-1">

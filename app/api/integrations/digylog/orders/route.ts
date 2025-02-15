@@ -5,48 +5,52 @@ import axios from "axios";
 import { doc } from "firebase/firestore";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET() {
-  // const traking = request.nextUrl.searchParams.get("traking");
-  // const phone = request.nextUrl.searchParams.get("phone");
+export const DIGYLOG_BASE_URL = "https://api.digylog.com/api/v2/seller";
+export const DIGYLOG_REFERER = "https://apiseller.digylog.com";
+
+// GET ORDER INFO
+export async function GET(request: NextRequest) {
+  // get it from /order/:traking/info
   //
-  // const storeId = request.nextUrl.searchParams.get("storeId");
-  //
-  // if (!storeId) {
-  //   return NextResponse.json({ status: "no storeId" });
-  // }
-  // const store = (await dbGetDoc(
-  //   doc(db, "stores", storeId),
-  //   storeId,
-  //   "",
-  // )) as Store;
-  //
-  // if (!store) {
-  //   return NextResponse.json({ status: "no store by that id" });
-  // }
-  // if (!store.integrations) {
-  //   return NextResponse.json({ status: "no integrations" });
-  // }
-  // if (
-  //   !store.integrations.find((i: { name: string }) => i.name === "digylog")
-  //     ?.enabled
-  // ) {
-  //   return NextResponse.json({ status: "integration not enabled" });
-  // }
-  // const { headers: hdrs } = store.integrations.find(
-  //   (i: { name: string }) => i.name === "digylog",
-  // ) as digylogIntegration;
-  //
-  // const authorization = hdrs.authorization;
-  //
-  // if (!authorization) {
-  //   return NextResponse.json({ status: "no authorization" });
-  // }
+  const storeId = request.nextUrl.searchParams.get("storeId");
+  const traking = request.nextUrl.searchParams.get("traking");
+
+  if (!storeId) {
+    return NextResponse.json({ status: "no storeId" });
+  }
+  if (!traking) {
+    return NextResponse.json({ status: "no traking" });
+  }
+
+  const { token, errors } = await getDigylogCredantials(storeId);
+
+  console.log("get order info", token, storeId, traking, errors);
+
+  if (errors) {
+    return NextResponse.json({ status: errors });
+  }
+
+  try {
+    const response = await axios
+      .get(`${DIGYLOG_BASE_URL}/order/${traking}/infos`, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Referer: DIGYLOG_REFERER,
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => res.data);
+
+    return NextResponse.json({ status: "success", data: response });
+  } catch (error) {
+    console.error("Error sending data to Digylog");
+    console.log(JSON.stringify(error, null, 2));
+    return NextResponse.json({ status: error }, { status: 500 });
+  }
 }
 
 // CREATE NEW ORDER
-
-const baseUrl = "https://api.digylog.com/api/v2/seller";
-const referer = "https://apiseller.digylog.com";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -57,37 +61,12 @@ export async function POST(request: NextRequest) {
   if (!storeId) {
     return NextResponse.json({ status: "no storeId" });
   }
-  const currentStore = (await dbGetDoc(
-    doc(db, "stores", storeId),
-    storeId,
-    "",
-  )) as Store;
 
-  if (!currentStore) {
-    return NextResponse.json({ status: "no store by that id" });
-  }
-  if (!currentStore.integrations) {
-    return NextResponse.json({ status: "no integrations" });
-  }
-  if (
-    !currentStore.integrations.find(
-      (i: { name: string }) => i.name === "digylog",
-    )?.enabled
-  ) {
-    return NextResponse.json({ status: "integration not enabled" });
-  }
-  const { token, store, network } = currentStore.integrations.find(
-    (i: { name: string }) => i.name === "digylog",
-  ) as digylogIntegration;
+  const { token, store, network, errors } =
+    await getDigylogCredantials(storeId);
 
-  if (!token) {
-    return NextResponse.json({ status: "no token" });
-  }
-  if (!store) {
-    return NextResponse.json({ status: "no store" });
-  }
-  if (!network) {
-    return NextResponse.json({ status: "no network" });
+  if (errors) {
+    return NextResponse.json({ status: errors });
   }
 
   try {
@@ -96,7 +75,7 @@ export async function POST(request: NextRequest) {
 
     const response = await axios
       .post(
-        `${baseUrl}/orders`,
+        `${DIGYLOG_BASE_URL}/orders`,
         {
           network,
           store,
@@ -108,7 +87,7 @@ export async function POST(request: NextRequest) {
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
-            Referer: referer,
+            Referer: DIGYLOG_REFERER,
             Authorization: `Bearer ${token}`,
           },
         },
@@ -121,4 +100,44 @@ export async function POST(request: NextRequest) {
     console.log(JSON.stringify(error, null, 2));
     return NextResponse.json({ status: error }, { status: 500 });
   }
+}
+
+export async function getDigylogCredantials(storeId: string) {
+  if (!storeId) {
+    return { token: "", store: "", network: "", errors: "no storeId" };
+  }
+  const currentStore = (await dbGetDoc(
+    doc(db, "stores", storeId),
+    storeId,
+    "",
+  )) as Store;
+
+  if (!currentStore) {
+    return { token: "", store: "", network: "", errors: "no store" };
+  }
+  if (!currentStore.integrations) {
+    return { token: "", store: "", network: "", errors: "no integrations" };
+  }
+  if (
+    !currentStore.integrations.find(
+      (i: { name: string }) => i.name === "digylog",
+    )?.enabled
+  ) {
+    return { token: "", store: "", network: "", errors: "digylog not enabled" };
+  }
+  const { token, store, network } = currentStore.integrations.find(
+    (i: { name: string }) => i.name === "digylog",
+  ) as digylogIntegration;
+
+  if (!token) {
+    return { token: "", store, network, errors: "no token" };
+  }
+  if (!store) {
+    return { token, store: "", network, errors: "no store" };
+  }
+  if (!network) {
+    return { token, store, network: "", errors: "no network" };
+  }
+
+  return { token, store, network, errors: "" };
 }
