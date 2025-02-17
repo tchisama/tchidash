@@ -23,6 +23,11 @@ const links = [
     icon: <Shield className="w-4 h-4" />,
   },
   {
+    href: "/dashboard/settings/rules",
+    label: "Rules",
+    icon: <Shield className="w-4 h-4" />,
+  },
+  {
     href: "/dashboard/settings/whatsapp",
     label: "Communication",
     icon: <MessageCircle className="w-4 h-4" />,

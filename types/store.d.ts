@@ -1,4 +1,3 @@
-import { Role } from "@/lib/permissions/main";
 import { Timestamp } from "firebase/firestore";
 
 // Type for store owner
@@ -68,18 +67,12 @@ export type Employee = {
   id: string;
   name: string;
   email: string;
-  roles: Role[];
+  roles: string[];
   imageUrl?: string;
+  active?: boolean;
 };
 
 type Integration = digylogIntegration | whatsappNotificationIntegration;
-
-
-export enum DigylogENUM  {
-  digylog: "digylog",
-  whatsapp: "whatsapp",
-  whatsappUser: "whatsapp-user",
-};
 
 type digylogIntegration = {
   name: "digylog";

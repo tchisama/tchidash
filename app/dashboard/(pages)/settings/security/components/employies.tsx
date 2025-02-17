@@ -12,7 +12,7 @@ import { db } from "@/firebase";
 import { useStore } from "@/store/storeInfos";
 import { Employee, Store } from "@/types/store";
 import { useQuery } from "@tanstack/react-query";
-import { doc } from "firebase/firestore";
+import { collection, doc, getDocs, query, where } from "firebase/firestore";
 import { useState } from "react";
 import {
   Popover,
@@ -22,9 +22,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { v4 } from "uuid";
-import { dbGetDoc, dbUpdateDoc } from "@/lib/dbFuntions/fbFuns";
+import { dbUpdateDoc } from "@/lib/dbFuntions/fbFuns";
 import Avvvatars from "avvvatars-react";
-import { Role, ROLES_NAMES } from "@/lib/permissions/main";
 
 import {
   Dialog,
@@ -37,24 +36,11 @@ import {
 import { DialogClose } from "@radix-ui/react-dialog";
 import UploadImageProvider from "@/components/UploadImageProvider";
 import { Upload } from "lucide-react";
-
+import { Rule } from "@/hooks/use-permission";
+import { Switch } from "@/components/ui/switch";
 
 const Emplyies = () => {
-  const { storeId } = useStore();
-  const { data: store } = useQuery({
-    queryKey: ["store", storeId],
-    queryFn: async () => {
-      if (!storeId) return null;
-      const store: Store = await dbGetDoc(doc(db, "stores"), storeId, "").then(
-        (doc) => {
-          if (!doc) return {} as Store;
-          return { ...doc.data(), id: doc.id } as Store;
-        },
-      );
-      return store;
-    },
-    refetchOnWindowFocus: false,
-  });
+  const { storeId, store, setStore } = useStore();
   const [, setSaved] = useState(false);
   const [newEmployee, setNewEmployee] = useState<Employee>({
     name: "",
@@ -115,6 +101,26 @@ const Emplyies = () => {
       "",
     );
   };
+
+  const { data: rules = [] } = useQuery({
+    queryKey: ["rules", storeId],
+    queryFn: async () => {
+      if (!storeId) return [];
+      try {
+        const snapshot = await getDocs(
+          query(collection(db, "rules"), where("storeId", "==", storeId)),
+        );
+        return snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Rule[];
+      } catch (error) {
+        console.error("Error fetching rules:", error);
+        return [];
+      }
+    },
+    enabled: !!storeId,
+  });
 
   return (
     store && (
@@ -178,31 +184,31 @@ const Emplyies = () => {
                     <Button variant="outline" className="space-y-1 space-x-1">
                       {newEmployee.roles.length > 0
                         ? newEmployee.roles.map((role) => (
-                          <Badge variant={"outline"} key={role}>
-                            {role}
-                          </Badge>
-                        ))
+                            <Badge variant={"outline"} key={role}>
+                              {role}
+                            </Badge>
+                          ))
                         : "Select Roles"}
                     </Button>
                   </div>
                 </PopoverTrigger>
                 <PopoverContent className="p-1 flex relative z-10 flex-col">
-                  {ROLES_NAMES.map((role) => (
+                  {rules.map((role) => (
                     <Button
                       onClick={() => {
                         setNewEmployee((prev) => ({
                           ...prev,
-                          roles: prev.roles.includes(role)
-                            ? prev.roles.filter((r) => r !== role)
-                            : [...prev.roles, role],
+                          roles: prev.roles.includes(role.id)
+                            ? prev.roles.filter((r) => r !== role.id)
+                            : [...prev.roles, role.id],
                         }));
                       }}
                       variant="ghost"
-                      key={role}
+                      key={role.id}
                       className="w-full flex justify-between"
                     >
-                      {role}{" "}
-                      <div>{newEmployee.roles.includes(role) && "✔️"} </div>
+                      {role.name}{" "}
+                      <div>{newEmployee.roles.includes(role.id) && "✔️"} </div>
                     </Button>
                   ))}
                 </PopoverContent>
@@ -235,6 +241,29 @@ const Emplyies = () => {
                   <p>{employee.name}</p>
                   <p>{employee.email}</p>
                 </div>
+                <Switch
+                  checked={employee.active}
+                  onCheckedChange={(v) => {
+                    if (!storeId) return;
+                    setStore({
+                      ...store,
+                      employees: store?.employees?.map((e) =>
+                        e.id === employee.id ? { ...e, active: v } : e,
+                      ),
+                    });
+
+                    dbUpdateDoc(
+                      doc(db, "stores", storeId),
+                      {
+                        employees: store?.employees?.map((e) =>
+                          e.id === employee.id ? { ...e, active: v } : e,
+                        ),
+                      },
+                      storeId,
+                      "",
+                    );
+                  }}
+                />
                 <UpdateEmployee
                   employee={employee}
                   store={store}
@@ -249,10 +278,6 @@ const Emplyies = () => {
   );
 };
 
-
-
-
-
 const UpdateEmployee = ({
   employee,
   store,
@@ -265,7 +290,7 @@ const UpdateEmployee = ({
   const { storeId } = useStore();
   const [updatedEmployee, setUpdatedEmployee] = useState<Employee>(employee);
 
-  const handleRoleChange = (role: Role) => {
+  const handleRoleChange = (role: string) => {
     const newRoles = updatedEmployee?.roles?.includes(role)
       ? updatedEmployee.roles.filter((r) => r !== role)
       : [...updatedEmployee.roles, role];
@@ -286,6 +311,26 @@ const UpdateEmployee = ({
       "",
     );
   };
+
+  const { data: rules = [] } = useQuery({
+    queryKey: ["rules", storeId],
+    queryFn: async () => {
+      if (!storeId) return [];
+      try {
+        const snapshot = await getDocs(
+          query(collection(db, "rules"), where("storeId", "==", storeId)),
+        );
+        return snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Rule[];
+      } catch (error) {
+        console.error("Error fetching rules:", error);
+        return [];
+      }
+    },
+    enabled: !!storeId,
+  });
 
   return (
     <>
@@ -332,33 +377,45 @@ const UpdateEmployee = ({
               value={updatedEmployee.email}
               placeholder="Email"
               onChange={(e) =>
-                setUpdatedEmployee({ ...updatedEmployee, email: e.target.value })
+                setUpdatedEmployee({
+                  ...updatedEmployee,
+                  email: e.target.value,
+                })
               }
             />
             {/* Image Upload */}
             {/* Role Selection */}
+            <Button
+              onClick={() =>
+                setUpdatedEmployee((prev) => ({ ...prev, roles: [] }))
+              }
+            >
+              Clean Roles
+            </Button>
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="outline" className="w-full justify-start">
                   {updatedEmployee?.roles?.length > 0
                     ? updatedEmployee?.roles?.map((role) => (
-                      <Badge variant={"outline"} key={role} className="mr-1">
-                        {role}
-                      </Badge>
-                    ))
+                        <Badge variant={"outline"} key={role} className="mr-1">
+                          {rules.find((r) => r.id === role)?.name}
+                        </Badge>
+                      ))
                     : "Select Roles"}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="p-1 flex flex-col">
-                {ROLES_NAMES.map((role) => (
+                {rules.map((role) => (
                   <Button
-                    onClick={() => handleRoleChange(role)}
+                    onClick={() => handleRoleChange(role.id)}
                     variant="ghost"
-                    key={role}
+                    key={role.id}
                     className="w-full flex justify-between"
                   >
-                    {role}{" "}
-                    <div>{updatedEmployee?.roles?.includes(role) && "✔️"} </div>
+                    {role.name}{" "}
+                    <div>
+                      {updatedEmployee?.roles?.includes(role.id) && "✔️"}{" "}
+                    </div>
                   </Button>
                 ))}
               </PopoverContent>
@@ -381,6 +438,5 @@ const UpdateEmployee = ({
   );
 };
 
-
-
 export { Emplyies };
+
