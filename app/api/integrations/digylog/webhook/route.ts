@@ -78,6 +78,40 @@ export async function PUT(request: NextRequest) {
       order = orders[0].data() as Order;
     }
 
+    if ((body.status === "Livrée *" || body.status === "Livrée") && order) {
+      axios.post("https://dash.tchisama.com/order-status-changer", {
+        orderId: order.id,
+        newStatus: "delivered",
+        storeId: order.storeId,
+      });
+
+      addDoc(collection(db, "notes"), {
+        changed: `${"delivered"}`,
+        creator: "Digylog",
+        createdAt: Timestamp.now(),
+        details: {
+          for: "order",
+          orderId: order?.id,
+        },
+      });
+    }
+    if (body.status === "Retournée" && order) {
+      axios.post("https://dash.tchisama.com/order-status-changer", {
+        orderId: order.id,
+        newStatus: "returned",
+        storeId: order.storeId,
+      });
+      addDoc(collection(db, "notes"), {
+        changed: `${"returned"}`,
+        creator: "Digylog",
+        createdAt: Timestamp.now(),
+        details: {
+          for: "order",
+          orderId: order?.id,
+        },
+      });
+    }
+
     if (order) {
       if (!order?.storeId) return;
       if (!body?.status) return;

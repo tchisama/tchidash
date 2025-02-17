@@ -96,6 +96,11 @@ export default function IntegrationConfig() {
       .then((res) => {
         setNetworks(res.data.data);
       });
+    await axios
+      .get("/api/integrations/digylog/status?token=" + token)
+      .then((res) => {
+        console.log(res.data);
+      });
   };
 
   useEffect(() => {

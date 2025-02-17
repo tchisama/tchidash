@@ -2,11 +2,8 @@
 import React, { useState } from "react";
 import {
   collection,
-  orderBy,
   query,
   where,
-  limit,
-  startAfter,
   getAggregateFromServer,
   count,
   sum,
@@ -28,54 +25,72 @@ import {
   X,
 } from "lucide-react";
 import { IconBrandWhatsapp } from "@tabler/icons-react";
+import FilteringComponent from "@/components/global/filter";
 
 const ITEMS_PER_PAGE = 25;
 
 export default function CustomerPage() {
-  const { storeId } = useStore();
+  // const { storeId } = useStore();
   const [page, setPage] = useState(1);
-  const [lastDoc, setLastDoc] = useState<null | unknown>(null);
+  // const [lastDoc, setLastDoc] = useState<null | unknown>(null);
+  const [customers, setCustomers] = useState<Customer[]>([]);
 
-  const {
-    data: customers = [],
-    isLoading,
-    isError,
-    error,
-  } = useQuery({
-    queryKey: ["customers", page],
-    queryFn: async () => {
-      if (!storeId) return [];
-      let q = query(
-        collection(db, "customers"),
-        where("storeId", "==", storeId),
-        orderBy("createdAt", "desc"),
-        limit(ITEMS_PER_PAGE),
-      );
-      if (lastDoc) q = query(q, startAfter(lastDoc));
-      const response = await dbGetDocs(q, storeId, "");
-      setLastDoc(
-        response.docs.length ? response.docs[response.docs.length - 1] : null,
-      );
-      return response.docs.map(
-        (doc) => ({ ...doc.data(), id: doc.id }) as Customer,
-      );
-    },
-    staleTime: 1 * 60 * 1000, // 10 minutes in milliseconds
-    gcTime: 3 * 60 * 1000, // 15 minutes in milliseconds (should be longer than staleTime)
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-  });
+  // const {
+  //   data: customers = [],
+  //   isLoading,
+  //   isError,
+  //   error,
+  // } = useQuery({
+  //   queryKey: ["customers", page],
+  //   queryFn: async () => {
+  //     if (!storeId) return [];
+  //     let q = query(
+  //       collection(db, "customers"),
+  //       where("storeId", "==", storeId),
+  //       orderBy("createdAt", "desc"),
+  //       limit(ITEMS_PER_PAGE),
+  //     );
+  //     if (lastDoc) q = query(q, startAfter(lastDoc));
+  //     const response = await dbGetDocs(q, storeId, "");
+  //     setLastDoc(
+  //       response.docs.length ? response.docs[response.docs.length - 1] : null,
+  //     );
+  //     return response.docs.map(
+  //       (doc) => ({ ...doc.data(), id: doc.id }) as Customer,
+  //     );
+  //   },
+  //   staleTime: 1 * 60 * 1000, // 10 minutes in milliseconds
+  //   gcTime: 3 * 60 * 1000, // 15 minutes in milliseconds (should be longer than staleTime)
+  //   refetchOnMount: false,
+  //   refetchOnWindowFocus: false,
+  // });
 
   const hasViewPermission = usePermission();
   if (!hasViewPermission("customers", "view")) {
     return <div>You don{"'"}t have permission to view this page</div>;
   }
 
-  if (isLoading) return <p>Loading...</p>;
-  if (isError) return <p>Failed to load customer data {error.message}.</p>;
+  // if (isLoading) return <p>Loading...</p>;
+  // if (isError) return <p>Failed to load customer data {error.message}.</p>;
 
   return (
     <div>
+      <FilteringComponent
+        collectionName="customers"
+        defaultFilters={[]}
+        docStructure={{
+          name: "string",
+          phoneNumber: "string",
+          firstName: "string",
+          purchaseCount: "number",
+          lastName: "string",
+          "address.city": "string",
+        }}
+        searchField="firstName"
+        callback={(data) => {
+          setCustomers((data as Customer[]) ?? []);
+        }}
+      />
       <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {customers.map((customer) => (
           <CustomerCard key={customer.id} customer={customer} />

@@ -26,7 +26,10 @@ import {
 } from "firebase/firestore";
 import { db } from "@/firebase";
 
-import { sectionActions as sectionActionsGlobal } from "@/hooks/use-permission";
+import {
+  sectionActions as sectionActionsGlobal,
+  usePermission,
+} from "@/hooks/use-permission";
 
 type Rule = {
   id: string;
@@ -155,6 +158,12 @@ export default function RulesPage() {
       storeId: rule.storeId,
     });
   };
+
+  const hasViewPermission = usePermission();
+
+  if (!hasViewPermission("settings", "update")) {
+    return <div>You dont have permission to view this page</div>;
+  }
 
   return (
     <div className="container mx-auto p-4 flex gap-4">

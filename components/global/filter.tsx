@@ -101,14 +101,16 @@ export default function FilteringComponent({
     } as {
       filters?: Filter[];
       searchField?: string;
-      searchValue?: string;
+      searchValue?: string | number;
       orderBy?: string;
       orderDirection?: "asc" | "desc";
+      limit?: number;
     };
     if (searchTerm !== "") {
       filtring.searchField = searchField;
       filtring.searchValue = searchTerm;
     }
+    filtring.limit = 50;
 
     // convirt date to timestamp
 
@@ -140,7 +142,7 @@ export default function FilteringComponent({
   const selectedFieldType = docStructure[newFilter.field] || "string";
 
   return (
-    <div className="space-y-4 p-2  w-fit min-w-[500px] rounded-2xl ">
+    <div className="space-y-4 p-2 bg-white border mb-2 w-fit min-w-[500px] rounded-2xl ">
       <div className="flex space-x-2">
         <div className="flex flex-1">
           <Input

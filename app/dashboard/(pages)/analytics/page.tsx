@@ -20,6 +20,9 @@ export default function page() {
           <div className="md:col-span-3 flex">
             <OrdersGraph />
           </div>
+          {/* <div className="md:col-span-4  flex"> */}
+          {/*   <OrdersGraphLines /> */}
+          {/* </div> */}
           <div className="w-full md:col-span-3 ">
             <MoroccanMap />
           </div>
