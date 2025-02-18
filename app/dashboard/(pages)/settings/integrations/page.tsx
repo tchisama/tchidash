@@ -36,15 +36,15 @@ const integrations: Integration[] = [
       "https://firebasestorage.googleapis.com/v0/b/tchidash-fd7aa.appspot.com/o/294424033_375002151434645_2765565352434267578_n%201.png?alt=media&token=99502b5f-b5c9-4ba0-acf5-a810eb4e3a34",
   },
   {
-    id: "whatsapp-notifications",
-    title: "WhatsApp Notifications",
+    id: "whatsapp-notification",
+    title: "WhatsApp Notification",
     description: "receive notifications on WhatsApp on sertain events",
     imageUrl:
       "https://firebasestorage.googleapis.com/v0/b/tchidash-fd7aa.appspot.com/o/whatsapp-logo-whatsapp-logo-transparent-whatsapp-icon-transparent-free-free-png.webp?alt=media&token=38019c55-c90f-42ba-8d26-3bc025a758a4",
   },
   {
-    id: "whatsapp-sender",
-    title: "WhatsApp Sender",
+    id: "whatsapp",
+    title: "WhatsApp",
     description: "Send messages to customers on WhatsApp",
     imageUrl:
       "https://firebasestorage.googleapis.com/v0/b/tchidash-fd7aa.appspot.com/o/whatsapp-logo-whatsapp-logo-transparent-whatsapp-icon-transparent-free-free-png.webp?alt=media&token=38019c55-c90f-42ba-8d26-3bc025a758a4",
@@ -87,10 +87,31 @@ const IntegrationCard = ({ integration }: { integration: Integration }) => {
   const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
-    if (store?.integrations) {
-      setEnabled(
-        store.integrations.find((i) => i.name === integration.id)?.enabled ??
-          false,
+    if (!store) return;
+    console.log(store);
+    setEnabled(
+      (store?.integrations ?? []).find((i) => i.name === integration.id)
+        ?.enabled ?? false,
+    );
+
+    if (!store.integrations) {
+      const newUpdate = {
+        ...store,
+        integrations: [
+          {
+            name: integration.id,
+            enabled: false,
+          },
+        ],
+      } as Store;
+      setStore(newUpdate);
+      dbUpdateDoc(
+        doc(db, "stores", store.id),
+        {
+          integrations: newUpdate.integrations ?? [],
+        },
+        store.id,
+        "",
       );
     }
   }, [store, setEnabled, integration.id]);
@@ -126,7 +147,7 @@ const IntegrationCard = ({ integration }: { integration: Integration }) => {
                   const newUpdate = {
                     ...store,
                     integrations: [
-                      ...store.integrations,
+                      ...(store.integrations ?? []),
                       {
                         name: integration.id,
                         enabled: true,
@@ -137,7 +158,7 @@ const IntegrationCard = ({ integration }: { integration: Integration }) => {
                   dbUpdateDoc(
                     doc(db, "stores", store.id),
                     {
-                      integrations: newUpdate.integrations,
+                      integrations: newUpdate.integrations ?? [],
                     },
                     store.id,
                     "",
@@ -147,7 +168,7 @@ const IntegrationCard = ({ integration }: { integration: Integration }) => {
 
                 const newUpdate = {
                   ...store,
-                  integrations: store?.integrations.map((i) =>
+                  integrations: (store?.integrations ?? []).map((i) =>
                     i.name === integration.id
                       ? {
                           ...i,
@@ -160,7 +181,7 @@ const IntegrationCard = ({ integration }: { integration: Integration }) => {
                 dbUpdateDoc(
                   doc(db, "stores", store.id),
                   {
-                    integrations: newUpdate.integrations,
+                    integrations: newUpdate.integrations ?? [],
                   },
                   store.id,
                   "",

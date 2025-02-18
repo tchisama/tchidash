@@ -125,9 +125,10 @@ export async function getDigylogCredantials(storeId: string) {
   ) {
     return { token: "", store: "", network: "", errors: "digylog not enabled" };
   }
-  const { token, store, network } = currentStore.integrations.find(
-    (i: { name: string }) => i.name === "digylog",
-  ) as digylogIntegration;
+  const { token, store, network, autoStatusUpdate } =
+    currentStore.integrations.find(
+      (i: { name: string }) => i.name === "digylog",
+    ) as digylogIntegration;
 
   if (!token) {
     return { token: "", store, network, errors: "no token" };
@@ -139,5 +140,5 @@ export async function getDigylogCredantials(storeId: string) {
     return { token, store, network: "", errors: "no network" };
   }
 
-  return { token, store, network, errors: "" };
+  return { token, store, network, errors: "", autoStatusUpdate };
 }

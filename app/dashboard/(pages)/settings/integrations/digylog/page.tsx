@@ -26,6 +26,8 @@ import {
 } from "@/components/ui/select";
 
 import axios from "axios";
+import { Checkbox } from "@/components/ui/checkbox";
+import { toast } from "@/hooks/use-toast";
 
 export default function IntegrationConfig() {
   const [token, setToken] = useState("");
@@ -34,6 +36,8 @@ export default function IntegrationConfig() {
   const [network, setNetwork] = useState("");
 
   const { store, setStore } = useStore();
+
+  const [autoStatusUpdate, setAutoStatusUpdate] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,6 +54,7 @@ export default function IntegrationConfig() {
               token,
               network,
               store: Dstore,
+              autoStatusUpdate: autoStatusUpdate,
             }
           : i,
       ),
@@ -65,6 +70,7 @@ export default function IntegrationConfig() {
                 token,
                 network,
                 store: Dstore,
+                autoStatusUpdate: autoStatusUpdate,
               }
             : i,
         ),
@@ -72,6 +78,11 @@ export default function IntegrationConfig() {
       store.id,
       "",
     );
+    toast({
+      title: "Integration Updated",
+      description: "Your Digylog integration has been updated",
+    });
+    alert("Your Digylog integration has been updated");
   };
 
   const [showPassword, setShowPassword] = useState(false);
@@ -111,12 +122,14 @@ export default function IntegrationConfig() {
       store: Dstore,
       token,
       network,
+      autoStatusUpdate,
     } = store.integrations.find(
       (i) => i.name === "digylog",
     ) as digylogIntegration;
     setToken(token);
     setNetwork(network);
     setDStore(Dstore);
+    setAutoStatusUpdate(autoStatusUpdate);
   }, [store]);
 
   useEffect(() => {
@@ -208,6 +221,23 @@ export default function IntegrationConfig() {
                   </Select>
                 </div>
               ) : null}
+              <div className=" flex mt-4 border p-2 rounded-xl items-center">
+                <Checkbox
+                  id="autoStatusUpdate"
+                  checked={autoStatusUpdate}
+                  onCheckedChange={(checked) =>
+                    setAutoStatusUpdate(checked as boolean)
+                  }
+                  className="rounded mr-4 ml-2"
+                />
+                <Label htmlFor="autoStatusUpdate">
+                  <h4>Auto Status Update</h4>
+                  <p className="text-sm text-gray-500">
+                    Automatically Sync order status between Digylog and your
+                    store
+                  </p>
+                </Label>
+              </div>
             </form>
           </CardContent>
         </Card>

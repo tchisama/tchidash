@@ -80,16 +80,18 @@ type digylogIntegration = {
   token: string;
   store: string;
   network: string;
+  autoStatusUpdate: boolean;
 };
 
 type whatsappNotificationIntegration = {
   name: "whatsapp";
   enabled: boolean;
+  connected: boolean;
 };
 
-export type whatsappUser = {
+export type whatsappNotification = {
   id: string;
-  name: "whatsapp-user";
+  name: "whatsapp-notification";
   whatsappNumber: string;
   active: boolean;
   storeId: string;
