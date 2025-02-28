@@ -57,7 +57,8 @@ export const orderStatusValuesWithIcon = [
   {
     name: "packed",
     icon: <PackageCheck className="h-4 w-4" />,
-    color: "#3a0ca3", // Orange: Represents preparation and readiness
+    // color i want rgba(30, 7, 83, 0.5)
+    color: "#1e0753", // Purple: Represents preparation and readiness
     effectStock: true,
     next: ["shipped", "cancelled", "scheduled", "pending"],
   },
@@ -123,7 +124,6 @@ export type OrderStatus =
   | "no_reply"
   | "returned";
 
-
 export function StateChanger({
   state: st,
   order,
@@ -163,38 +163,34 @@ export function StateChanger({
       const note = await dbGetDocs(q, storeId, "");
       const noteData = note.docs.map((doc) => doc.data())[0];
       console.log(noteData);
-      if(!store) return null
+      if (!store) return null;
       const user = store?.employees?.find(
-        (employee) => employee.email.trim()== noteData?.creator.trim(),
+        (employee) => employee.email.trim() == noteData?.creator.trim(),
       );
       return user;
     },
   });
 
-
   const stateActions = {
-    pending: [<SendWhatsAppConfirmationButton
-    key={0}
-          currentOrder={order}
-          />],
-    scheduled: [<ScheduledOrdersDate
-    key={0}
-          currentOrder={order}
-          />],
-    no_reply: [<CancelledCalls currentOrder={order} key={0}/>],
-    delivered: [<AskForReviewButton currentOrder={order} key={0}/>,<Button 
-    onClick={
-      ()=>{
-          window.open(
-            `https://wa.me/212${order?.customer?.phoneNumber}`,
-          );
-      }
-    }
-    className="flex items-center gap-1" size={"sm"} variant={"outline"} key={1}>
-      <ArrowUpRight className="w-4 h-4" />
-      Open Whatsapp 
-    </Button>],
-  }
+    pending: [<SendWhatsAppConfirmationButton key={0} currentOrder={order} />],
+    scheduled: [<ScheduledOrdersDate key={0} currentOrder={order} />],
+    no_reply: [<CancelledCalls currentOrder={order} key={0} />],
+    delivered: [
+      <AskForReviewButton currentOrder={order} key={0} />,
+      <Button
+        onClick={() => {
+          window.open(`https://wa.me/212${order?.customer?.phoneNumber}`);
+        }}
+        className="flex items-center gap-1"
+        size={"sm"}
+        variant={"outline"}
+        key={1}
+      >
+        <ArrowUpRight className="w-4 h-4" />
+        Open Whatsapp
+      </Button>,
+    ],
+  };
 
   return (
     st && (
@@ -244,118 +240,117 @@ export function StateChanger({
             )}
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className={cn("shadow-2xl flex flex-col-reverse", 
-        stateActions[state as keyof typeof stateActions] && "grid-cols-2"
-        )} align="start" side="right">
-
-<div>
-
-          <DropdownMenuLabel>Change Status</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          {orderStatusValuesWithIcon
-          .filter((s) => s.name !== state)
-          .map((status) => (
-            <>
-              <DropdownMenuItem
-                key={status.name}
-                style={{
-                  background: status.color + "80",
-                  borderColor: status.color + "90",
-                  color: "#000a",
-                  // opacity: !orderStatusValuesWithIcon.find(
-                  //   (s) => s.name === state,
-                  // )?.next.includes(status.name) ? "0.3" : "1",
-                }}
-                className="py-1 rounded-sm mt-[1px] cursor-pointer border"
-                disabled={
-                  false
-                  // !orderStatusValuesWithIcon.find(
-                  //   (s) => s.name === state,
-                  // )?.next.includes(status.name)
-                }
-                onClick={async () => {
-                  setActionLoading(true);
-                  setState(status.name as OrderStatus);
-
-                  try {
-                    const response = await axios.post(
-                      "/api/order-status-changer",
-                      {
-                        orderId: order.id,
-                        newStatus: status.name as OrderStatus,
-                        storeId: order.storeId,
-                      },
-                    );
-                    console.log("Order status updated:", response.data);
-                    // setCurrentOrderData({
-                    //   ...order,
-                    //   orderStatus: status.name as OrderStatus,
-                    // } as Order);
-
-                    if (!order.storeId) return;
-                    // Send notification
-                    sendNotification(
-                      "Change order state 🔄",
-                      `of order:#${order.sequence} to ${status.name}`,
-                    );
-
-                    // Add note
-                    dbAddDoc(
-                      collection(db, "notes"),
-                      {
-                        changed: `${status.name.toLocaleLowerCase()}`,
-                        creator: session?.user?.email,
-                        createdAt: Timestamp.now(),
-                        details: {
-                          for: "order",
-                          orderId: order?.id,
-                        },
-                      },
-                      order.storeId,
-                      "",
-                    );
-                  } catch (error) {
-                    console.error("Error updating order status:", error);
-                  } finally {
-                    setOrders(
-                      orders.map((o) =>
-                        o.id === order.id
-                          ? {
-                              ...order,
-                              orderStatus: status.name as OrderStatus,
-                            }
-                          : o,
-                      ),
-                    );
-
-                    setActionLoading(false);
-                  }
-                }}
-              >
-                <span className="mr-2">{status.icon}</span>
-                <span className="capitalize">{status.name}</span>
-              </DropdownMenuItem>
-              {(status.name == "delivered" || status.name == "pending") && (
-                <DropdownMenuSeparator className="w-full h-[2px]" />
-              )}
-            </>
-          ))}
-</div>
+        <DropdownMenuContent
+          className={cn(
+            "shadow-2xl flex flex-col-reverse",
+            stateActions[state as keyof typeof stateActions] && "grid-cols-2",
+          )}
+          align="start"
+          side="right"
+        >
           <div>
+            <DropdownMenuLabel>Change Status</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {orderStatusValuesWithIcon
+              .filter((s) => s.name !== state)
+              .map((status) => (
+                <>
+                  <DropdownMenuItem
+                    key={status.name}
+                    style={{
+                      background: status.color + "80",
+                      borderColor: status.color + "90",
+                      color: "#000a",
+                      // opacity: !orderStatusValuesWithIcon.find(
+                      //   (s) => s.name === state,
+                      // )?.next.includes(status.name) ? "0.3" : "1",
+                    }}
+                    className="py-1 rounded-sm mt-[1px] cursor-pointer border"
+                    disabled={
+                      false
+                      // !orderStatusValuesWithIcon.find(
+                      //   (s) => s.name === state,
+                      // )?.next.includes(status.name)
+                    }
+                    onClick={async () => {
+                      setActionLoading(true);
+                      setState(status.name as OrderStatus);
 
-{
-  Object.keys(stateActions).length > 0
-  && stateActions[state as keyof typeof stateActions]
-   && (
-    <>
-      <DropdownMenuLabel>State Actions</DropdownMenuLabel>
-      <DropdownMenuSeparator />
-      <div className="flex gap-1 flex-col">
-      {stateActions[state as keyof typeof stateActions]}
-      </div>
-    </>
-  )
-}
+                      try {
+                        const response = await axios.post(
+                          "/api/order-status-changer",
+                          {
+                            orderId: order.id,
+                            newStatus: status.name as OrderStatus,
+                            storeId: order.storeId,
+                          },
+                        );
+                        console.log("Order status updated:", response.data);
+                        // setCurrentOrderData({
+                        //   ...order,
+                        //   orderStatus: status.name as OrderStatus,
+                        // } as Order);
+
+                        if (!order.storeId) return;
+                        // Send notification
+                        sendNotification(
+                          "Change order state 🔄",
+                          `of order:#${order.sequence} to ${status.name}`,
+                        );
+
+                        // Add note
+                        dbAddDoc(
+                          collection(db, "notes"),
+                          {
+                            changed: `${status.name.toLocaleLowerCase()}`,
+                            creator: session?.user?.email,
+                            createdAt: Timestamp.now(),
+                            details: {
+                              for: "order",
+                              orderId: order?.id,
+                            },
+                          },
+                          order.storeId,
+                          "",
+                        );
+                      } catch (error) {
+                        console.error("Error updating order status:", error);
+                      } finally {
+                        setOrders(
+                          orders.map((o) =>
+                            o.id === order.id
+                              ? {
+                                  ...order,
+                                  orderStatus: status.name as OrderStatus,
+                                }
+                              : o,
+                          ),
+                        );
+
+                        setActionLoading(false);
+                      }
+                    }}
+                  >
+                    <span className="mr-2">{status.icon}</span>
+                    <span className="capitalize">{status.name}</span>
+                  </DropdownMenuItem>
+                  {(status.name == "delivered" || status.name == "pending") && (
+                    <DropdownMenuSeparator className="w-full h-[2px]" />
+                  )}
+                </>
+              ))}
+          </div>
+          <div>
+            {Object.keys(stateActions).length > 0 &&
+              stateActions[state as keyof typeof stateActions] && (
+                <>
+                  <DropdownMenuLabel>State Actions</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <div className="flex gap-1 flex-col">
+                    {stateActions[state as keyof typeof stateActions]}
+                  </div>
+                </>
+              )}
           </div>
         </DropdownMenuContent>
       </DropdownMenu>
