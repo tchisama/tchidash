@@ -17,9 +17,15 @@ import { Customer } from "@/types/customer";
 import axios from "axios";
 import { Store } from "@/types/store";
 
+// TODO: Add option of custom total price
+//
+//
 // Utility function to calculate order totals
 const calculateOrderTotals = (items: OrderItem[], shippingCost: number) => {
-  const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const subtotal = items.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0,
+  );
   const totalItems = items.reduce((acc, item) => acc + item.quantity, 0);
 
   const getTotalPriceFromItem = (item: OrderItem) => {
@@ -32,7 +38,10 @@ const calculateOrderTotals = (items: OrderItem[], shippingCost: number) => {
     return (unitPrice - discount) * quantity;
   };
 
-  const total = items.reduce((acc, item) => acc + getTotalPriceFromItem(item), 0);
+  const total = items.reduce(
+    (acc, item) => acc + getTotalPriceFromItem(item),
+    0,
+  );
   const discountAmount = items.reduce(
     (acc, item) =>
       acc +
@@ -56,8 +65,10 @@ const validateOrderInputs = (order: Order) => {
   if (!order.customer.firstName) throw new Error("First name is required");
   if (!order.customer.lastName) throw new Error("Last name is required");
   if (!order.customer.phoneNumber) throw new Error("Phone number is required");
-  if (!order.customer.shippingAddress.address) throw new Error("Shipping address is required");
-  if (!order.customer.shippingAddress.city) throw new Error("Shipping city is required");
+  if (!order.customer.shippingAddress.address)
+    throw new Error("Shipping address is required");
+  if (!order.customer.shippingAddress.city)
+    throw new Error("Shipping city is required");
   if (!order.items.length) throw new Error("At least one item is required");
 };
 
@@ -69,7 +80,11 @@ const fetchStoreDetails = async (storeId: string) => {
 };
 
 // Function to update or create an order
-const createOrUpdateOrder = async (order: Order, storeId: string, update: boolean) => {
+const createOrUpdateOrder = async (
+  order: Order,
+  storeId: string,
+  update: boolean,
+) => {
   if (update) {
     await dbUpdateDoc(
       doc(db, "orders", order.id),
@@ -97,7 +112,11 @@ const createOrUpdateOrder = async (order: Order, storeId: string, update: boolea
 // };
 
 // Function to create or update a customer
-const handleCustomer = async (order: Order, storeId: string, update: boolean) => {
+const handleCustomer = async (
+  order: Order,
+  storeId: string,
+  update: boolean,
+) => {
   const newCustomer: Customer = {
     id: "",
     firstName: order.customer.firstName ?? "",
@@ -198,7 +217,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const store = await fetchStoreDetails(storeId);
 
-    const orderSequence = update ? body.sequence : (store?.sequences?.orders || 0);
+    const orderSequence = update
+      ? body.sequence
+      : store?.sequences?.orders || 0;
     if (!update) {
       await updateDoc(doc(db, "stores", storeId), {
         sequences: {
@@ -207,9 +228,8 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    
     let order;
-    if(update){ 
+    if (update) {
       // body but remove createdAt
       order = {
         customer: body.customer,
@@ -226,8 +246,8 @@ export async function POST(request: NextRequest) {
         sequence: orderSequence,
         storeId,
       } as Order;
-      console.log(order)
-    }else{
+      console.log(order);
+    } else {
       order = {
         ...body,
         sequence: orderSequence,
@@ -250,10 +270,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Calculate order totals
-    const { subtotal, totalItems, totalPrice, discountAmount } = calculateOrderTotals(
-      order.items,
-      order.shippingInfo.cost || 0,
-    );
+    const { subtotal, totalItems, totalPrice, discountAmount } =
+      calculateOrderTotals(order.items, order.shippingInfo.cost || 0);
     order.subtotal = subtotal;
     order.totalItems = totalItems;
     order.totalPrice = totalPrice;
@@ -291,6 +309,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ storeId, data });
   } catch (error) {
     console.error("Error fetching orders:", error);
-    return NextResponse.json({ error: "Failed to fetch orders" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch orders" },
+      { status: 500 },
+    );
   }
 }
+
