@@ -28,6 +28,7 @@ import {
 import axios from "axios";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "@/hooks/use-toast";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function IntegrationConfig() {
   const [token, setToken] = useState("");
@@ -36,6 +37,7 @@ export default function IntegrationConfig() {
   const [network, setNetwork] = useState("");
 
   const { store, setStore } = useStore();
+  const [note, setNote] = useState("");
 
   const [autoStatusUpdate, setAutoStatusUpdate] = useState(false);
 
@@ -55,6 +57,7 @@ export default function IntegrationConfig() {
               network,
               store: Dstore,
               autoStatusUpdate: autoStatusUpdate,
+              note: note,
             }
           : i,
       ),
@@ -71,6 +74,7 @@ export default function IntegrationConfig() {
                 network,
                 store: Dstore,
                 autoStatusUpdate: autoStatusUpdate,
+                note: note,
               }
             : i,
         ),
@@ -123,6 +127,7 @@ export default function IntegrationConfig() {
       token,
       network,
       autoStatusUpdate,
+      note,
     } = store.integrations.find(
       (i) => i.name === "digylog",
     ) as digylogIntegration;
@@ -130,6 +135,7 @@ export default function IntegrationConfig() {
     setNetwork(network);
     setDStore(Dstore);
     setAutoStatusUpdate(autoStatusUpdate);
+    setNote(note);
   }, [store]);
 
   useEffect(() => {
@@ -237,6 +243,16 @@ export default function IntegrationConfig() {
                     store
                   </p>
                 </Label>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="note">Note</Label>
+                <Textarea
+                  id="note"
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  required
+                  name="note"
+                />
               </div>
             </form>
           </CardContent>

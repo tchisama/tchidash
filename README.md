@@ -14,10 +14,12 @@ Tchidash is a powerful and clean eCommerce dashboard that seamlessly integrates 
 ## Installation ⚙️📥🛠️
 
 ### Prerequisites 📝🔧✅
+
 - Node.js & npm installed
 - Database setup (MongoDB, PostgreSQL, or MySQL depending on your preference)
 
 ### Steps 🚀💻📂
+
 1. Clone the repository:
    ```bash
    git clone https://github.com/tchisama/tchidash.git
@@ -45,6 +47,7 @@ Tchidash provides RESTful APIs to integrate seamlessly with your store. Detailed
 ## Contributing 🤝📌💡
 
 Contributions are welcome! Please follow these steps:
+
 1. Fork the repository.
 2. Create a feature branch (`git checkout -b feature-name`).
 3. Commit your changes (`git commit -m 'Add new feature'`).
@@ -58,4 +61,3 @@ This project is licensed under the MIT License. See the `LICENSE` file for more 
 ## Contact 📧💬📞
 
 For support or questions, reach out at [your email] or open an issue in the repository. 📩🔗💡
-

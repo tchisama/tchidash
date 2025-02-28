@@ -21,6 +21,8 @@ import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/firebase";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Order } from "@/types/order";
+import { useIntegrations } from "@/hooks/use-integrations";
+import { digylogIntegration } from "@/types/store";
 
 type City = {
   name: string;
@@ -58,6 +60,12 @@ export default function DigylogDialog({
       setTrakingId(currentOrder.shippingInfo?.trackingNumber ?? "");
     }
   }, [currentOrder, open]);
+
+  const integrations = useIntegrations();
+  useEffect(() => {
+    const digylogIntegration = integrations("digylog") as digylogIntegration;
+    setNote(digylogIntegration?.note ?? "");
+  }, [integrations]);
 
   const sendOrderToDigylog = () => {
     setLoading(true);

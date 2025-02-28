@@ -81,6 +81,7 @@ type digylogIntegration = {
   store: string;
   network: string;
   autoStatusUpdate: boolean;
+  note: string;
 };
 
 type whatsappNotificationIntegration = {
