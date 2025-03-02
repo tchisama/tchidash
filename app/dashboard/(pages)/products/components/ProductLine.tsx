@@ -1,4 +1,9 @@
 "use client";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -38,6 +43,7 @@ import {
   getAggregateFromServer,
   query,
   sum,
+  updateDoc,
   where,
 } from "firebase/firestore";
 import { useProducts } from "@/store/products";
@@ -49,6 +55,7 @@ import { getStock } from "@/lib/fetchs/stock";
 import { useQuery } from "@tanstack/react-query";
 import { dbAddDoc, dbUpdateDoc } from "@/lib/dbFuntions/fbFuns";
 import { Checkbox } from "@/components/ui/checkbox";
+import { VariantStateChanger } from "../[product]/components/ProductVariant";
 
 const ProductLine = ({
   product,
@@ -199,17 +206,7 @@ const ProductLine = ({
           </Link>
         </TableCell>
         <TableCell>
-          <Badge
-            variant={
-              product.status === "active"
-                ? "default"
-                : product.status === "archived"
-                  ? "outline"
-                  : "secondary"
-            }
-          >
-            {product.status}
-          </Badge>
+          <ProductStateChanger product={product} />
         </TableCell>
         <TableCell className="hidden md:table-cell">
           {product.variants &&
@@ -302,6 +299,7 @@ const ProductLine = ({
                     >
                       Price
                     </TableHead>
+                    <TableHead>state</TableHead>
                     <TableHead
                       className={product.variantsAreOneProduct ? "hidden" : ""}
                     >
@@ -393,6 +391,9 @@ const VariantLine = ({
       <TableCell className={product.variantsAreOneProduct ? "hidden" : ""}>
         {variant.price} Dh
       </TableCell>
+      <TableCell>
+        <VariantStateChanger variant={variant} id={product.id} />
+      </TableCell>
       <TableCell className={product.variantsAreOneProduct ? "hidden" : ""}>
         {variant.hasInfiniteStock ? "infinite" : stockQuantity || 0} Items
       </TableCell>
@@ -403,6 +404,67 @@ const VariantLine = ({
         </div>
       </TableCell>
     </TableRow>
+  );
+};
+
+const ProductStateChanger = ({ product }: { product: Product }) => {
+  const { setProducts, products } = useProducts();
+  const updateProductStatus = (status: "draft" | "active" | "archived") => {
+    updateDoc(doc(db, "products", product.id), {
+      ...product,
+      status,
+    });
+    setProducts(
+      products.map((p) => (p.id === product.id ? { ...product, status } : p)),
+    );
+  };
+  return (
+    <Popover>
+      <PopoverTrigger>
+        <Badge
+          variant={
+            product.status === "active"
+              ? "default"
+              : product.status === "draft"
+                ? "secondary"
+                : product.status === "archived"
+                  ? "outline"
+                  : "destructive"
+          }
+        >
+          {product.status}
+        </Badge>
+      </PopoverTrigger>
+      <PopoverContent className="flex gap-2 flex-col">
+        <Button
+          size="sm"
+          variant="default"
+          onClick={() => {
+            updateProductStatus("active");
+          }}
+        >
+          Active
+        </Button>
+        <Button
+          size="sm"
+          variant="secondary"
+          onClick={() => {
+            updateProductStatus("draft");
+          }}
+        >
+          Draft
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => {
+            updateProductStatus("archived");
+          }}
+        >
+          Archived
+        </Button>
+      </PopoverContent>
+    </Popover>
   );
 };
 

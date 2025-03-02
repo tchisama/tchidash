@@ -25,6 +25,7 @@ export interface Variant {
   images?: string[];
   variantValues: VariantValue[]; // Array of option and value pairs
   totalSales?: number;
+  status?: "draft" | "active" | "archived";
 }
 
 // Type for product option (general options like size, color)
