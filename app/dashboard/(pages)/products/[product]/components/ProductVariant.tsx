@@ -33,6 +33,15 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import FilesystemExplorer from "@/components/FilesystemExplorer";
 
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Badge } from "@/components/ui/badge";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "@/firebase";
+
 const ProductVariantsCard = ({}: { saveProduct: () => void }) => {
   const { currentProduct, setCurrentProduct } = useProducts();
   const [productVariants, setProductVariants] = useState<Variant[]>([]);
@@ -210,6 +219,7 @@ const ProductVariantsCard = ({}: { saveProduct: () => void }) => {
                 Price
               </TableHead>
               <TableHead>SKU</TableHead>
+              <TableHead className="text-right">Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -327,6 +337,9 @@ const ProductVariantsCard = ({}: { saveProduct: () => void }) => {
                   )}
                 </TableCell>
                 <TableCell>{variant.sku}</TableCell>
+                <TableCell>
+                  <VariantStateChanger variant={variant} />
+                </TableCell>
                 <TableCell className="flex justify-end">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -374,6 +387,92 @@ const ProductVariantsCard = ({}: { saveProduct: () => void }) => {
         </Table>
       </CardContent>
     </Card>
+  );
+};
+
+export const VariantStateChanger = ({
+  variant,
+  id,
+}: {
+  variant: Variant;
+  id?: string;
+}) => {
+  const { setCurrentProduct, currentProduct, products, setProducts } =
+    useProducts();
+  const product = currentProduct as Product;
+  const updateVariantStatus = (status: "active" | "draft" | "archived") => {
+    if (currentProduct) {
+      const newVariants = product.variants?.map((v) =>
+        v.id === variant.id ? { ...v, status: status } : v,
+      );
+      const currentProductValue = {
+        ...currentProduct,
+        variants: newVariants as Variant[],
+      };
+
+      setCurrentProduct(currentProductValue);
+    } else {
+      if (!id) return;
+      const currentProductValue = products.find((p) => p.id === id) as Product;
+
+      currentProductValue.variants = currentProductValue.variants?.map((v) =>
+        v.id === variant.id ? { ...v, status: status } : v,
+      );
+      updateDoc(doc(db, "products", id), currentProductValue);
+      setProducts(
+        products.map((p) =>
+          p.id === id ? currentProductValue : p,
+        ) as Product[],
+      );
+    }
+  };
+  return (
+    <Popover>
+      <PopoverTrigger>
+        <Badge
+          variant={
+            variant.status === "active"
+              ? "default"
+              : variant.status === "draft"
+                ? "secondary"
+                : variant.status === "archived"
+                  ? "outline"
+                  : "destructive"
+          }
+        >
+          {variant.status ? variant.status : "no status"}
+        </Badge>
+      </PopoverTrigger>
+      <PopoverContent className="flex gap-2 flex-col">
+        <Button
+          size="sm"
+          variant="default"
+          onClick={() => {
+            updateVariantStatus("active");
+          }}
+        >
+          Active
+        </Button>
+        <Button
+          size="sm"
+          variant="secondary"
+          onClick={() => {
+            updateVariantStatus("draft");
+          }}
+        >
+          Draft
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => {
+            updateVariantStatus("archived");
+          }}
+        >
+          Archived
+        </Button>
+      </PopoverContent>
+    </Popover>
   );
 };
 

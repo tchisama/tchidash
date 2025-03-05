@@ -34,6 +34,7 @@ export default function Page() {
   const { store } = useStore();
   const { data: session } = useSession();
   const { storeId } = useStore();
+
   const { data: orders } = useQuery({
     queryKey: ["pending-orders"],
     queryFn: async () => {
@@ -58,7 +59,7 @@ export default function Page() {
   });
 
   return (
-    <main className="flex flex-1 flex-col gap-4  md:gap-8 ">
+    <main className="flex flex-1 flex-col gap-4  md:gap-8">
       <h1 className="text-4xl text-slate-800 capitalize font-bold tracking-tight">
         {/* // with emoji of hi */}
         <span className="flex gap-2 items-center">
@@ -181,6 +182,7 @@ export default function Page() {
                       <div>{order.customer.shippingAddress.city}</div>
                       <div className="hidden text-sm text-muted-foreground md:inline">
                         {order.customer.shippingAddress.address.slice(0, 50)}
+
                         {order.customer.shippingAddress.address.length > 50 &&
                           "..."}
                       </div>
