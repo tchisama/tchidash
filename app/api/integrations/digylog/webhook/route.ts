@@ -78,6 +78,8 @@ export async function PUT(request: NextRequest) {
       order = orders[0].data() as Order;
     }
 
+    console.log(body);
+
     if ((body.status === "Livrée *" || body.status === "Livrée") && order) {
       axios.post("https://dash.tchisama.com/order-status-changer", {
         orderId: order.id,

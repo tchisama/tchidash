@@ -194,7 +194,7 @@ const handleCustomer = async (
 const correctCityName = async (city: string) => {
   try {
     const response = await axios.get(
-      `https://tchidash.vercel.app/api/ai/city-corrector?city=${city}`,
+      `https://dash.tchisama.com/api/ai/city-corrector?city=${city}`,
     );
     return response.data;
   } catch (error) {
@@ -315,4 +315,3 @@ export async function GET(request: NextRequest) {
     );
   }
 }
-

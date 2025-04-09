@@ -242,9 +242,12 @@ export default function SideBarDashboard({
                             )}
                           />
                           {item.name}
-                          {item.name === "Orders" && ((totalNewOrders??0) > 0) && (
-                            <Badge className="ml-auto">{totalNewOrders}</Badge>
-                          )}
+                          {item.name === "Orders" &&
+                            (totalNewOrders ?? 0) > 0 && (
+                              <Badge className="ml-auto">
+                                {totalNewOrders}
+                              </Badge>
+                            )}
                         </Link>
                       </li>
                     ))}
@@ -301,7 +304,6 @@ export default function SideBarDashboard({
               <div className="flex items-center gap-x-4 lg:gap-x-4">
                 <Notification />
 
-
                 {/* Profile dropdown */}
                 <UserProfileButton />
               </div>
@@ -324,4 +326,3 @@ const isLinkActive = (href: string, pathname: string) => {
     return pathname === href;
   }
 };
-

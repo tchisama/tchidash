@@ -38,14 +38,13 @@ export default function DashboardUiProvider({
   const { actions } = useNavbar();
   const { setStoreId, store } = useStore();
 
-
   useEffect(() => {
-   document.title = "Dashboard";
-  },[store])
+    document.title = "Dashboard";
+  }, [store]);
   return (
     <div className="flex min-h-screen w-full bg-slate-50 dark:bg-slate-900">
       <Head>
-          <link rel="icon" href={store?.logoUrl || ""} />
+        <link rel="icon" href={store?.logoUrl || ""} />
       </Head>
       {/*
       <SideBar />
@@ -68,7 +67,7 @@ export default function DashboardUiProvider({
             {/* <DashboardCommand /> */}
           </div>
           <div className="flex-1 flex gap-2 items-center justify-end">
-          <Notification />
+            <Notification />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -80,21 +79,20 @@ export default function DashboardUiProvider({
                       {store?.name}
                     </span>
                     <span className="font-medium text-xs">
-                      {
-                        store?.employees?.find(
-                          (employee: Employee) =>
-                            employee.email === session?.user?.email
-                        )?.name ?? ""
-                      }
+                      {store?.employees?.find(
+                        (employee: Employee) =>
+                          employee.email === session?.user?.email,
+                      )?.name ?? ""}
                     </span>
                   </div>
                   <Image
                     src={
-                      (store  && 
-                      store.employees?.find(
-                        (employee: Employee) =>
-                          employee.email === session?.user?.email
-                        )?.imageUrl )?? ""
+                      (store &&
+                        store.employees?.find(
+                          (employee: Employee) =>
+                            employee.email === session?.user?.email,
+                        )?.imageUrl) ??
+                      ""
                     }
                     width={36}
                     height={36}
@@ -122,15 +120,11 @@ export default function DashboardUiProvider({
                     router.push("/dashboard/settings");
                   }}
                 >
-                  <SettingsIcon
-                    className="mr-2 h-4 w-4"
-                  />
+                  <SettingsIcon className="mr-2 h-4 w-4" />
                   Settings
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <InfoIcon
-                    className="mr-2 h-4 w-4"
-                  />
+                  <InfoIcon className="mr-2 h-4 w-4" />
                   Support
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />

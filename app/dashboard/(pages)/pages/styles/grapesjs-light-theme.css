@@ -1,0 +1,119 @@
+/* app/styles/grapesjs-light-theme.css */
+
+/* --- Basic Light Theme Overrides for GrapesJS --- */
+
+/* Main container and panels */
+.gjs-one-bg,
+.gjs-two-bg,
+.gjs-three-bg,
+.gjs-four-bg {
+  background-color: #f8f9fa; /* Light grey background */
+}
+
+.gjs-pn-panels {
+  background-color: #e9ecef; /* Slightly darker panel background */
+}
+
+/* Panel Titles and Borders */
+.gjs-pn-panel .gjs-pn-title,
+.gjs-pn-views-container,
+.gjs-pn-views .gjs-pn-view {
+  background-color: #dee2e6; /* Lighter title/tab background */
+  color: #343a40; /* Darker text */
+  border-color: #ced4da;
+}
+.gjs-pn-views .gjs-pn-view.gjs-pn-active {
+  background-color: #f8f9fa; /* Active tab background */
+  box-shadow: none;
+}
+
+/* Buttons */
+.gjs-pn-buttons .gjs-pn-btn {
+  color: #495057; /* Dark grey icon color */
+  background-color: #f8f9fa;
+  border: 1px solid #ced4da;
+}
+.gjs-pn-buttons .gjs-pn-btn:hover {
+  background-color: #e9ecef;
+  border-color: #adb5bd;
+}
+.gjs-pn-buttons .gjs-pn-btn.gjs-pn-active {
+  background-color: #007bff; /* Example primary color for active state */
+  color: white;
+  border-color: #007bff;
+  box-shadow: none;
+}
+
+/* Blocks Panel */
+.gjs-block {
+  background-color: #ffffff; /* White block background */
+  color: #343a40; /* Dark text */
+  border: 1px solid #dee2e6;
+}
+.gjs-block:hover {
+  border-color: #007bff;
+}
+.gjs-block-label {
+  color: #495057;
+}
+.gjs-block-category .gjs-title {
+  background-color: #e9ecef;
+  color: #343a40;
+  border-bottom: 1px solid #dee2e6;
+}
+.gjs-block-category.gjs-open .gjs-caret-icon {
+  color: #343a40;
+}
+
+/* Style Manager */
+.gjs-sm-sector .gjs-sm-title {
+  background-color: #e9ecef;
+  color: #343a40;
+  border-bottom: 1px solid #dee2e6;
+}
+.gjs-sm-property {
+  background-color: #ffffff;
+  border-bottom: 1px solid #f1f1f1;
+}
+.gjs-sm-label {
+  color: #495057;
+}
+.gjs-field /* Input fields etc */ {
+  background-color: #ffffff;
+  color: #495057;
+  border: 1px solid #ced4da;
+}
+.gjs-field select,
+.gjs-field input {
+  background-color: inherit;
+  color: inherit;
+}
+
+/* Layer Manager */
+.gjs-layer {
+  color: #495057;
+}
+.gjs-layer:hover {
+  background-color: #e9ecef;
+}
+.gjs-layer.gjs-selected {
+  background-color: #cfe2ff; /* Light blue selection */
+  color: #052c65;
+}
+
+/* General Text */
+body,
+.gjs-text-color {
+  color: #212529; /* Default dark text */
+}
+
+/* --- Add more specific overrides as needed --- */
+
+div.gjs-pn-panel {
+  background-color: white;
+}
+
+div.gjs-pn-panel * {
+  background-color: transparent;
+  color: #333 !important;
+}
