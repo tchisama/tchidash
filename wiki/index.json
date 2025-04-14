@@ -1,0 +1,89 @@
+export interface Banana {
+  user: User;
+}
+export interface User {
+  id: number;
+  username: string;
+  email: string;
+  profile: Profile;
+  settings: Settings;
+  subscriptions?: (SubscriptionsEntity)[] | null;
+  activity: Activity;
+  social: Social;
+}
+export interface Profile {
+  firstName: string;
+  lastName: string;
+  birthdate: string;
+  gender: string;
+  location: Location;
+  languages?: (string)[] | null;
+  avatar: string;
+  bio: string;
+}
+export interface Location {
+  country: string;
+  city: string;
+  coordinates: Coordinates;
+}
+export interface Coordinates {
+  latitude: number;
+  longitude: number;
+}
+export interface Settings {
+  theme: string;
+  notifications: Notifications;
+  privacy: Privacy;
+}
+export interface Notifications {
+  email: boolean;
+  sms: boolean;
+  push: boolean;
+}
+export interface Privacy {
+  profileVisibility: string;
+  lastSeen: string;
+  searchable: boolean;
+}
+export interface SubscriptionsEntity {
+  plan: string;
+  status: string;
+  renewalDate: string;
+  paymentMethod: PaymentMethod;
+}
+export interface PaymentMethod {
+  type: string;
+  last4: string;
+  expiry: string;
+}
+export interface Activity {
+  lastLogin: string;
+  ipAddress: string;
+  device: Device;
+  recentActions?: (RecentActionsEntity)[] | null;
+}
+export interface Device {
+  type: string;
+  os: string;
+  browser: string;
+}
+export interface RecentActionsEntity {
+  type: string;
+  details: string;
+  timestamp: string;
+}
+export interface Social {
+  followers: number;
+  following: number;
+  friends?: (FriendsEntity)[] | null;
+}
+export interface FriendsEntity {
+  id: number;
+  username: string;
+  status: string;
+  lastMessage: LastMessage;
+}
+export interface LastMessage {
+  text: string;
+  timestamp: string;
+}

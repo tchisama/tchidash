@@ -310,8 +310,8 @@ export default function SideBarDashboard({
             </div>
           </div>
 
-          <main className="py-10">
-            <div className="px-4 sm:px-6 lg:px-8">{children}</div>
+          <main className="">
+            <div className="">{children}</div>
           </main>
         </div>
       </div>

@@ -25,27 +25,6 @@ export type Rule = {
 
 export type actions = "view" | "create" | "update" | "delete" | "change state";
 
-// settings_security: {
-//   dataType: null;
-//   action: "view" | "update";
-// };
-// settings_integrations: {
-//   dataType: null;
-//   action: "view" | "update";
-// };
-// settings_advanced: {
-//   dataType: null;
-//   action: "view" | "update";
-// };
-// notifications: {
-//   dataType: null;
-//   action: "view";
-// };
-// employees: {
-//   dataType: null;
-//   action: "view" | "create" | "update" | "delete";
-// };
-
 // Predefined Section Actions Map
 export const sectionActions = {
   orders: ["view", "update", "change state", "delete", "create"],
@@ -117,4 +96,3 @@ export const usePermission = () => {
 
   return checkPermission;
 };
-
