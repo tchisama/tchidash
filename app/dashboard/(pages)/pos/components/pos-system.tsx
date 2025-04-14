@@ -136,7 +136,7 @@ export default function PosSystem() {
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(
     null,
   );
-  const [quantity, setQuantity] = useState(1);
+  const [, setQuantity] = useState(1);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isVariantDialogOpen, setIsVariantDialogOpen] = useState(false);
   const [numpadValue, setNumpadValue] = useState("");
@@ -356,7 +356,7 @@ export default function PosSystem() {
     }));
   };
 
-  const createOrder = async (orderDetails: OrderDetails): Promise<any> => {
+  const createOrder = async (orderDetails: OrderDetails): Promise<unknown> => {
     console.log("Preparing order payload:", orderDetails);
 
     if (!STORE_ID) {
