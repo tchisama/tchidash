@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/card";
 import { useProducts } from "@/store/products";
 import { Button } from "@/components/ui/button";
-import { doc } from "firebase/firestore";
+import { deleteDoc, doc } from "firebase/firestore";
 import { db } from "@/firebase";
 import { useRouter } from "next/navigation";
 import { useStore } from "@/store/storeInfos";
@@ -29,10 +29,8 @@ const ProductDangerZone = () => {
         <Button
           onClick={() => {
             if (!storeId) return;
-            dbDeleteDoc(
-              doc(db, "products", currentProduct.id),
-              storeId,
-              "",
+            deleteDoc(
+              doc(db, "products", currentProduct.id)
             ).then(() => {
               setCurrentProduct(null);
               router.push("/dashboard/products");
