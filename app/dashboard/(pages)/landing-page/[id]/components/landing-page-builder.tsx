@@ -6,11 +6,11 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import { Layers, Eye, Smartphone, Tablet, Monitor } from "lucide-react";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ElementsSidebar } from "../components/elements-sidebar";
-import { StylePanel } from "../components/style-panel";
-import { Canvas } from "../components/canvas";
-import { Preview } from "../components/preview";
-import { ProductSelector } from "../components/product-selector";
+import { ElementsSidebar } from "./elements-sidebar";
+import { StylePanel } from "./style-panel";
+import { Canvas } from "./canvas";
+import { Preview } from "./preview";
+import { ProductSelector } from "./product-selector";
 import { usePageElements } from "../hooks/use-page-elements";
 import { useProduct } from "../context/product-context";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";

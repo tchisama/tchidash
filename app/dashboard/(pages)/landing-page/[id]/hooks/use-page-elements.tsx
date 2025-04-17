@@ -1,12 +1,21 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { v4 as uuidv4 } from "uuid"
-import type { PageElement, ElementType, Review, FAQ, Feature, Specification } from "@/types/elements"
+import { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
+import type {
+  PageElement,
+  ElementType,
+  Review,
+  FAQ,
+  Feature,
+  Specification,
+} from "@/types/elements";
 
 export function usePageElements() {
-  const [elements, setElements] = useState<PageElement[]>([])
-  const [selectedElementId, setSelectedElementId] = useState<string | null>(null)
+  const [elements, setElements] = useState<PageElement[]>([]);
+  const [selectedElementId, setSelectedElementId] = useState<string | null>(
+    null,
+  );
 
   const addElement = (type: ElementType) => {
     const newElement: PageElement = {
@@ -14,7 +23,7 @@ export function usePageElements() {
       type,
       content: {},
       style: {},
-    }
+    };
 
     // Set default content and style based on element type
     switch (type) {
@@ -22,7 +31,7 @@ export function usePageElements() {
         newElement.content = {
           src: "/placeholder.svg?height=400&width=600",
           alt: "Image",
-        }
+        };
         newElement.style = {
           height: 300,
           maxWidth: 600,
@@ -33,12 +42,12 @@ export function usePageElements() {
           backgroundColor: "transparent",
           borderWidth: 0,
           borderColor: "#e5e7eb",
-        }
-        break
+        };
+        break;
       case "header":
         newElement.content = {
           text: "Header Text",
-        }
+        };
         newElement.style = {
           fontSize: 24,
           fontWeight: "bold",
@@ -50,12 +59,12 @@ export function usePageElements() {
           backgroundColor: "transparent",
           borderWidth: 0,
           borderColor: "#e5e7eb",
-        }
-        break
+        };
+        break;
       case "paragraph":
         newElement.content = {
           text: "Paragraph text goes here. Edit this text in the content panel.",
-        }
+        };
         newElement.style = {
           fontSize: 16,
           fontWeight: "normal",
@@ -67,13 +76,13 @@ export function usePageElements() {
           backgroundColor: "transparent",
           borderWidth: 0,
           borderColor: "#e5e7eb",
-        }
-        break
+        };
+        break;
       case "variant-selector":
         newElement.content = {
           customTitle: "",
           customOptionName: "",
-        }
+        };
         newElement.style = {
           titleFontSize: 18,
           titleFontWeight: "bold",
@@ -85,13 +94,13 @@ export function usePageElements() {
           borderRadius: 8,
           borderWidth: 1,
           borderColor: "#e5e7eb",
-        }
-        break
+        };
+        break;
       case "order-form":
         newElement.content = {
           customTitle: "Your Information",
           customButtonText: "Place Order",
-        }
+        };
         newElement.style = {
           title: "Your Information",
           titleFontSize: 20,
@@ -108,8 +117,8 @@ export function usePageElements() {
           borderRadius: 8,
           borderWidth: 1,
           borderColor: "#e5e7eb",
-        }
-        break
+        };
+        break;
       case "reviews":
         newElement.content = {
           sectionTitle: "Customer Reviews",
@@ -131,7 +140,7 @@ export function usePageElements() {
               photoUrl: "/placeholder.svg?height=100&width=100",
             },
           ] as Review[],
-        }
+        };
         newElement.style = {
           titleFontSize: 24,
           titleFontWeight: "bold",
@@ -148,14 +157,14 @@ export function usePageElements() {
           reviewBorderRadius: 8,
           reviewPadding: 16,
           showPhotos: true,
-        }
-        break
+        };
+        break;
       case "contact-form":
         newElement.content = {
           sectionTitle: "Contact Us",
           subtitle: "Have questions? We're here to help!",
           buttonText: "Send Message",
-        }
+        };
         newElement.style = {
           titleFontSize: 24,
           titleFontWeight: "bold",
@@ -171,8 +180,8 @@ export function usePageElements() {
           borderColor: "#e5e7eb",
           buttonColor: "#000000",
           buttonTextColor: "#ffffff",
-        }
-        break
+        };
+        break;
       case "features":
         newElement.content = {
           sectionTitle: "Product Features",
@@ -181,23 +190,26 @@ export function usePageElements() {
             {
               id: uuidv4(),
               title: "Premium Quality",
-              description: "Made with the finest materials for durability and performance.",
+              description:
+                "Made with the finest materials for durability and performance.",
               iconName: "Shield",
             },
             {
               id: uuidv4(),
               title: "Easy to Use",
-              description: "Intuitive design makes it simple for anyone to use right away.",
+              description:
+                "Intuitive design makes it simple for anyone to use right away.",
               iconName: "ThumbsUp",
             },
             {
               id: uuidv4(),
               title: "Versatile",
-              description: "Multiple uses in various situations to meet all your needs.",
+              description:
+                "Multiple uses in various situations to meet all your needs.",
               iconName: "Layers",
             },
           ] as Feature[],
-        }
+        };
         newElement.style = {
           titleFontSize: 24,
           titleFontWeight: "bold",
@@ -219,8 +231,8 @@ export function usePageElements() {
           featureTextColor: "#6b7280",
           iconColor: "#000000",
           columns: 3,
-        }
-        break
+        };
+        break;
       case "faq":
         newElement.content = {
           sectionTitle: "Frequently Asked Questions",
@@ -245,7 +257,7 @@ export function usePageElements() {
                 "Yes, all our products come with a 1-year manufacturer's warranty that covers defects in materials and workmanship.",
             },
           ] as FAQ[],
-        }
+        };
         newElement.style = {
           titleFontSize: 24,
           titleFontWeight: "bold",
@@ -269,17 +281,18 @@ export function usePageElements() {
           itemBgColor: "#f9fafb",
           itemBorderRadius: 8,
           itemPadding: 16,
-        }
-        break
+        };
+        break;
       case "cta":
         newElement.content = {
           title: "Ready to Experience the Difference?",
-          subtitle: "Join thousands of satisfied customers who have upgraded their lifestyle.",
+          subtitle:
+            "Join thousands of satisfied customers who have upgraded their lifestyle.",
           buttonText: "Shop Now",
           buttonLink: "#",
           secondaryButtonText: "Learn More",
           secondaryButtonLink: "#",
-        }
+        };
         newElement.style = {
           titleFontSize: 28,
           titleFontWeight: "bold",
@@ -301,8 +314,8 @@ export function usePageElements() {
           secondaryButtonColor: "transparent",
           secondaryButtonTextColor: "#ffffff",
           secondaryButtonBorderColor: "#ffffff",
-        }
-        break
+        };
+        break;
       case "specifications":
         newElement.content = {
           sectionTitle: "Product Specifications",
@@ -334,7 +347,7 @@ export function usePageElements() {
               value: "1 Year Limited",
             },
           ] as Specification[],
-        }
+        };
         newElement.style = {
           titleFontSize: 24,
           titleFontWeight: "bold",
@@ -356,8 +369,8 @@ export function usePageElements() {
           nameColor: "#000000",
           valueFontSize: 14,
           valueColor: "#6b7280",
-        }
-        break
+        };
+        break;
       case "related-products":
         newElement.content = {
           sectionTitle: "You May Also Like",
@@ -389,7 +402,7 @@ export function usePageElements() {
               link: "#",
             },
           ],
-        }
+        };
         newElement.style = {
           titleFontSize: 24,
           titleFontWeight: "bold",
@@ -415,16 +428,17 @@ export function usePageElements() {
           buttonColor: "#000000",
           buttonTextColor: "#ffffff",
           columns: 3,
-        }
-        break
+        };
+        break;
       case "newsletter":
         newElement.content = {
           sectionTitle: "Stay Updated",
-          subtitle: "Subscribe to our newsletter for exclusive offers and updates",
+          subtitle:
+            "Subscribe to our newsletter for exclusive offers and updates",
           buttonText: "Subscribe",
           placeholderText: "Enter your email",
           successMessage: "Thank you for subscribing!",
-        }
+        };
         newElement.style = {
           titleFontSize: 24,
           titleFontWeight: "bold",
@@ -445,8 +459,8 @@ export function usePageElements() {
           buttonColor: "#000000",
           buttonTextColor: "#ffffff",
           maxWidth: 500,
-        }
-        break
+        };
+        break;
       case "hero":
         newElement.content = {
           title: "Premium Leather Products",
@@ -457,7 +471,7 @@ export function usePageElements() {
           secondaryButtonLink: "#",
           backgroundImage: "/placeholder.svg?height=600&width=1200",
           overlayOpacity: 0.3,
-        }
+        };
         newElement.style = {
           titleFontSize: 48,
           titleFontWeight: "bold",
@@ -481,52 +495,64 @@ export function usePageElements() {
           secondaryButtonTextColor: "#ffffff",
           secondaryButtonBorderColor: "#ffffff",
           contentWidth: 800,
-        }
-        break
+        };
+        break;
     }
 
     // If there's a selected element, add the new element after it
     if (selectedElementId) {
-      const selectedIndex = elements.findIndex((el) => el.id === selectedElementId)
+      const selectedIndex = elements.findIndex(
+        (el) => el.id === selectedElementId,
+      );
       if (selectedIndex !== -1) {
-        const newElements = [...elements]
-        newElements.splice(selectedIndex + 1, 0, newElement)
-        setElements(newElements)
-        return
+        const newElements = [...elements];
+        newElements.splice(selectedIndex + 1, 0, newElement);
+        setElements(newElements);
+        return;
       }
     }
 
     // Otherwise add to the end
-    setElements((prev) => [...prev, newElement])
-  }
+    setElements((prev) => [...prev, newElement]);
+  };
 
   const updateElement = (id: string, updates: Partial<PageElement>) => {
-    setElements((prev) => prev.map((element) => (element.id === id ? { ...element, ...updates } : element)))
-  }
+    setElements((prev) =>
+      prev.map((element) =>
+        element.id === id ? { ...element, ...updates } : element,
+      ),
+    );
+  };
 
   const removeElement = (id: string) => {
-    setElements((prev) => prev.filter((element) => element.id !== id))
+    setElements((prev) => prev.filter((element) => element.id !== id));
     if (selectedElementId === id) {
-      setSelectedElementId(null)
+      setSelectedElementId(null);
     }
-  }
+  };
 
   const moveElement = (id: string, direction: "up" | "down") => {
-    const index = elements.findIndex((element) => element.id === id)
-    if (index === -1) return
+    const index = elements.findIndex((element) => element.id === id);
+    if (index === -1) return;
 
-    const newElements = [...elements]
+    const newElements = [...elements];
 
     if (direction === "up" && index > 0) {
       // Swap with the element above
-      ;[newElements[index], newElements[index - 1]] = [newElements[index - 1], newElements[index]]
+      [newElements[index], newElements[index - 1]] = [
+        newElements[index - 1],
+        newElements[index],
+      ];
     } else if (direction === "down" && index < elements.length - 1) {
       // Swap with the element below
-      ;[newElements[index], newElements[index + 1]] = [newElements[index + 1], newElements[index]]
+      [newElements[index], newElements[index + 1]] = [
+        newElements[index + 1],
+        newElements[index],
+      ];
     }
 
-    setElements(newElements)
-  }
+    setElements(newElements);
+  };
 
   return {
     elements,
@@ -536,5 +562,5 @@ export function usePageElements() {
     updateElement,
     removeElement,
     moveElement,
-  }
+  };
 }

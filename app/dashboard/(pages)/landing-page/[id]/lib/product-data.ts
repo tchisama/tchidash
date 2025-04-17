@@ -81,4 +81,4 @@ export const productData = {
     '<div class="product-description">\n <h2>Pocket – Premium Leather Carry Case</h2>\n <p>The <strong>Pocket</strong> is a sleek and durable carry case crafted from high-quality <strong>jeld (جلد)</strong>, offering a perfect blend of elegance and protection. Designed for those who appreciate minimalism and functionality, it keeps your essentials safe while maintaining a stylish look.</p>\n\n<br></br>\n \n <h3>Key Features:</h3>\n <ul>\n <li><strong>Premium Leather (Jeld)</strong> – Made from high-quality, durable leather for a timeless aesthetic.</li>\n <li><strong>Compact & Lightweight</strong> – Perfectly sized for easy carrying without bulk.</li>\n <li><strong>Soft Interior Lining</strong> – Protects your items from scratches and dust.</li>\n <li><strong>Secure Closure</strong> – Ensures your essentials stay in place at all times.</li>\n <li><strong>Versatile Use</strong> – Ideal for storing small gadgets, cards, cash, or accessories.</li>\n </ul>\n</div>\n',
   hasDiscount: true,
   updatedAt: { _seconds: 1739538338, _nanoseconds: 682000000 },
-}
+};

@@ -3,7 +3,7 @@
 import { useDrop } from "react-dnd";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { PageElement } from "../types/elements";
-import { CanvasElement } from "../components/canvas-element";
+import { CanvasElement } from "./canvas-element";
 
 interface CanvasProps {
   elements: PageElement[];

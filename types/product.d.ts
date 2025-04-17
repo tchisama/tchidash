@@ -28,11 +28,18 @@ export interface Variant {
   status?: "draft" | "active" | "archived";
 }
 
+export enum OptionType {
+  TEXT = "text",
+  COLOR = "color",
+  IMAGE = "image",
+  NUMBER = "number",
+}
 // Type for product option (general options like size, color)
 export interface Option {
   name: string; // e.g., "Size"
-  values: string[]; // e.g., ["Small", "Medium", "Large"]
+  values: string[]; // e.g., ["Small", "Medium", "Large"] or ["#fff","#000","#000000"]
   id: string;
+  optionType: OptionType;
 }
 
 // Type for discount

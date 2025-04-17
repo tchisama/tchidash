@@ -1,13 +1,19 @@
 "use client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
+import { useState } from "react";
+import { PlusCircle, Trash2, Edit, Save, X, Plus } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -16,202 +22,388 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MoreVertical } from "lucide-react";
-import { Label } from "@/components/ui/label";
 import { useProducts } from "@/store/products";
-import { Input } from "@/components/ui/input";
-import { Product } from "@/types/product";
-import { useState } from "react";
-import { Checkbox } from "@/components/ui/checkbox";
+import type { Product } from "@/types/product";
+
+export enum OptionType {
+  TEXT = "text",
+  COLOR = "color",
+  IMAGE = "image",
+  NUMBER = "number",
+}
+
+// Type for product option (general options like size, color)
+export interface Option {
+  name: string; // e.g., "Size"
+  values: string[]; // e.g., ["Small", "Medium", "Large"] or ["#fff","#000","#000000"]
+  id: string;
+  optionType: OptionType;
+}
 
 const ProductOptionsCard = () => {
   const { currentProduct, setCurrentProduct } = useProducts();
+
+  const addNewOption = () => {
+    setCurrentProduct({
+      ...currentProduct,
+      options: [
+        ...(currentProduct?.options ?? []),
+        {
+          id: `option-${Date.now()}`,
+          name: "",
+          values: [],
+          optionType: OptionType.TEXT,
+        },
+      ],
+    } as Product);
+  };
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Options</CardTitle>
+    <Card className="shadow-sm">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-xl font-semibold">Product Options</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="grid gap-3">
-          <div className="flex gap-2">
-            <Checkbox
-              checked={currentProduct?.variantsAreOneProduct}
-              onCheckedChange={(value) =>
-                setCurrentProduct({
-                  ...currentProduct,
-                  variantsAreOneProduct: value,
-                } as Product)
-              }
-              id="variantarejustoneproduct"
-            />
-            <Label htmlFor="variantarejustoneproduct">
-              Asign stock and price to the product only
-            </Label>
-          </div>
-          {currentProduct?.variantsAreOneProduct && (
-            <p className="mb-2 text-slate-500 text-sm">
-              {" "}
-              by checking this option, the stock now is signed to the product
-              and not to the variant as well as the price
-            </p>
-          )}
+      <CardContent className="space-y-4">
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="variantsAreOneProduct"
+            checked={currentProduct?.variantsAreOneProduct}
+            onCheckedChange={(value) =>
+              setCurrentProduct({
+                ...currentProduct,
+                variantsAreOneProduct: value,
+              } as Product)
+            }
+          />
+          <Label htmlFor="variantsAreOneProduct" className="font-medium">
+            Assign stock and price to the product only
+          </Label>
+        </div>
 
-          <div className="flex items-center justify-between">
-            <Label htmlFor="options">Options List</Label>
-            <Button
-              variant="outline"
-              size={"sm"}
-              onClick={() =>
-                setCurrentProduct({
-                  ...currentProduct,
-                  options: [
-                    ...(currentProduct?.options ?? []),
-                    { name: "", values: [] },
-                  ],
-                } as Product)
-              }
-            >
-              Add Option
-            </Button>
-          </div>
+        {currentProduct?.variantsAreOneProduct && (
+          <p className="text-sm text-muted-foreground">
+            Stock and price will be assigned to the product as a whole, not to
+            individual variants.
+          </p>
+        )}
 
-          {currentProduct?.options && currentProduct?.options?.length > 0 && (
+        <div className="flex items-center justify-between pt-2">
+          <h3 className="text-base font-medium">Options</h3>
+          <Button
+            onClick={addNewOption}
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-1"
+          >
+            <PlusCircle className="h-4 w-4" />
+            Add Option
+          </Button>
+        </div>
+
+        {currentProduct?.options && currentProduct.options.length > 0 ? (
+          <div className="rounded-md border">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Options</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="w-[180px]">Name</TableHead>
+                  <TableHead className="w-[120px]">Type</TableHead>
+                  <TableHead>Values</TableHead>
+                  <TableHead className="w-[100px] text-right">
+                    Actions
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {currentProduct &&
-                  (currentProduct?.options ?? []).map((option, index) => (
-                    <OptionRow option={option} index={index} key={index} />
-                  ))}
+                {currentProduct.options.map((option, index) => (
+                  <OptionRow
+                    key={option.id || index}
+                    option={option}
+                    index={index}
+                  />
+                ))}
               </TableBody>
             </Table>
-          )}
-        </div>
+          </div>
+        ) : (
+          <div className="flex h-24 items-center justify-center rounded-md border border-dashed">
+            <p className="text-sm text-muted-foreground">
+              No options added. Add an option to create product variants.
+            </p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
 };
 
-const OptionRow = ({
-  option,
-  index,
-}: {
-  option: { id: string; name: string; values: string[] };
-  index: number;
-}) => {
+const OptionRow = ({ option, index }: { option: Option; index: number }) => {
   const [editing, setEditing] = useState(false);
+  const [newValue, setNewValue] = useState("");
   const { currentProduct, setCurrentProduct } = useProducts();
+
+  const handleSave = () => {
+    setEditing(false);
+    setNewValue("");
+  };
+
+  const handleCancel = () => {
+    setEditing(false);
+    setNewValue("");
+  };
+
+  const updateOption = (field: keyof Option, value: any) => {
+    if (!currentProduct) return;
+
+    const newOptions = [...(currentProduct.options || [])];
+    newOptions[index] = {
+      ...newOptions[index],
+      [field]: value,
+    };
+
+    setCurrentProduct({
+      ...currentProduct,
+      options: newOptions,
+    } as Product);
+  };
+
+  const addValue = () => {
+    if (!newValue.trim() || !currentProduct) return;
+
+    const newOptions = [...(currentProduct.options || [])];
+    const currentValues = [...(newOptions[index].values || [])];
+
+    // Don't add duplicates
+    if (!currentValues.includes(newValue.trim())) {
+      newOptions[index] = {
+        ...newOptions[index],
+        values: [...currentValues, newValue.trim()],
+      };
+
+      setCurrentProduct({
+        ...currentProduct,
+        options: newOptions,
+      } as Product);
+    }
+
+    setNewValue("");
+  };
+
+  const removeValue = (valueIndex: number) => {
+    if (!currentProduct) return;
+
+    const newOptions = [...(currentProduct.options || [])];
+    const currentValues = [...(newOptions[index].values || [])];
+    currentValues.splice(valueIndex, 1);
+
+    newOptions[index] = {
+      ...newOptions[index],
+      values: currentValues,
+    };
+
+    setCurrentProduct({
+      ...currentProduct,
+      options: newOptions,
+    } as Product);
+  };
+
+  const deleteOption = () => {
+    if (!currentProduct) return;
+
+    const newOptions = [...(currentProduct.options || [])];
+    newOptions.splice(index, 1);
+
+    setCurrentProduct({
+      ...currentProduct,
+      options: newOptions,
+    } as Product);
+  };
+
+  const getInputType = () => {
+    switch (option.optionType) {
+      case OptionType.COLOR:
+        return "color";
+      case OptionType.NUMBER:
+        return "number";
+      default:
+        return "text";
+    }
+  };
+
+  const renderOptionValues = () => {
+    if (!option.values || option.values.length === 0) {
+      return <span className="text-sm text-muted-foreground">No values</span>;
+    }
+
+    return (
+      <div className="flex flex-wrap gap-1.5">
+        {option.values.map((value, i) => {
+          if (option.optionType === OptionType.COLOR) {
+            return (
+              <div key={i} className="flex items-center gap-1">
+                <div
+                  className="h-4 w-4 rounded-full border"
+                  style={{ backgroundColor: value }}
+                />
+                <Badge variant="outline" className="text-xs">
+                  {value}
+                </Badge>
+              </div>
+            );
+          } else {
+            return (
+              <Badge key={i} variant="outline">
+                {value}
+              </Badge>
+            );
+          }
+        })}
+      </div>
+    );
+  };
+
   return (
     currentProduct && (
       <TableRow>
-        <TableCell className="space-x-2">
+        <TableCell>
           {editing ? (
             <Input
               value={option.name}
-              className="w-full max-w-[150px]"
-              onChange={(e) => {
-                const newOptions = [
-                  ...(currentProduct.options as {
-                    name: string;
-                    values: string[];
-                  }[]),
-                ];
-                newOptions[index].name = e.target.value;
-                setCurrentProduct({
-                  ...currentProduct,
-                  options: newOptions,
-                } as Product);
-              }}
-            />
-          ) : (
-            <span>{option.name}</span>
-          )}
-        </TableCell>
-        <TableCell className="min-w-[70%]">
-          {editing ? (
-            <Input
-              value={option.values.join(",")}
+              placeholder="Option name"
+              onChange={(e) => updateOption("name", e.target.value)}
               className="w-full"
-              onChange={(e) => {
-                const newOptions = [
-                  ...(currentProduct.options as {
-                    name: string;
-                    values: string[];
-                  }[]),
-                ];
-                // Allow spaces while typing, only trim when leaving the input (onBlur)
-                newOptions[index].values = e.target.value.split(",");
-                setCurrentProduct({
-                  ...currentProduct,
-                  options: newOptions,
-                } as Product);
-              }}
             />
           ) : (
-            option.values.map((value, index) => (
-              <Badge key={index} variant="outline">
-                {value}
-              </Badge>
-            ))
+            <span className="font-medium">
+              {option.name || "Unnamed option"}
+            </span>
           )}
         </TableCell>
-        <TableCell className="flex gap-2 justify-end">
+        <TableCell>
           {editing ? (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setEditing(false);
-              }}
+            <Select
+              value={option.optionType}
+              onValueChange={(value) => updateOption("optionType", value)}
             >
-              Save
-            </Button>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={OptionType.TEXT}>Text</SelectItem>
+                <SelectItem value={OptionType.COLOR}>Color</SelectItem>
+                <SelectItem value={OptionType.IMAGE}>Image</SelectItem>
+                <SelectItem value={OptionType.NUMBER}>Number</SelectItem>
+              </SelectContent>
+            </Select>
           ) : (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setEditing(true);
-              }}
-            >
-              Edit
-            </Button>
+            <Badge variant="secondary" className="capitalize">
+              {option.optionType || "text"}
+            </Badge>
           )}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon">
-                <MoreVertical className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() => {
-                  const newOptions = [
-                    ...(currentProduct.options as {
-                      name: string;
-                      values: string[];
-                    }[]),
-                  ];
-                  newOptions.splice(index, 1);
-                  setCurrentProduct({
-                    ...currentProduct,
-                    options: newOptions,
-                  } as Product);
-                }}
-              >
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        </TableCell>
+        <TableCell>
+          {editing ? (
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <Input
+                  type={getInputType()}
+                  value={newValue}
+                  placeholder={`Add ${option.optionType} value`}
+                  onChange={(e) => setNewValue(e.target.value)}
+                  className="w-full"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      addValue();
+                    }
+                  }}
+                />
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={addValue}
+                  className="shrink-0"
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+
+              {option.values && option.values.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {option.values.map((value, i) => (
+                    <Badge
+                      key={i}
+                      variant="secondary"
+                      className="flex items-center gap-1"
+                    >
+                      {option.optionType === OptionType.COLOR && (
+                        <div
+                          className="h-3 w-3 rounded-full"
+                          style={{ backgroundColor: value }}
+                        />
+                      )}
+                      {value}
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-3 w-3 rounded-full p-0 text-muted-foreground hover:text-foreground"
+                        onClick={() => removeValue(i)}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </Badge>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            renderOptionValues()
+          )}
+        </TableCell>
+        <TableCell className="text-right">
+          <div className="flex justify-end gap-1">
+            {editing ? (
+              <>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleSave}
+                  title="Save"
+                >
+                  <Save className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleCancel}
+                  title="Cancel"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setEditing(true)}
+                  title="Edit"
+                >
+                  <Edit className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={deleteOption}
+                  title="Delete"
+                  className="text-destructive hover:text-destructive/90"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </>
+            )}
+          </div>
         </TableCell>
       </TableRow>
     )
