@@ -1,38 +1,44 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { Star, X } from "lucide-react"
-import type { Review } from "@/types/elements"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Star, X } from "lucide-react";
+import type { Review } from "../../types/elements";
 
 interface ReviewFormProps {
-  initialData?: Review
-  onSubmit: (review: Omit<Review, "id">) => void
-  onCancel: () => void
+  initialData?: Review;
+  onSubmit: (review: Omit<Review, "id">) => void;
+  onCancel: () => void;
 }
 
-export function ReviewForm({ initialData, onSubmit, onCancel }: ReviewFormProps) {
-  const [name, setName] = useState(initialData?.name || "")
-  const [rating, setRating] = useState(initialData?.rating || 5)
-  const [text, setText] = useState(initialData?.text || "")
-  const [date, setDate] = useState(initialData?.date || new Date().toISOString().split("T")[0])
-  const [photoUrl, setPhotoUrl] = useState(initialData?.photoUrl || "")
+export function ReviewForm({
+  initialData,
+  onSubmit,
+  onCancel,
+}: ReviewFormProps) {
+  const [name, setName] = useState(initialData?.name || "");
+  const [rating, setRating] = useState(initialData?.rating || 5);
+  const [text, setText] = useState(initialData?.text || "");
+  const [date, setDate] = useState(
+    initialData?.date || new Date().toISOString().split("T")[0],
+  );
+  const [photoUrl, setPhotoUrl] = useState(initialData?.photoUrl || "");
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     onSubmit({
       name,
       rating,
       text,
       date,
       photoUrl,
-    })
-  }
+    });
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -59,7 +65,9 @@ export function ReviewForm({ initialData, onSubmit, onCancel }: ReviewFormProps)
               className={`p-1 ${star <= rating ? "text-yellow-500" : "text-gray-300"}`}
               onClick={() => setRating(star)}
             >
-              <Star className={`h-5 w-5 ${star <= rating ? "fill-yellow-500" : ""}`} />
+              <Star
+                className={`h-5 w-5 ${star <= rating ? "fill-yellow-500" : ""}`}
+              />
             </Button>
           ))}
         </div>
@@ -79,7 +87,13 @@ export function ReviewForm({ initialData, onSubmit, onCancel }: ReviewFormProps)
 
       <div className="space-y-2">
         <Label htmlFor="review-date">Date</Label>
-        <Input id="review-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
+        <Input
+          id="review-date"
+          type="date"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+          required
+        />
       </div>
 
       <div className="space-y-2">
@@ -94,7 +108,13 @@ export function ReviewForm({ initialData, onSubmit, onCancel }: ReviewFormProps)
             className="flex-1"
           />
           {photoUrl && (
-            <Button type="button" variant="ghost" size="icon" className="flex-shrink-0" onClick={() => setPhotoUrl("")}>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="flex-shrink-0"
+              onClick={() => setPhotoUrl("")}
+            >
               <X className="h-4 w-4" />
               <span className="sr-only">Clear photo</span>
             </Button>
@@ -108,7 +128,7 @@ export function ReviewForm({ initialData, onSubmit, onCancel }: ReviewFormProps)
               alt="Product photo preview"
               className="object-cover h-full w-full"
               onError={(e) => {
-                e.currentTarget.src = "/placeholder.svg?height=128&width=128"
+                e.currentTarget.src = "/placeholder.svg?height=128&width=128";
               }}
             />
           </div>
@@ -119,8 +139,10 @@ export function ReviewForm({ initialData, onSubmit, onCancel }: ReviewFormProps)
         <Button type="button" variant="outline" onClick={onCancel}>
           Cancel
         </Button>
-        <Button type="submit">{initialData ? "Update Review" : "Add Review"}</Button>
+        <Button type="submit">
+          {initialData ? "Update Review" : "Add Review"}
+        </Button>
       </div>
     </form>
-  )
+  );
 }

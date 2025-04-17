@@ -1,19 +1,25 @@
-"use client"
+"use client";
 
-import { useDrop } from "react-dnd"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import type { PageElement } from "@/types/elements"
-import { CanvasElement } from "@/components/canvas-element"
+import { useDrop } from "react-dnd";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import type { PageElement } from "../types/elements";
+import { CanvasElement } from "../components/canvas-element";
 
 interface CanvasProps {
-  elements: PageElement[]
-  selectedElementId: string | null
-  onSelectElement: (id: string | null) => void
-  onMoveElement: (id: string, direction: "up" | "down") => void
-  onRemoveElement: (id: string) => void
+  elements: PageElement[];
+  selectedElementId: string | null;
+  onSelectElement: (id: string | null) => void;
+  onMoveElement: (id: string, direction: "up" | "down") => void;
+  onRemoveElement: (id: string) => void;
 }
 
-export function Canvas({ elements, selectedElementId, onSelectElement, onMoveElement, onRemoveElement }: CanvasProps) {
+export function Canvas({
+  elements,
+  selectedElementId,
+  onSelectElement,
+  onMoveElement,
+  onRemoveElement,
+}: CanvasProps) {
   const [, drop] = useDrop(() => ({
     accept: "element",
     drop: () => ({ name: "Canvas" }),
@@ -21,13 +27,15 @@ export function Canvas({ elements, selectedElementId, onSelectElement, onMoveEle
       isOver: monitor.isOver(),
       canDrop: monitor.canDrop(),
     }),
-  }))
+  }));
 
   return (
     <div className="bg-gray-100 h-full flex flex-col overflow-hidden">
       <div className="p-4 border-b bg-white">
         <h2 className="font-semibold">Canvas</h2>
-        <p className="text-sm text-muted-foreground">Click on an element to edit its properties</p>
+        <p className="text-sm text-muted-foreground">
+          Click on an element to edit its properties
+        </p>
       </div>
       <ScrollArea className="flex-1">
         <div className="p-6">
@@ -38,7 +46,10 @@ export function Canvas({ elements, selectedElementId, onSelectElement, onMoveEle
           >
             {elements.length === 0 ? (
               <div className="h-full flex items-center justify-center text-muted-foreground border-2 border-dashed rounded-lg p-12">
-                <p>Add elements from the sidebar to start building your landing page</p>
+                <p>
+                  Add elements from the sidebar to start building your landing
+                  page
+                </p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -60,5 +71,5 @@ export function Canvas({ elements, selectedElementId, onSelectElement, onMoveEle
         </div>
       </ScrollArea>
     </div>
-  )
+  );
 }

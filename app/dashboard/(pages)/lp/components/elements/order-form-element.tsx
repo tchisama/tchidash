@@ -1,40 +1,55 @@
-"use client"
+"use client";
 
-import type React from "react"
-
-import { useState } from "react"
-import type { PageElement } from "@/types/elements"
-import { useProduct } from "@/context/product-context"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Button } from "@/components/ui/button"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertCircle } from "lucide-react"
+import type React from "react";
+import { useState } from "react";
+import type { PageElement } from "../../types/elements";
+import { useProduct } from "../../context/product-context";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
+import { createOrder } from "@/lib/orders/createOrder";
+import { useStore } from "@/store/storeInfos";
 
 interface OrderFormElementProps {
-  element: PageElement
+  element: PageElement;
 }
 
 export function OrderFormElement({ element }: OrderFormElementProps) {
-  const { style, content } = element
-  const { selectedProduct, selectedVariant, quantity, getTotalPrice, getFullProductTitle } = useProduct()
+  const { style, content } = element;
+  const {
+    selectedProduct,
+    selectedVariant,
+    quantity,
+    getTotalPrice,
+    getFullProductTitle,
+  } = useProduct();
 
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
+    firstName: "",
+    lastName: "",
+    number: "",
     address: "",
-    notes: "",
-  })
+    city: "",
+    note: "",
+  });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const { storeId } = useStore();
 
   const containerStyle = {
     padding: `${style.padding || 16}px`,
     margin: `${style.margin || 0}px`,
     borderRadius: `${style.borderRadius || 8}px`,
-    border: style.borderWidth ? `${style.borderWidth}px solid ${style.borderColor || "#e5e7eb"}` : "1px solid #e5e7eb",
+    border: style.borderWidth
+      ? `${style.borderWidth}px solid ${style.borderColor || "#e5e7eb"}`
+      : "1px solid #e5e7eb",
     backgroundColor: style.backgroundColor || "#ffffff",
-  }
+  };
 
   const titleStyle = {
     color: style.titleColor || "#000",
@@ -42,44 +57,92 @@ export function OrderFormElement({ element }: OrderFormElementProps) {
     fontWeight: style.titleFontWeight || "bold",
     marginBottom: `${style.titleMarginBottom || 16}px`,
     textAlign: style.titleAlign || "left",
-  } as React.CSSProperties
+  } as React.CSSProperties;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-    // In a real app, you would submit the order here with the product info
-    const orderDetails = {
-      product: selectedProduct?.title,
-      variant: selectedVariant?.title,
-      quantity,
-      totalPrice: getTotalPrice(),
-      customerInfo: formData,
+    if (!selectedProduct) {
+      setError("Please select a product");
+      return;
     }
 
-    console.log("Order submitted:", orderDetails)
-    alert(`Order for ${quantity} x ${getFullProductTitle()} submitted successfully!`)
-  }
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      const orderDetails = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        number: formData.number,
+        address: formData.address,
+        city: formData.city,
+        note: formData.note,
+        cartItems: [
+          {
+            productId: selectedProduct.id,
+            variantId: selectedVariant?.id || "",
+            name: selectedProduct.title,
+            variantInfo: selectedVariant?.title,
+            price: selectedVariant?.price || selectedProduct.price,
+            quantity: quantity,
+            image: selectedProduct.images?.[0] || "",
+          },
+        ],
+        cartTotal: getTotalPrice(),
+      };
+
+      // Call the createOrder function with the order details
+      const response = await createOrder(orderDetails, storeId);
+      console.log("Order created successfully:", response);
+      setSuccess(true);
+    } catch (err) {
+      console.error("Error creating order:", err);
+      setError("Failed to submit order. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   if (!selectedProduct) {
     return (
       <div style={containerStyle}>
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>Please select a product to enable the order form</AlertDescription>
+          <AlertDescription>
+            Please select a product to enable the order form
+          </AlertDescription>
         </Alert>
       </div>
-    )
+    );
+  }
+
+  if (success) {
+    return (
+      <div style={containerStyle}>
+        <Alert>
+          <AlertDescription className="text-green-600">
+            Order submitted successfully! Thank you for your purchase.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
   }
 
   // Use custom title if provided
-  const formTitle = content.customTitle || style.title || "Your Information"
+  const formTitle = content.customTitle || style.title || "Your Information";
   // Use custom button text if provided
-  const buttonText = content.customButtonText || style.buttonText || `Order Now • ${getTotalPrice().toFixed(2)}`
+  const buttonText =
+    content.customButtonText ||
+    style.buttonText ||
+    `Order Now • ${getTotalPrice().toFixed(2)}`;
 
   return (
     <div style={containerStyle}>
@@ -91,51 +154,64 @@ export function OrderFormElement({ element }: OrderFormElementProps) {
             <h3 className="font-medium mb-2">Order Summary</h3>
             <div className="space-y-1">
               <p className="text-sm">
-                <span className="font-medium">Product:</span> {getFullProductTitle()}
+                <span className="font-medium">Product:</span>{" "}
+                {getFullProductTitle()}
               </p>
               <p className="text-sm">
                 <span className="font-medium">Quantity:</span> {quantity}
               </p>
               <p className="text-sm">
                 <span className="font-medium">Unit Price:</span> $
-                {selectedVariant?.price.toFixed(2) || selectedProduct.price.toFixed(2)}
+                {selectedVariant?.price.toFixed(2) ||
+                  selectedProduct.price.toFixed(2)}
               </p>
-              <p className="font-medium text-base mt-2">Total: ${getTotalPrice().toFixed(2)}</p>
+              <p className="font-medium text-base mt-2">
+                Total: ${getTotalPrice().toFixed(2)}
+              </p>
             </div>
           </div>
         )}
 
-        <div className="space-y-2">
-          <Label htmlFor="name">Full Name</Label>
-          <Input
-            id="name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            placeholder="Enter your full name"
-            required
-          />
+        {error && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="firstName">First Name</Label>
+            <Input
+              id="firstName"
+              name="firstName"
+              value={formData.firstName}
+              onChange={handleChange}
+              placeholder="Enter your first name"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="lastName">Last Name</Label>
+            <Input
+              id="lastName"
+              name="lastName"
+              value={formData.lastName}
+              onChange={handleChange}
+              placeholder="Enter your last name"
+              required
+            />
+          </div>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="number">Phone Number</Label>
           <Input
-            id="email"
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="Enter your email address"
-            required
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="phone">Phone Number</Label>
-          <Input
-            id="phone"
-            name="phone"
-            value={formData.phone}
+            id="number"
+            name="number"
+            type="tel"
+            value={formData.number}
             onChange={handleChange}
             placeholder="Enter your phone number"
             required
@@ -144,22 +220,34 @@ export function OrderFormElement({ element }: OrderFormElementProps) {
 
         <div className="space-y-2">
           <Label htmlFor="address">Shipping Address</Label>
-          <Textarea
+          <Input
             id="address"
             name="address"
             value={formData.address}
             onChange={handleChange}
-            placeholder="Enter your shipping address"
+            placeholder="Enter your street address"
             required
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="notes">Order Notes (Optional)</Label>
+          <Label htmlFor="city">City</Label>
+          <Input
+            id="city"
+            name="city"
+            value={formData.city}
+            onChange={handleChange}
+            placeholder="Enter your city"
+            required
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="note">Order Notes (Optional)</Label>
           <Textarea
-            id="notes"
-            name="notes"
-            value={formData.notes}
+            id="note"
+            name="note"
+            value={formData.note}
             onChange={handleChange}
             placeholder="Any special instructions for your order"
           />
@@ -168,14 +256,15 @@ export function OrderFormElement({ element }: OrderFormElementProps) {
         <Button
           type="submit"
           className="w-full"
+          disabled={isSubmitting}
           style={{
             backgroundColor: style.buttonColor || undefined,
             color: style.buttonTextColor || undefined,
           }}
         >
-          {buttonText}
+          {isSubmitting ? "Processing..." : buttonText}
         </Button>
       </form>
     </div>
-  )
+  );
 }

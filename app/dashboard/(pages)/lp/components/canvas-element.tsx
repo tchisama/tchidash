@@ -1,32 +1,32 @@
-"use client"
+"use client";
 
-import type { MouseEvent } from "react"
-import { ArrowUp, ArrowDown, Trash2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import type { PageElement } from "@/types/elements"
-import { ImageElement } from "@/components/elements/image-element"
-import { HeaderElement } from "@/components/elements/header-element"
-import { ParagraphElement } from "@/components/elements/paragraph-element"
-import { VariantSelectorElement } from "@/components/elements/variant-selector-element"
-import { OrderFormElement } from "@/components/elements/order-form-element"
-import { ReviewsElement } from "@/components/elements/reviews-element"
-import { ContactFormElement } from "@/components/elements/contact-form-element"
-import { FeaturesElement } from "@/components/elements/features-element"
-import { FAQElement } from "@/components/elements/faq-element"
-import { CTAElement } from "@/components/elements/cta-element"
-import { SpecificationsElement } from "@/components/elements/specifications-element"
-import { RelatedProductsElement } from "@/components/elements/related-products-element"
-import { NewsletterElement } from "@/components/elements/newsletter-element"
-import { HeroElement } from "@/components/elements/hero-element"
+import type { MouseEvent } from "react";
+import { ArrowUp, ArrowDown, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import type { PageElement } from "../types/elements";
+import { ImageElement } from "../components/elements/image-element";
+import { HeaderElement } from "../components/elements/header-element";
+import { ParagraphElement } from "../components/elements/paragraph-element";
+import { VariantSelectorElement } from "../components/elements/variant-selector-element";
+import { OrderFormElement } from "../components/elements/order-form-element";
+import { ReviewsElement } from "../components/elements/reviews-element";
+import { ContactFormElement } from "../components/elements/contact-form-element";
+import { FeaturesElement } from "../components/elements/features-element";
+import { FAQElement } from "../components/elements/faq-element";
+import { CTAElement } from "../components/elements/cta-element";
+import { SpecificationsElement } from "../components/elements/specifications-element";
+import { RelatedProductsElement } from "../components/elements/related-products-element";
+import { NewsletterElement } from "../components/elements/newsletter-element";
+import { HeroElement } from "../components/elements/hero-element";
 
 interface CanvasElementProps {
-  element: PageElement
-  isSelected: boolean
-  onSelect: () => void
-  onMove: (direction: "up" | "down") => void
-  onRemove: () => void
-  isFirst: boolean
-  isLast: boolean
+  element: PageElement;
+  isSelected: boolean;
+  onSelect: () => void;
+  onMove: (direction: "up" | "down") => void;
+  onRemove: () => void;
+  isFirst: boolean;
+  isLast: boolean;
 }
 
 export function CanvasElement({
@@ -39,47 +39,50 @@ export function CanvasElement({
   isLast,
 }: CanvasElementProps) {
   const handleClick = (e: MouseEvent) => {
-    e.stopPropagation()
-    onSelect()
-  }
+    e.stopPropagation();
+    onSelect();
+  };
 
   const renderElement = () => {
     switch (element.type) {
       case "image":
-        return <ImageElement element={element} />
+        return <ImageElement element={element} />;
       case "header":
-        return <HeaderElement element={element} />
+        return <HeaderElement element={element} />;
       case "paragraph":
-        return <ParagraphElement element={element} />
+        return <ParagraphElement element={element} />;
       case "variant-selector":
-        return <VariantSelectorElement element={element} />
+        return <VariantSelectorElement element={element} />;
       case "order-form":
-        return <OrderFormElement element={element} />
+        return <OrderFormElement element={element} />;
       case "reviews":
-        return <ReviewsElement element={element} />
+        return <ReviewsElement element={element} />;
       case "contact-form":
-        return <ContactFormElement element={element} />
+        return <ContactFormElement element={element} />;
       case "features":
-        return <FeaturesElement element={element} />
+        return <FeaturesElement element={element} />;
       case "faq":
-        return <FAQElement element={element} />
+        return <FAQElement element={element} />;
       case "cta":
-        return <CTAElement element={element} />
+        return <CTAElement element={element} />;
       case "specifications":
-        return <SpecificationsElement element={element} />
+        return <SpecificationsElement element={element} />;
       case "related-products":
-        return <RelatedProductsElement element={element} />
+        return <RelatedProductsElement element={element} />;
       case "newsletter":
-        return <NewsletterElement element={element} />
+        return <NewsletterElement element={element} />;
       case "hero":
-        return <HeroElement element={element} />
+        return <HeroElement element={element} />;
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   return (
-    <div className={`relative group ${isSelected ? "ring-2 ring-primary" : ""}`} onClick={handleClick}>
+    <div
+      className={`relative group ${isSelected ? "ring-2 ring-primary" : ""}`}
+      onClick={handleClick}
+    >
       {isSelected && (
         <div className="absolute -top-3 -right-3 flex space-x-1 bg-white shadow-sm rounded-md border p-1 z-10">
           <Button
@@ -87,8 +90,8 @@ export function CanvasElement({
             size="icon"
             className="h-6 w-6"
             onClick={(e) => {
-              e.stopPropagation()
-              onMove("up")
+              e.stopPropagation();
+              onMove("up");
             }}
             disabled={isFirst}
           >
@@ -100,8 +103,8 @@ export function CanvasElement({
             size="icon"
             className="h-6 w-6"
             onClick={(e) => {
-              e.stopPropagation()
-              onMove("down")
+              e.stopPropagation();
+              onMove("down");
             }}
             disabled={isLast}
           >
@@ -113,8 +116,8 @@ export function CanvasElement({
             size="icon"
             className="h-6 w-6 text-destructive hover:text-destructive"
             onClick={(e) => {
-              e.stopPropagation()
-              onRemove()
+              e.stopPropagation();
+              onRemove();
             }}
           >
             <Trash2 className="h-4 w-4" />
@@ -124,5 +127,5 @@ export function CanvasElement({
       )}
       {renderElement()}
     </div>
-  )
+  );
 }

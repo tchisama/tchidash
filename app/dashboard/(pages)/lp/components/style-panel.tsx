@@ -1,34 +1,37 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import type { PageElement, Review } from "@/types/elements"
-import { ImageStyleForm } from "@/components/style-forms/image-style-form"
-import { HeaderStyleForm } from "@/components/style-forms/header-style-form"
-import { ParagraphStyleForm } from "@/components/style-forms/paragraph-style-form"
-import { VariantSelectorStyleForm } from "@/components/style-forms/variant-selector-style-form"
-import { OrderFormStyleForm } from "@/components/style-forms/order-form-style-form"
-import { ReviewsStyleForm } from "@/components/style-forms/reviews-style-form"
-import { ContactFormStyleForm } from "@/components/style-forms/contact-form-style-form"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { Plus, Trash2, Star, X } from "lucide-react"
-import { v4 as uuidv4 } from "uuid"
-import { Switch } from "@/components/ui/switch"
-import { ReviewForm } from "@/components/forms/review-form"
+import { useState } from "react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { PageElement, Review } from "../types/elements";
+import { ImageStyleForm } from "../components/style-forms/image-style-form";
+import { HeaderStyleForm } from "../components/style-forms/header-style-form";
+import { ParagraphStyleForm } from "../components/style-forms/paragraph-style-form";
+import { VariantSelectorStyleForm } from "../components/style-forms/variant-selector-style-form";
+import { OrderFormStyleForm } from "../components/style-forms/order-form-style-form";
+import { ReviewsStyleForm } from "../components/style-forms/reviews-style-form";
+import { ContactFormStyleForm } from "../components/style-forms/contact-form-style-form";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Plus, Trash2, Star, X } from "lucide-react";
+import { v4 as uuidv4 } from "uuid";
+import { Switch } from "@/components/ui/switch";
+import { ReviewForm } from "../components/forms/review-form";
 
 interface StylePanelProps {
-  selectedElement: PageElement | undefined
-  onUpdateElement: (id: string, updates: Partial<PageElement>) => void
+  selectedElement: PageElement | undefined;
+  onUpdateElement: (id: string, updates: Partial<PageElement>) => void;
 }
 
-export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps) {
-  const [activeTab, setActiveTab] = useState("style")
-  const [showAddReview, setShowAddReview] = useState(false)
-  const [editingReviewId, setEditingReviewId] = useState<string | null>(null)
+export function StylePanel({
+  selectedElement,
+  onUpdateElement,
+}: StylePanelProps) {
+  const [activeTab, setActiveTab] = useState("style");
+  const [showAddReview, setShowAddReview] = useState(false);
+  const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
 
   if (!selectedElement) {
     return (
@@ -37,7 +40,7 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
           <p>Select an element to edit its properties</p>
         </div>
       </div>
-    )
+    );
   }
 
   const renderStyleForm = () => {
@@ -48,102 +51,116 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
             element={selectedElement}
             onUpdate={(updates) => onUpdateElement(selectedElement.id, updates)}
           />
-        )
+        );
       case "header":
         return (
           <HeaderStyleForm
             element={selectedElement}
             onUpdate={(updates) => onUpdateElement(selectedElement.id, updates)}
           />
-        )
+        );
       case "paragraph":
         return (
           <ParagraphStyleForm
             element={selectedElement}
             onUpdate={(updates) => onUpdateElement(selectedElement.id, updates)}
           />
-        )
+        );
       case "variant-selector":
         return (
           <VariantSelectorStyleForm
             element={selectedElement}
             onUpdate={(updates) => onUpdateElement(selectedElement.id, updates)}
           />
-        )
+        );
       case "order-form":
         return (
           <OrderFormStyleForm
             element={selectedElement}
             onUpdate={(updates) => onUpdateElement(selectedElement.id, updates)}
           />
-        )
+        );
       case "reviews":
         return (
           <ReviewsStyleForm
             element={selectedElement}
             onUpdate={(updates) => onUpdateElement(selectedElement.id, updates)}
           />
-        )
+        );
       case "contact-form":
         return (
           <ContactFormStyleForm
             element={selectedElement}
             onUpdate={(updates) => onUpdateElement(selectedElement.id, updates)}
           />
-        )
+        );
       case "features":
         return (
           <div className="p-4 text-center text-muted-foreground">
             <p>Style options for Features element are coming soon.</p>
-            <p className="mt-2">Please use the Content tab to customize this element.</p>
+            <p className="mt-2">
+              Please use the Content tab to customize this element.
+            </p>
           </div>
-        )
+        );
       case "faq":
         return (
           <div className="p-4 text-center text-muted-foreground">
             <p>Style options for FAQ element are coming soon.</p>
-            <p className="mt-2">Please use the Content tab to customize this element.</p>
+            <p className="mt-2">
+              Please use the Content tab to customize this element.
+            </p>
           </div>
-        )
+        );
       case "cta":
         return (
           <div className="p-4 text-center text-muted-foreground">
             <p>Style options for CTA element are coming soon.</p>
-            <p className="mt-2">Please use the Content tab to customize this element.</p>
+            <p className="mt-2">
+              Please use the Content tab to customize this element.
+            </p>
           </div>
-        )
+        );
       case "specifications":
         return (
           <div className="p-4 text-center text-muted-foreground">
             <p>Style options for Specifications element are coming soon.</p>
-            <p className="mt-2">Please use the Content tab to customize this element.</p>
+            <p className="mt-2">
+              Please use the Content tab to customize this element.
+            </p>
           </div>
-        )
+        );
       case "related-products":
         return (
           <div className="p-4 text-center text-muted-foreground">
             <p>Style options for Related Products element are coming soon.</p>
-            <p className="mt-2">Please use the Content tab to customize this element.</p>
+            <p className="mt-2">
+              Please use the Content tab to customize this element.
+            </p>
           </div>
-        )
+        );
       case "newsletter":
         return (
           <div className="p-4 text-center text-muted-foreground">
             <p>Style options for Newsletter element are coming soon.</p>
-            <p className="mt-2">Please use the Content tab to customize this element.</p>
+            <p className="mt-2">
+              Please use the Content tab to customize this element.
+            </p>
           </div>
-        )
+        );
       case "hero":
         return (
           <div className="p-4 text-center text-muted-foreground">
             <p>Style options for Hero element are coming soon.</p>
-            <p className="mt-2">Please use the Content tab to customize this element.</p>
+            <p className="mt-2">
+              Please use the Content tab to customize this element.
+            </p>
           </div>
-        )
+        );
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   const renderContentForm = () => {
     switch (selectedElement.type) {
@@ -158,7 +175,10 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
                 value={selectedElement.content.src || ""}
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, src: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      src: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter image URL"
@@ -172,14 +192,17 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
                 value={selectedElement.content.alt || ""}
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, alt: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      alt: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter alt text"
               />
             </div>
           </div>
-        )
+        );
 
       case "header":
         return (
@@ -192,14 +215,17 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
                 value={selectedElement.content.text || ""}
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, text: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      text: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter header text"
               />
             </div>
           </div>
-        )
+        );
 
       case "paragraph":
         return (
@@ -211,7 +237,10 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
                 value={selectedElement.content.text || ""}
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, text: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      text: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter paragraph text"
@@ -219,41 +248,51 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
               />
             </div>
           </div>
-        )
+        );
 
       case "variant-selector":
         return (
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="variant-title">Custom Product Title (leave empty to use product title)</Label>
+              <Label htmlFor="variant-title">
+                Custom Product Title (leave empty to use product title)
+              </Label>
               <Input
                 id="variant-title"
                 type="text"
                 value={selectedElement.content.customTitle || ""}
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, customTitle: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      customTitle: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter custom product title"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="option-name">Custom Option Name (leave empty to use product option name)</Label>
+              <Label htmlFor="option-name">
+                Custom Option Name (leave empty to use product option name)
+              </Label>
               <Input
                 id="option-name"
                 type="text"
                 value={selectedElement.content.customOptionName || ""}
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, customOptionName: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      customOptionName: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter custom option name"
               />
             </div>
           </div>
-        )
+        );
 
       case "order-form":
         return (
@@ -266,7 +305,10 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
                 value={selectedElement.content.customTitle || ""}
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, customTitle: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      customTitle: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter form title"
@@ -280,14 +322,17 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
                 value={selectedElement.content.customButtonText || ""}
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, customButtonText: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      customButtonText: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter button text"
               />
             </div>
           </div>
-        )
+        );
 
       case "reviews":
         return (
@@ -297,10 +342,15 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
               <Input
                 id="reviews-title"
                 type="text"
-                value={selectedElement.content.sectionTitle || "Customer Reviews"}
+                value={
+                  selectedElement.content.sectionTitle || "Customer Reviews"
+                }
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, sectionTitle: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      sectionTitle: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter section title"
@@ -330,8 +380,8 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
                   variant="outline"
                   className="flex items-center gap-1"
                   onClick={() => {
-                    setShowAddReview(true)
-                    setEditingReviewId(null)
+                    setShowAddReview(true);
+                    setEditingReviewId(null);
                   }}
                 >
                   <Plus className="h-4 w-4" /> Add Review
@@ -342,7 +392,12 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
                 <div className="mb-6 border rounded-md p-4">
                   <div className="flex justify-between items-center mb-3">
                     <h4 className="font-medium">Add New Review</h4>
-                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={() => setShowAddReview(false)}>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-8 w-8 p-0"
+                      onClick={() => setShowAddReview(false)}
+                    >
                       <X className="h-4 w-4" />
                       <span className="sr-only">Cancel</span>
                     </Button>
@@ -356,13 +411,16 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
                           ...review,
                           id: uuidv4(),
                         },
-                      ]
+                      ];
 
                       onUpdateElement(selectedElement.id, {
-                        content: { ...selectedElement.content, reviews: updatedReviews },
-                      })
+                        content: {
+                          ...selectedElement.content,
+                          reviews: updatedReviews,
+                        },
+                      });
 
-                      setShowAddReview(false)
+                      setShowAddReview(false);
                     }}
                     onCancel={() => setShowAddReview(false)}
                   />
@@ -370,135 +428,153 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
               )}
 
               <div className="space-y-6">
-                {selectedElement.content.reviews?.map((review: Review, index: number) => (
-                  <div key={review.id} className="border rounded-md p-4 space-y-3">
-                    {editingReviewId === review.id ? (
-                      <>
-                        <div className="flex justify-between items-center mb-3">
-                          <h4 className="font-medium">Edit Review</h4>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-8 w-8 p-0"
-                            onClick={() => setEditingReviewId(null)}
-                          >
-                            <X className="h-4 w-4" />
-                            <span className="sr-only">Cancel</span>
-                          </Button>
-                        </div>
-
-                        <ReviewForm
-                          initialData={review}
-                          onSubmit={(updatedReview) => {
-                            const updatedReviews = selectedElement.content.reviews.map((r: Review) =>
-                              r.id === review.id ? { ...updatedReview, id: review.id } : r,
-                            )
-
-                            onUpdateElement(selectedElement.id, {
-                              content: { ...selectedElement.content, reviews: updatedReviews },
-                            })
-
-                            setEditingReviewId(null)
-                          }}
-                          onCancel={() => setEditingReviewId(null)}
-                        />
-                      </>
-                    ) : (
-                      <>
-                        <div className="flex items-center justify-between">
-                          <h4 className="font-medium">Review #{index + 1}</h4>
-                          <div className="flex gap-1">
+                {selectedElement.content.reviews?.map(
+                  (review: Review, index: number) => (
+                    <div
+                      key={review.id}
+                      className="border rounded-md p-4 space-y-3"
+                    >
+                      {editingReviewId === review.id ? (
+                        <>
+                          <div className="flex justify-between items-center mb-3">
+                            <h4 className="font-medium">Edit Review</h4>
                             <Button
                               size="sm"
                               variant="ghost"
                               className="h-8 w-8 p-0"
-                              onClick={() => setEditingReviewId(review.id)}
+                              onClick={() => setEditingReviewId(null)}
                             >
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="16"
-                                height="16"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                className="lucide lucide-pencil"
+                              <X className="h-4 w-4" />
+                              <span className="sr-only">Cancel</span>
+                            </Button>
+                          </div>
+
+                          <ReviewForm
+                            initialData={review}
+                            onSubmit={(updatedReview) => {
+                              const updatedReviews =
+                                selectedElement.content.reviews.map(
+                                  (r: Review) =>
+                                    r.id === review.id
+                                      ? { ...updatedReview, id: review.id }
+                                      : r,
+                                );
+
+                              onUpdateElement(selectedElement.id, {
+                                content: {
+                                  ...selectedElement.content,
+                                  reviews: updatedReviews,
+                                },
+                              });
+
+                              setEditingReviewId(null);
+                            }}
+                            onCancel={() => setEditingReviewId(null)}
+                          />
+                        </>
+                      ) : (
+                        <>
+                          <div className="flex items-center justify-between">
+                            <h4 className="font-medium">Review #{index + 1}</h4>
+                            <div className="flex gap-1">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="h-8 w-8 p-0"
+                                onClick={() => setEditingReviewId(review.id)}
                               >
-                                <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
-                                <path d="m15 5 4 4" />
-                              </svg>
-                              <span className="sr-only">Edit review</span>
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="h-8 w-8 p-0 text-destructive"
-                              onClick={() => {
-                                const updatedReviews = selectedElement.content.reviews.filter(
-                                  (r: Review) => r.id !== review.id,
-                                )
-                                onUpdateElement(selectedElement.id, {
-                                  content: { ...selectedElement.content, reviews: updatedReviews },
-                                })
-                              }}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                              <span className="sr-only">Delete review</span>
-                            </Button>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-2 mt-2">
-                          <div className="font-medium">Name:</div>
-                          <div>{review.name}</div>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <div className="font-medium">Rating:</div>
-                          <div className="flex">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <Star
-                                key={star}
-                                className={`h-4 w-4 ${
-                                  star <= review.rating ? "text-yellow-500 fill-yellow-500" : "text-gray-300"
-                                }`}
-                              />
-                            ))}
-                          </div>
-                        </div>
-
-                        <div className="flex items-start gap-2">
-                          <div className="font-medium">Review:</div>
-                          <div className="text-sm">{review.text}</div>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <div className="font-medium">Date:</div>
-                          <div>{review.date}</div>
-                        </div>
-
-                        {review.photoUrl && (
-                          <div className="space-y-1">
-                            <div className="font-medium">Product Photo:</div>
-                            <div className="relative h-32 w-32 rounded-md overflow-hidden border">
-                              <img
-                                src={review.photoUrl || "/placeholder.svg"}
-                                alt="Product photo"
-                                className="object-cover h-full w-full"
-                              />
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="16"
+                                  height="16"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  className="lucide lucide-pencil"
+                                >
+                                  <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+                                  <path d="m15 5 4 4" />
+                                </svg>
+                                <span className="sr-only">Edit review</span>
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="h-8 w-8 p-0 text-destructive"
+                                onClick={() => {
+                                  const updatedReviews =
+                                    selectedElement.content.reviews.filter(
+                                      (r: Review) => r.id !== review.id,
+                                    );
+                                  onUpdateElement(selectedElement.id, {
+                                    content: {
+                                      ...selectedElement.content,
+                                      reviews: updatedReviews,
+                                    },
+                                  });
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                                <span className="sr-only">Delete review</span>
+                              </Button>
                             </div>
                           </div>
-                        )}
-                      </>
-                    )}
-                  </div>
-                ))}
+
+                          <div className="flex items-center gap-2 mt-2">
+                            <div className="font-medium">Name:</div>
+                            <div>{review.name}</div>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <div className="font-medium">Rating:</div>
+                            <div className="flex">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <Star
+                                  key={star}
+                                  className={`h-4 w-4 ${
+                                    star <= review.rating
+                                      ? "text-yellow-500 fill-yellow-500"
+                                      : "text-gray-300"
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className="flex items-start gap-2">
+                            <div className="font-medium">Review:</div>
+                            <div className="text-sm">{review.text}</div>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <div className="font-medium">Date:</div>
+                            <div>{review.date}</div>
+                          </div>
+
+                          {review.photoUrl && (
+                            <div className="space-y-1">
+                              <div className="font-medium">Product Photo:</div>
+                              <div className="relative h-32 w-32 rounded-md overflow-hidden border">
+                                <img
+                                  src={review.photoUrl || "/placeholder.svg"}
+                                  alt="Product photo"
+                                  className="object-cover h-full w-full"
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  ),
+                )}
               </div>
             </div>
           </div>
-        )
+        );
 
       case "contact-form":
         return (
@@ -511,7 +587,10 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
                 value={selectedElement.content.sectionTitle || "Contact Us"}
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, sectionTitle: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      sectionTitle: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter section title"
@@ -522,10 +601,16 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
               <Input
                 id="contact-subtitle"
                 type="text"
-                value={selectedElement.content.subtitle || "Have questions? We're here to help!"}
+                value={
+                  selectedElement.content.subtitle ||
+                  "Have questions? We're here to help!"
+                }
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, subtitle: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      subtitle: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter subtitle text"
@@ -539,14 +624,17 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
                 value={selectedElement.content.buttonText || "Send Message"}
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, buttonText: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      buttonText: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter button text"
               />
             </div>
           </div>
-        )
+        );
 
       case "features":
         return (
@@ -556,10 +644,15 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
               <Input
                 id="features-title"
                 type="text"
-                value={selectedElement.content.sectionTitle || "Product Features"}
+                value={
+                  selectedElement.content.sectionTitle || "Product Features"
+                }
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, sectionTitle: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      sectionTitle: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter section title"
@@ -570,18 +663,26 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
               <Input
                 id="features-subtitle"
                 type="text"
-                value={selectedElement.content.subtitle || "Why our product stands out from the rest"}
+                value={
+                  selectedElement.content.subtitle ||
+                  "Why our product stands out from the rest"
+                }
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, subtitle: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      subtitle: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter subtitle text"
               />
             </div>
-            <p className="text-sm text-muted-foreground mt-4">Feature editing will be available in the next update.</p>
+            <p className="text-sm text-muted-foreground mt-4">
+              Feature editing will be available in the next update.
+            </p>
           </div>
-        )
+        );
 
       case "faq":
         return (
@@ -591,10 +692,16 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
               <Input
                 id="faq-title"
                 type="text"
-                value={selectedElement.content.sectionTitle || "Frequently Asked Questions"}
+                value={
+                  selectedElement.content.sectionTitle ||
+                  "Frequently Asked Questions"
+                }
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, sectionTitle: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      sectionTitle: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter section title"
@@ -605,18 +712,26 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
               <Input
                 id="faq-subtitle"
                 type="text"
-                value={selectedElement.content.subtitle || "Find answers to common questions about our product"}
+                value={
+                  selectedElement.content.subtitle ||
+                  "Find answers to common questions about our product"
+                }
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, subtitle: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      subtitle: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter subtitle text"
               />
             </div>
-            <p className="text-sm text-muted-foreground mt-4">FAQ item editing will be available in the next update.</p>
+            <p className="text-sm text-muted-foreground mt-4">
+              FAQ item editing will be available in the next update.
+            </p>
           </div>
-        )
+        );
 
       case "cta":
         return (
@@ -626,10 +741,16 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
               <Input
                 id="cta-title"
                 type="text"
-                value={selectedElement.content.title || "Ready to Experience the Difference?"}
+                value={
+                  selectedElement.content.title ||
+                  "Ready to Experience the Difference?"
+                }
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, title: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      title: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter title"
@@ -646,7 +767,10 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
                 }
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, subtitle: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      subtitle: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter subtitle text"
@@ -660,7 +784,10 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
                 value={selectedElement.content.buttonText || "Shop Now"}
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, buttonText: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      buttonText: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter button text"
@@ -674,56 +801,76 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
                 value={selectedElement.content.buttonLink || "#"}
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, buttonLink: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      buttonLink: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter button link"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="cta-secondary-button-text">Secondary Button Text (optional)</Label>
+              <Label htmlFor="cta-secondary-button-text">
+                Secondary Button Text (optional)
+              </Label>
               <Input
                 id="cta-secondary-button-text"
                 type="text"
-                value={selectedElement.content.secondaryButtonText || "Learn More"}
+                value={
+                  selectedElement.content.secondaryButtonText || "Learn More"
+                }
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, secondaryButtonText: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      secondaryButtonText: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter secondary button text"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="cta-secondary-button-link">Secondary Button Link</Label>
+              <Label htmlFor="cta-secondary-button-link">
+                Secondary Button Link
+              </Label>
               <Input
                 id="cta-secondary-button-link"
                 type="text"
                 value={selectedElement.content.secondaryButtonLink || "#"}
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, secondaryButtonLink: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      secondaryButtonLink: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter secondary button link"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="cta-bg-image">Background Image URL (optional)</Label>
+              <Label htmlFor="cta-bg-image">
+                Background Image URL (optional)
+              </Label>
               <Input
                 id="cta-bg-image"
                 type="text"
                 value={selectedElement.content.backgroundImage || ""}
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, backgroundImage: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      backgroundImage: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter background image URL"
               />
             </div>
           </div>
-        )
+        );
 
       case "specifications":
         return (
@@ -733,10 +880,16 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
               <Input
                 id="specs-title"
                 type="text"
-                value={selectedElement.content.sectionTitle || "Product Specifications"}
+                value={
+                  selectedElement.content.sectionTitle ||
+                  "Product Specifications"
+                }
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, sectionTitle: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      sectionTitle: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter section title"
@@ -747,10 +900,16 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
               <Input
                 id="specs-subtitle"
                 type="text"
-                value={selectedElement.content.subtitle || "Technical details and dimensions"}
+                value={
+                  selectedElement.content.subtitle ||
+                  "Technical details and dimensions"
+                }
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, subtitle: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      subtitle: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter subtitle text"
@@ -760,7 +919,7 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
               Specification item editing will be available in the next update.
             </p>
           </div>
-        )
+        );
 
       case "related-products":
         return (
@@ -770,10 +929,15 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
               <Input
                 id="related-title"
                 type="text"
-                value={selectedElement.content.sectionTitle || "You May Also Like"}
+                value={
+                  selectedElement.content.sectionTitle || "You May Also Like"
+                }
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, sectionTitle: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      sectionTitle: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter section title"
@@ -784,10 +948,16 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
               <Input
                 id="related-subtitle"
                 type="text"
-                value={selectedElement.content.subtitle || "Customers who bought this item also purchased"}
+                value={
+                  selectedElement.content.subtitle ||
+                  "Customers who bought this item also purchased"
+                }
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, subtitle: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      subtitle: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter subtitle text"
@@ -801,7 +971,10 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
                 value={selectedElement.content.buttonText || "View Product"}
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, buttonText: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      buttonText: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter button text"
@@ -811,7 +984,7 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
               Related product editing will be available in the next update.
             </p>
           </div>
-        )
+        );
 
       case "newsletter":
         return (
@@ -824,7 +997,10 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
                 value={selectedElement.content.sectionTitle || "Stay Updated"}
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, sectionTitle: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      sectionTitle: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter section title"
@@ -836,11 +1012,15 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
                 id="newsletter-subtitle"
                 type="text"
                 value={
-                  selectedElement.content.subtitle || "Subscribe to our newsletter for exclusive offers and updates"
+                  selectedElement.content.subtitle ||
+                  "Subscribe to our newsletter for exclusive offers and updates"
                 }
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, subtitle: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      subtitle: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter subtitle text"
@@ -854,7 +1034,10 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
                 value={selectedElement.content.buttonText || "Subscribe"}
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, buttonText: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      buttonText: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter button text"
@@ -865,10 +1048,15 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
               <Input
                 id="newsletter-placeholder"
                 type="text"
-                value={selectedElement.content.placeholderText || "Enter your email"}
+                value={
+                  selectedElement.content.placeholderText || "Enter your email"
+                }
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, placeholderText: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      placeholderText: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter placeholder text"
@@ -879,17 +1067,23 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
               <Input
                 id="newsletter-success"
                 type="text"
-                value={selectedElement.content.successMessage || "Thank you for subscribing!"}
+                value={
+                  selectedElement.content.successMessage ||
+                  "Thank you for subscribing!"
+                }
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, successMessage: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      successMessage: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter success message"
               />
             </div>
           </div>
-        )
+        );
 
       case "hero":
         return (
@@ -899,10 +1093,15 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
               <Input
                 id="hero-title"
                 type="text"
-                value={selectedElement.content.title || "Premium Leather Products"}
+                value={
+                  selectedElement.content.title || "Premium Leather Products"
+                }
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, title: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      title: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter title"
@@ -913,10 +1112,16 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
               <Input
                 id="hero-subtitle"
                 type="text"
-                value={selectedElement.content.subtitle || "Handcrafted with care for the modern lifestyle"}
+                value={
+                  selectedElement.content.subtitle ||
+                  "Handcrafted with care for the modern lifestyle"
+                }
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, subtitle: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      subtitle: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter subtitle"
@@ -930,7 +1135,10 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
                 value={selectedElement.content.buttonText || "Shop Now"}
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, buttonText: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      buttonText: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter button text"
@@ -944,35 +1152,50 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
                 value={selectedElement.content.buttonLink || "#"}
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, buttonLink: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      buttonLink: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter button link"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="hero-secondary-button-text">Secondary Button Text (optional)</Label>
+              <Label htmlFor="hero-secondary-button-text">
+                Secondary Button Text (optional)
+              </Label>
               <Input
                 id="hero-secondary-button-text"
                 type="text"
-                value={selectedElement.content.secondaryButtonText || "Learn More"}
+                value={
+                  selectedElement.content.secondaryButtonText || "Learn More"
+                }
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, secondaryButtonText: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      secondaryButtonText: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter secondary button text"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="hero-secondary-button-link">Secondary Button Link</Label>
+              <Label htmlFor="hero-secondary-button-link">
+                Secondary Button Link
+              </Label>
               <Input
                 id="hero-secondary-button-link"
                 type="text"
                 value={selectedElement.content.secondaryButtonLink || "#"}
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, secondaryButtonLink: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      secondaryButtonLink: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter secondary button link"
@@ -983,17 +1206,25 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
               <Input
                 id="hero-bg-image"
                 type="text"
-                value={selectedElement.content.backgroundImage || "/placeholder.svg?height=600&width=1200"}
+                value={
+                  selectedElement.content.backgroundImage ||
+                  "/placeholder.svg?height=600&width=1200"
+                }
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, backgroundImage: e.target.value },
+                    content: {
+                      ...selectedElement.content,
+                      backgroundImage: e.target.value,
+                    },
                   })
                 }
                 placeholder="Enter background image URL"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="hero-overlay-opacity">Overlay Opacity (0-1)</Label>
+              <Label htmlFor="hero-overlay-opacity">
+                Overlay Opacity (0-1)
+              </Label>
               <Input
                 id="hero-overlay-opacity"
                 type="number"
@@ -1003,27 +1234,36 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
                 value={selectedElement.content.overlayOpacity || 0.3}
                 onChange={(e) =>
                   onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, overlayOpacity: Number.parseFloat(e.target.value) },
+                    content: {
+                      ...selectedElement.content,
+                      overlayOpacity: Number.parseFloat(e.target.value),
+                    },
                   })
                 }
                 placeholder="Enter overlay opacity"
               />
             </div>
           </div>
-        )
+        );
 
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   return (
     <div className="border-l bg-white h-full flex flex-col overflow-hidden">
       <div className="p-4 border-b">
         <h2 className="font-semibold">Element Properties</h2>
-        <p className="text-sm text-muted-foreground">Customize the selected element</p>
+        <p className="text-sm text-muted-foreground">
+          Customize the selected element
+        </p>
       </div>
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="flex-1 flex flex-col"
+      >
         <div className="border-b">
           <TabsList className="w-full justify-start rounded-none border-b bg-transparent p-0">
             <TabsTrigger
@@ -1050,5 +1290,5 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
         </ScrollArea>
       </Tabs>
     </div>
-  )
+  );
 }

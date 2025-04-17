@@ -1,14 +1,20 @@
-"use client"
+"use client";
 
-import { useProduct } from "@/context/product-context"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Package } from "lucide-react"
+import { useProduct } from "../context/product-context";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Package } from "lucide-react";
 
 export function ProductSelector() {
-  const { products, selectedProduct, setSelectedProduct } = useProduct()
+  const { products, selectedProduct, setSelectedProduct } = useProduct();
 
   // Ensure products is an array before using array methods
-  const productsList = Array.isArray(products) ? products : []
+  const productsList = Array.isArray(products) ? products : [];
 
   if (productsList.length === 0) {
     return (
@@ -16,7 +22,7 @@ export function ProductSelector() {
         <Package className="mr-2 h-4 w-4" />
         No products available
       </div>
-    )
+    );
   }
 
   return (
@@ -25,9 +31,9 @@ export function ProductSelector() {
       <Select
         value={selectedProduct?.id || ""}
         onValueChange={(value) => {
-          const product = productsList.find((p) => p.id === value)
+          const product = productsList.find((p) => p.id === value);
           if (product) {
-            setSelectedProduct(product)
+            setSelectedProduct(product);
           }
         }}
       >
@@ -43,5 +49,5 @@ export function ProductSelector() {
         </SelectContent>
       </Select>
     </div>
-  )
+  );
 }

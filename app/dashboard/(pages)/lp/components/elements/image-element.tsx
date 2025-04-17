@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
-import Image from "next/image"
-import type { PageElement } from "@/types/elements"
+import Image from "next/image";
+import type { PageElement } from "../../types/elements";
 
 interface ImageElementProps {
-  element: PageElement
+  element: PageElement;
 }
 
 export function ImageElement({ element }: ImageElementProps) {
-  const { content, style } = element
-  const src = content.src || "/placeholder.svg?height=400&width=600"
-  const alt = content.alt || "Image"
+  const { content, style } = element;
+  const src = content.src || "/placeholder.svg?height=400&width=600";
+  const alt = content.alt || "Image";
 
   return (
     <div
@@ -19,7 +19,9 @@ export function ImageElement({ element }: ImageElementProps) {
         padding: `${style.padding || 0}px`,
         margin: `${style.margin || 0}px`,
         borderRadius: `${style.borderRadius || 0}px`,
-        border: style.borderWidth ? `${style.borderWidth}px solid ${style.borderColor || "#e5e7eb"}` : "none",
+        border: style.borderWidth
+          ? `${style.borderWidth}px solid ${style.borderColor || "#e5e7eb"}`
+          : "none",
         backgroundColor: style.backgroundColor || "transparent",
       }}
     >
@@ -45,5 +47,5 @@ export function ImageElement({ element }: ImageElementProps) {
         />
       </div>
     </div>
-  )
+  );
 }

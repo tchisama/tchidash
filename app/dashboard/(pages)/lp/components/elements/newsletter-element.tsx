@@ -1,60 +1,67 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import type { PageElement } from "@/types/elements"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import type { PageElement } from "../../types/elements";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 interface NewsletterElementProps {
-  element: PageElement
+  element: PageElement;
 }
 
 export function NewsletterElement({ element }: NewsletterElementProps) {
-  const { style, content } = element
-  const [email, setEmail] = useState("")
-  const [isSubmitted, setIsSubmitted] = useState(false)
+  const { style, content } = element;
+  const [email, setEmail] = useState("");
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const containerStyle = {
     padding: `${style.padding || 24}px`,
     margin: `${style.margin || 0}px`,
     borderRadius: `${style.borderRadius || 8}px`,
-    border: style.borderWidth ? `${style.borderWidth}px solid ${style.borderColor || "#e5e7eb"}` : "1px solid #e5e7eb",
+    border: style.borderWidth
+      ? `${style.borderWidth}px solid ${style.borderColor || "#e5e7eb"}`
+      : "1px solid #e5e7eb",
     backgroundColor: style.backgroundColor || "#f9fafb",
-  }
+  };
 
   const titleStyle = {
     color: style.titleColor || "#000",
     fontSize: `${style.titleFontSize || 24}px`,
     fontWeight: style.titleFontWeight || "bold",
     marginBottom: "8px",
-    textAlign: (style.titleAlign as React.CSSProperties["textAlign"]) || "center",
-  }
+    textAlign:
+      (style.titleAlign as React.CSSProperties["textAlign"]) || "center",
+  };
 
   const subtitleStyle = {
     color: style.subtitleColor || "#6b7280",
     fontSize: `${style.subtitleFontSize || 16}px`,
     marginBottom: "24px",
-    textAlign: (style.subtitleAlign as React.CSSProperties["textAlign"]) || "center",
-  }
+    textAlign:
+      (style.subtitleAlign as React.CSSProperties["textAlign"]) || "center",
+  };
 
   const formContainerStyle = {
     maxWidth: `${style.maxWidth || 500}px`,
     margin: "0 auto",
-  }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log("Newsletter subscription:", email)
-    setIsSubmitted(true)
-    setEmail("")
-  }
+    e.preventDefault();
+    console.log("Newsletter subscription:", email);
+    setIsSubmitted(true);
+    setEmail("");
+  };
 
   return (
     <div style={containerStyle}>
       <h2 style={titleStyle}>{content.sectionTitle || "Stay Updated"}</h2>
-      <p style={subtitleStyle}>{content.subtitle || "Subscribe to our newsletter for exclusive offers and updates"}</p>
+      <p style={subtitleStyle}>
+        {content.subtitle ||
+          "Subscribe to our newsletter for exclusive offers and updates"}
+      </p>
 
       <div style={formContainerStyle}>
         {isSubmitted ? (
@@ -62,7 +69,10 @@ export function NewsletterElement({ element }: NewsletterElementProps) {
             {content.successMessage || "Thank you for subscribing!"}
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
+          <form
+            onSubmit={handleSubmit}
+            className="flex flex-col sm:flex-row gap-3"
+          >
             <Input
               type="email"
               value={email}
@@ -89,5 +99,5 @@ export function NewsletterElement({ element }: NewsletterElementProps) {
         )}
       </div>
     </div>
-  )
+  );
 }
