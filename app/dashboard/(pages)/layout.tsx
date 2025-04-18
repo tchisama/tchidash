@@ -8,9 +8,13 @@ type Props = {
 
 function layout({ children }: Props) {
   return (
-    <div className="bg-slate-50 min-h-screen">
+    <div className="bg-slate-50  min-h-screen">
       {/* <DashboardUiProvider> */}
-      <SideBarDashboard>{children}</SideBarDashboard>
+      <SideBarDashboard>
+        <div className="bg-white rounded-lg p-3">
+        {children}
+        </div>
+      </SideBarDashboard>
       {/* </DashboardUiProvider> */}
     </div>
   );

@@ -106,15 +106,20 @@ const ProductLine = ({
     );
   };
 
-  const deleteProduct = () => {
+  const deleteProduct = async () => {
     if (!storeId) return;
-    // updateDoc(doc(db, "products", product.id), {
-    //   ...product,
-    //   status: "deleted",
-    // });
+    
     if (confirm("Are you sure you want to delete this product?")) {
-      deleteDoc(doc(db, "products", product.id));
-      setProducts(products.filter((p) => p.id !== product.id));
+      try {
+        // Delete the product document from Firestore
+        await deleteDoc(doc(db, "products", product.id)).then(() => {
+          // Update the local state after successful deletion
+          setProducts(products.filter((p) => p.id !== product.id));
+        });
+      } catch (error) {
+        console.error("Error deleting product:", error);
+        alert("Failed to delete product. Please try again.");
+      }
     }
   };
   // const stock = (product.variants && product.variants.length > 0)
