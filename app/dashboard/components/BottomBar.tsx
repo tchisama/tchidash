@@ -14,11 +14,12 @@ import Customers from "@/public/images/svgs/icons/customers.svg";
 import Folder from "@/public/images/svgs/icons/folder.svg";
 import Stars from "@/public/images/svgs/icons/stars.svg";
 import Box from "@/public/images/svgs/icons/box.svg";
+import CashRegister from "@/public/images/svgs/icons/cash-register.svg";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 
 // import { db } from "@/firebase";
-// import { useStore } from "@/store/storeInfos";
+import { useStore } from "@/store/storeInfos";
 // import { Employee, Store } from "@/types/store";
 // import { useQuery } from "@tanstack/react-query";
 // import { doc, getDoc } from "firebase/firestore";
@@ -103,6 +104,20 @@ export const navLinks = [
     ),
   },
   {
+    href: "/dashboard/pos",
+    label: "POS",
+    icon: ({ className }: NavIconClass) => (
+      <Image
+        src={CashRegister}
+        alt="POS"
+        className={cn(iconsClass, className)}
+      />
+    ),
+    isVisible: (store) => {
+      return store?.integrations?.find(i => i.name === "pos")?.enabled ?? false;
+    }
+  },
+  {
     href: "/dashboard/settings",
     label: "Settings",
     icon: ({ className }: NavIconClass) => (
@@ -127,8 +142,9 @@ export const navLinks = [
   // }
 ];
 
-function BottomBar() {
+export function BottomBar() {
   const pathname = usePathname();
+  const { store } = useStore();
 
   // const { storeId } = useStore();
   // const { data: session } = useSession();
@@ -160,6 +176,7 @@ function BottomBar() {
               ]
             : [
                 ...navLinks
+                  .filter(link => !link.isVisible || link.isVisible(store))
                   .map((link) => ({
                     title: link.label,
                     icon: link.icon({}),

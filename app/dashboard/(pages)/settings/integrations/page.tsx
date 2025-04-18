@@ -36,6 +36,20 @@ const integrations: Integration[] = [
       "https://firebasestorage.googleapis.com/v0/b/tchidash-fd7aa.appspot.com/o/294424033_375002151434645_2765565352434267578_n%201.png?alt=media&token=99502b5f-b5c9-4ba0-acf5-a810eb4e3a34",
   },
   {
+    id: "pos",
+    title: "POS",
+    description: "Point of Sale integration for managing in-store sales",
+    imageUrl:
+      "https://firebasestorage.googleapis.com/v0/b/tchidash-fd7aa.appspot.com/o/pos-icon.png?alt=media&token=pos-token",
+  },
+  {
+    id: "landing-page-builder",
+    title: "Landing Page Builder",
+    description: "Create beautiful landing pages for your products and campaigns",
+    imageUrl:
+      "https://firebasestorage.googleapis.com/v0/b/tchidash-fd7aa.appspot.com/o/landing-page-icon.png?alt=media&token=landing-page-token",
+  },
+  {
     id: "whatsapp-notification",
     title: "WhatsApp Notification",
     description: "receive notifications on WhatsApp on sertain events",

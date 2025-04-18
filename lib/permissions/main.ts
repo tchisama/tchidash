@@ -54,6 +54,14 @@ export type Permissions = {
     dataType: null;
     action: "view" | "create" | "update" | "delete";
   };
+  pos: {
+    dataType: null;
+    action: "view" | "create" | "update" | "delete";
+  };
+  landing_page: {
+    dataType: null;
+    action: "view" | "create" | "update" | "delete";
+  };
 };
 
 export type Role =
@@ -62,7 +70,9 @@ export type Role =
   | "order_manager"
   | "inventory_manager"
   | "product_manager"
-  | "employees_manager";
+  | "employees_manager"
+  | "pos_manager"
+  | "marketing_manager";
 export const ROLES_NAMES = [
   "super_admin",
   "admin",
@@ -70,6 +80,8 @@ export const ROLES_NAMES = [
   "inventory_manager",
   "product_manager",
   "employees_manager",
+  "pos_manager",
+  "marketing_manager",
 ] as const;
 // make me a enum
 
@@ -103,6 +115,8 @@ const ROLES: RolesWithPermissions = {
     settings_integrations: { view: true, update: true },
     settings_advanced: { view: true, update: true },
     notifications: { view: true },
+    pos: { view: true, create: true, update: true, delete: true },
+    landing_page: { view: true, create: true, update: true, delete: true },
   },
   admin: {
     orders: { view: true, create: true, update: true, delete: true },
@@ -114,6 +128,8 @@ const ROLES: RolesWithPermissions = {
     settings: { view: true, update: true },
     notifications: { view: true },
     settings_security: { view: true, update: true },
+    pos: { view: true, create: true, update: true, delete: false },
+    landing_page: { view: true, create: true, update: true, delete: false },
   },
   order_manager: {
     orders: { view: true, create: true, update: true, delete: false },
@@ -129,6 +145,18 @@ const ROLES: RolesWithPermissions = {
   },
   employees_manager: {
     employees: { view: true, create: true, update: true, delete: true },
+    notifications: { view: true },
+  },
+  pos_manager: {
+    pos: { view: true, create: true, update: true, delete: false },
+    orders: { view: true, create: true, update: true, delete: false },
+    products: { view: true },
+    inventory: { view: true, create: true, update: true, delete: false },
+    notifications: { view: true },
+  },
+  marketing_manager: {
+    landing_page: { view: true, create: true, update: true, delete: true },
+    products: { view: true },
     notifications: { view: true },
   },
 };

@@ -19,10 +19,13 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { Plus, Trash2, Star, X } from "lucide-react"
+import { Plus, Trash2, Star, X, Upload } from "lucide-react"
 import { v4 as uuidv4 } from "uuid"
 import { Switch } from "@/components/ui/switch"
 import { ReviewForm } from "./../components/forms/review-form"
+import FilesystemExplorer from "@/components/FilesystemExplorer"
+import { HeroStyleForm } from "./style-forms/hero-style-form"
+import { Slider } from "@/components/ui/slider"
 
 interface StylePanelProps {
   selectedElement: PageElement | undefined
@@ -139,9 +142,141 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
         )
       case "hero":
         return (
-          <div className="p-4 text-center text-muted-foreground">
-            <p>Style options for Hero element are coming soon.</p>
-            <p className="mt-2">Please use the Content tab to customize this element.</p>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Title</Label>
+              <Input
+                value={selectedElement.content.title || ""}
+                onChange={(e) =>
+                  onUpdateElement(selectedElement.id, {
+                    content: {
+                      ...selectedElement.content,
+                      title: e.target.value,
+                    },
+                  })
+                }
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Subtitle</Label>
+              <Input
+                value={selectedElement.content.subtitle || ""}
+                onChange={(e) =>
+                  onUpdateElement(selectedElement.id, {
+                    content: {
+                      ...selectedElement.content,
+                      subtitle: e.target.value,
+                    },
+                  })
+                }
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Primary Button Text</Label>
+              <Input
+                value={selectedElement.content.buttonText || ""}
+                onChange={(e) =>
+                  onUpdateElement(selectedElement.id, {
+                    content: {
+                      ...selectedElement.content,
+                      buttonText: e.target.value,
+                    },
+                  })
+                }
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Primary Button Link</Label>
+              <Input
+                value={selectedElement.content.buttonLink || ""}
+                onChange={(e) =>
+                  onUpdateElement(selectedElement.id, {
+                    content: {
+                      ...selectedElement.content,
+                      buttonLink: e.target.value,
+                    },
+                  })
+                }
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Secondary Button Text</Label>
+              <Input
+                value={selectedElement.content.secondaryButtonText || ""}
+                onChange={(e) =>
+                  onUpdateElement(selectedElement.id, {
+                    content: {
+                      ...selectedElement.content,
+                      secondaryButtonText: e.target.value,
+                    },
+                  })
+                }
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Secondary Button Link</Label>
+              <Input
+                value={selectedElement.content.secondaryButtonLink || ""}
+                onChange={(e) =>
+                  onUpdateElement(selectedElement.id, {
+                    content: {
+                      ...selectedElement.content,
+                      secondaryButtonLink: e.target.value,
+                    },
+                  })
+                }
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Background Image</Label>
+              <FilesystemExplorer
+                callback={(url) =>
+                  onUpdateElement(selectedElement.id, {
+                    content: {
+                      ...selectedElement.content,
+                      backgroundImage: url,
+                    },
+                  })
+                }
+              >
+                <Button variant="outline" className="w-full">
+                  <Upload className="mr-2 h-4 w-4" />
+                  Choose Image
+                </Button>
+              </FilesystemExplorer>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Overlay Opacity</Label>
+              <Slider
+                value={[selectedElement.style.overlayOpacity || 0.5]}
+                min={0}
+                max={1}
+                step={0.1}
+                onValueChange={(value) =>
+                  onUpdateElement(selectedElement.id, {
+                    style: {
+                      ...selectedElement.style,
+                      overlayOpacity: value[0],
+                    },
+                  })
+                }
+              />
+              <div className="text-right text-sm text-muted-foreground">
+                {Math.round((selectedElement.style.overlayOpacity || 0.5) * 100)}%
+              </div>
+            </div>
+
+            <HeroStyleForm 
+              element={selectedElement} 
+              onUpdate={(updates) => onUpdateElement(selectedElement.id, updates)} 
+            />
           </div>
         )
       default:
@@ -895,127 +1030,6 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
           </div>
         )
 
-      case "hero":
-        return (
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="hero-title">Title</Label>
-              <Input
-                id="hero-title"
-                type="text"
-                value={selectedElement.content.title || "Premium Leather Products"}
-                onChange={(e) =>
-                  onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, title: e.target.value },
-                  })
-                }
-                placeholder="Enter title"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="hero-subtitle">Subtitle</Label>
-              <Input
-                id="hero-subtitle"
-                type="text"
-                value={selectedElement.content.subtitle || "Handcrafted with care for the modern lifestyle"}
-                onChange={(e) =>
-                  onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, subtitle: e.target.value },
-                  })
-                }
-                placeholder="Enter subtitle"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="hero-button-text">Primary Button Text</Label>
-              <Input
-                id="hero-button-text"
-                type="text"
-                value={selectedElement.content.buttonText || "Shop Now"}
-                onChange={(e) =>
-                  onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, buttonText: e.target.value },
-                  })
-                }
-                placeholder="Enter button text"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="hero-button-link">Primary Button Link</Label>
-              <Input
-                id="hero-button-link"
-                type="text"
-                value={selectedElement.content.buttonLink || "#"}
-                onChange={(e) =>
-                  onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, buttonLink: e.target.value },
-                  })
-                }
-                placeholder="Enter button link"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="hero-secondary-button-text">Secondary Button Text (optional)</Label>
-              <Input
-                id="hero-secondary-button-text"
-                type="text"
-                value={selectedElement.content.secondaryButtonText || "Learn More"}
-                onChange={(e) =>
-                  onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, secondaryButtonText: e.target.value },
-                  })
-                }
-                placeholder="Enter secondary button text"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="hero-secondary-button-link">Secondary Button Link</Label>
-              <Input
-                id="hero-secondary-button-link"
-                type="text"
-                value={selectedElement.content.secondaryButtonLink || "#"}
-                onChange={(e) =>
-                  onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, secondaryButtonLink: e.target.value },
-                  })
-                }
-                placeholder="Enter secondary button link"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="hero-bg-image">Background Image URL</Label>
-              <Input
-                id="hero-bg-image"
-                type="text"
-                value={selectedElement.content.backgroundImage || "/placeholder.svg?height=600&width=1200"}
-                onChange={(e) =>
-                  onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, backgroundImage: e.target.value },
-                  })
-                }
-                placeholder="Enter background image URL"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="hero-overlay-opacity">Overlay Opacity (0-1)</Label>
-              <Input
-                id="hero-overlay-opacity"
-                type="number"
-                min="0"
-                max="1"
-                step="0.1"
-                value={selectedElement.content.overlayOpacity || 0.3}
-                onChange={(e) =>
-                  onUpdateElement(selectedElement.id, {
-                    content: { ...selectedElement.content, overlayOpacity: Number.parseFloat(e.target.value) },
-                  })
-                }
-                placeholder="Enter overlay opacity"
-              />
-            </div>
-          </div>
-        )
-
       default:
         return null
     }
@@ -1044,7 +1058,7 @@ export function StylePanel({ selectedElement, onUpdateElement }: StylePanelProps
             </TabsTrigger>
           </TabsList>
         </div>
-        <ScrollArea className="flex-1">
+        <ScrollArea className="flex-1 max-h-[80vh]">
           <TabsContent value="style" className="p-4 m-0">
             {renderStyleForm()}
           </TabsContent>

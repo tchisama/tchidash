@@ -40,6 +40,8 @@ export const sectionActions = {
   settings_advanced: ["update", "view"],
   notifications: ["view"],
   employees: ["view", "create", "update", "delete"],
+  pos: ["view", "create", "update", "delete"],
+  landing_page: ["view", "create", "update", "delete"],
 };
 
 export const usePermission = () => {

@@ -58,6 +58,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { useStore } from "@/store/storeInfos";
@@ -131,6 +132,7 @@ export default function PosSystem() {
   const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const { setCategories: setGlobalCategories } = useCategories();
+  const [userSelectionType, setUserSelectionType] = useState<"default" | "specific">("default");
 
   // Checkout form state
   const [checkoutForm, setCheckoutForm] = useState({
@@ -141,6 +143,15 @@ export default function PosSystem() {
     city: "",
     note: "",
   });
+
+  // Default user information
+  const defaultUser = {
+    firstName: "POS",
+    lastName: "User",
+    number: "",
+    address: "",
+    city: "",
+  };
 
   // Track product quantities in cart
   const [productQuantities, setProductQuantities] = useState<
@@ -370,6 +381,32 @@ export default function PosSystem() {
       return;
     }
     setIsCheckoutDialogOpen(true);
+    // Reset to default user selection when opening checkout
+    setUserSelectionType("default");
+    setCheckoutForm({
+      ...defaultUser,
+      note: "",
+    });
+  };
+
+  const handleUserSelectionChange = (type: "default" | "specific") => {
+    setUserSelectionType(type);
+    if (type === "default") {
+      setCheckoutForm({
+        ...defaultUser,
+        note: checkoutForm.note,
+      });
+    } else {
+      // Clear form for specific user
+      setCheckoutForm({
+        firstName: "",
+        lastName: "",
+        number: "",
+        address: "",
+        city: "",
+        note: checkoutForm.note,
+      });
+    }
   };
 
   const handleCheckoutFormChange = (
@@ -383,20 +420,32 @@ export default function PosSystem() {
   };
 
   const handleCheckout = async () => {
-    // Validate form
-    if (
-      !checkoutForm.firstName ||
-      !checkoutForm.lastName ||
-      !checkoutForm.number ||
-      !checkoutForm.address ||
-      !checkoutForm.city
-    ) {
-      toast({
-        title: "Missing information",
-        description: "Please fill in all required fields",
-        variant: "destructive",
-      });
-      return;
+    // Validate form based on user selection type
+    if (userSelectionType === "specific") {
+      if (
+        !checkoutForm.firstName ||
+        !checkoutForm.lastName ||
+        !checkoutForm.number ||
+        !checkoutForm.address ||
+        !checkoutForm.city
+      ) {
+        toast({
+          title: "Missing information",
+          description: "Please fill in all required fields",
+          variant: "destructive",
+        });
+        return;
+      }
+    } else {
+      // For default user, only validate that we have a phone number
+      if (!checkoutForm.number) {
+        toast({
+          title: "Missing information",
+          description: "Please enter a phone number",
+          variant: "destructive",
+        });
+        return;
+      }
     }
 
     setIsSubmitting(true);
@@ -405,6 +454,7 @@ export default function PosSystem() {
       // Prepare order details
       const orderDetails: OrderDetails = {
         ...checkoutForm,
+        userType: userSelectionType,
         cartItems: cart.map((item) => ({
           productId: item.productId,
           variantId: item.variantId,
@@ -451,7 +501,6 @@ export default function PosSystem() {
       setIsSubmitting(false);
     }
   };
-
 
   // Function to get an icon component based on the category's icon
   const getIconComponent = (iconName: string) => {
@@ -854,28 +903,75 @@ export default function PosSystem() {
           </DialogHeader>
 
           <div className="space-y-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="firstName">First Name *</Label>
-                <Input
-                  id="firstName"
-                  name="firstName"
-                  value={checkoutForm.firstName}
-                  onChange={handleCheckoutFormChange}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="lastName">Last Name *</Label>
-                <Input
-                  id="lastName"
-                  name="lastName"
-                  value={checkoutForm.lastName}
-                  onChange={handleCheckoutFormChange}
-                  required
-                />
+            {/* User Selection */}
+            <div className="space-y-2">
+              <Label>Customer Type</Label>
+              <div className="flex gap-2">
+                <Button
+                  variant={userSelectionType === "default" ? "default" : "outline"}
+                  className="flex-1"
+                  onClick={() => handleUserSelectionChange("default")}
+                >
+                  Default User
+                </Button>
+                <Button
+                  variant={userSelectionType === "specific" ? "default" : "outline"}
+                  className="flex-1"
+                  onClick={() => handleUserSelectionChange("specific")}
+                >
+                  Specific User
+                </Button>
               </div>
             </div>
+
+            {userSelectionType === "specific" && (
+              <>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName">First Name *</Label>
+                    <Input
+                      id="firstName"
+                      name="firstName"
+                      value={checkoutForm.firstName}
+                      onChange={handleCheckoutFormChange}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName">Last Name *</Label>
+                    <Input
+                      id="lastName"
+                      name="lastName"
+                      value={checkoutForm.lastName}
+                      onChange={handleCheckoutFormChange}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="address">Address *</Label>
+                  <Input
+                    id="address"
+                    name="address"
+                    value={checkoutForm.address}
+                    onChange={handleCheckoutFormChange}
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="city">City *</Label>
+                  <Input
+                    id="city"
+                    name="city"
+                    value={checkoutForm.city}
+                    onChange={handleCheckoutFormChange}
+                    required
+                  />
+                </div>
+              </>
+            )}
 
             <div className="space-y-2">
               <Label htmlFor="number">Phone Number *</Label>
@@ -883,28 +979,6 @@ export default function PosSystem() {
                 id="number"
                 name="number"
                 value={checkoutForm.number}
-                onChange={handleCheckoutFormChange}
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="address">Address *</Label>
-              <Input
-                id="address"
-                name="address"
-                value={checkoutForm.address}
-                onChange={handleCheckoutFormChange}
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="city">City *</Label>
-              <Input
-                id="city"
-                name="city"
-                value={checkoutForm.city}
                 onChange={handleCheckoutFormChange}
                 required
               />
@@ -950,7 +1024,7 @@ export default function PosSystem() {
             </div>
           </div>
 
-          <div className="flex justify-end gap-2">
+          <DialogFooter>
             <Button
               variant="outline"
               onClick={() => setIsCheckoutDialogOpen(false)}
@@ -960,7 +1034,7 @@ export default function PosSystem() {
             <Button onClick={handleCheckout} disabled={isSubmitting}>
               {isSubmitting ? "Processing..." : "Place Order"}
             </Button>
-          </div>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

@@ -21,6 +21,8 @@ import {
   StarIcon,
   Truck,
   UsersIcon,
+  Store as StoreIcon,
+  LayoutTemplate,
 } from "lucide-react";
 import { Notification } from "./Notifications";
 import UserProfileButton from "./UserProfileButton";
@@ -39,6 +41,7 @@ import {
 import { db } from "@/firebase";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
+import { Store } from "@/types/store";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
@@ -50,6 +53,18 @@ const navigation = [
   { name: "Reviews", href: "/dashboard/reviews", icon: StarIcon },
   { name: "Customers", href: "/dashboard/customers", icon: UsersIcon },
   { name: "FileSystem", href: "/dashboard/filesystem", icon: Folder },
+  { 
+    name: "POS", 
+    href: "/dashboard/pos", 
+    icon: StoreIcon,
+    isVisible: (store: Store | null) => store?.integrations?.find((i: { name: string; enabled: boolean }) => i.name === "pos")?.enabled ?? false
+  },
+  {
+    name: "Landing Pages",
+    href: "/dashboard/landing-page/pages",
+    icon: LayoutTemplate,
+    isVisible: (store: Store | null) => store?.integrations?.find((i: { name: string; enabled: boolean }) => i.name === "landing-page-builder")?.enabled ?? false
+  },
 ];
 
 function classNames(...classes: string[]) {
@@ -152,30 +167,32 @@ export default function SideBarDashboard({
                   <ul role="list" className="flex flex-1 flex-col gap-y-7">
                     <li>
                       <ul role="list" className="-mx-2 space-y-1">
-                        {navigation.map((item) => (
-                          <li key={item.name}>
-                            <Link
-                              href={item.href}
-                              className={classNames(
-                                isLinkActive(item.href, pathname)
-                                  ? "bg-gray-50 text-primary"
-                                  : "text-gray-700 hover:bg-gray-50 hover:text-primary",
-                                "group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6",
-                              )}
-                            >
-                              <item.icon
-                                aria-hidden="true"
+                        {navigation
+                          .filter(item => !item.isVisible || item.isVisible(store))
+                          .map((item) => (
+                            <li key={item.name}>
+                              <Link
+                                href={item.href}
                                 className={classNames(
                                   isLinkActive(item.href, pathname)
-                                    ? "text-primary"
-                                    : "text-gray-400 group-hover:text-primary",
-                                  "h-6 w-6 shrink-0",
+                                    ? "bg-gray-50 text-primary"
+                                    : "text-gray-700 hover:bg-gray-50 hover:text-primary",
+                                  "group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6",
                                 )}
-                              />
-                              {item.name}
-                            </Link>
-                          </li>
-                        ))}
+                              >
+                                <item.icon
+                                  aria-hidden="true"
+                                  className={classNames(
+                                    isLinkActive(item.href, pathname)
+                                      ? "text-primary"
+                                      : "text-gray-400 group-hover:text-primary",
+                                    "h-6 w-6 shrink-0",
+                                  )}
+                                />
+                                {item.name}
+                              </Link>
+                            </li>
+                          ))}
                       </ul>
                     </li>
 
@@ -221,36 +238,38 @@ export default function SideBarDashboard({
               <ul role="list" className="flex flex-1 flex-col gap-y-7">
                 <li>
                   <ul role="list" className="-mx-2 space-y-1">
-                    {navigation.map((item) => (
-                      <li key={item.name}>
-                        <Link
-                          href={item.href}
-                          className={classNames(
-                            isLinkActive(item.href, pathname)
-                              ? "bg-primary/10 text-primary border border-primary/10"
-                              : "text-gray-700 hover:bg-gray-50 hover:text-primary",
-                            "group items-center flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6",
-                          )}
-                        >
-                          <item.icon
-                            aria-hidden="true"
+                    {navigation
+                      .filter(item => !item.isVisible || item.isVisible(store))
+                      .map((item) => (
+                        <li key={item.name}>
+                          <Link
+                            href={item.href}
                             className={classNames(
                               isLinkActive(item.href, pathname)
-                                ? "text-primary"
-                                : "text-gray-400 group-hover:text-primary",
-                              "size-5 shrink-0",
+                                ? "bg-primary/10 text-primary border border-primary/10"
+                                : "text-gray-700 hover:bg-gray-50 hover:text-primary",
+                              "group items-center flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6",
                             )}
-                          />
-                          {item.name}
-                          {item.name === "Orders" &&
-                            (totalNewOrders ?? 0) > 0 && (
-                              <Badge className="ml-auto">
-                                {totalNewOrders}
-                              </Badge>
-                            )}
-                        </Link>
-                      </li>
-                    ))}
+                          >
+                            <item.icon
+                              aria-hidden="true"
+                              className={classNames(
+                                isLinkActive(item.href, pathname)
+                                  ? "text-primary"
+                                  : "text-gray-400 group-hover:text-primary",
+                                "size-5 shrink-0",
+                              )}
+                            />
+                            {item.name}
+                            {item.name === "Orders" &&
+                              (totalNewOrders ?? 0) > 0 && (
+                                <Badge className="ml-auto">
+                                  {totalNewOrders}
+                                </Badge>
+                              )}
+                          </Link>
+                        </li>
+                      ))}
                   </ul>
                 </li>
 

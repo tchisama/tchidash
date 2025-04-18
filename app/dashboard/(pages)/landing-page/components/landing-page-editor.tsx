@@ -22,6 +22,9 @@ import { Toaster } from "@/components/ui/toaster"
 import { getLandingPageById, LandingPage, saveLandingPage, setLandingPagePublishStatus } from "../lib/firebase-service"
 import type { ScreenSize } from "../types/elements"
 import { useStore } from "@/store/storeInfos"
+import { usePermission } from "@/hooks/use-permission"
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
+import { LayoutTemplate } from "lucide-react"
 
 interface LandingPageEditorProps {
   pageId: string
@@ -46,9 +49,14 @@ export function LandingPageEditor({ pageId }: LandingPageEditorProps) {
   const [isPublished, setIsPublished] = useState(false)
   const [pageLoading, setPageLoading] = useState(true)
   const router = useRouter()
+  const hasViewPermission = usePermission()
 
   // In a real app, you would get the storeId from authentication or context
-  const {storeId} = useStore()
+  const {storeId, store} = useStore()
+
+  const isLandingPageBuilderEnabled = store?.integrations?.find(i => i.name === "landing-page-builder")?.enabled ?? false
+  const canViewLandingPage = hasViewPermission("landing_page", "view")
+  const canEditLandingPage = hasViewPermission("landing_page", "update")
 
   const screenSizes: ScreenSize[] = [
     { id: "mobile", name: "Mobile", width: 375, icon: "Smartphone" },
@@ -62,7 +70,7 @@ export function LandingPageEditor({ pageId }: LandingPageEditorProps) {
       if (pageId) {
         try {
           setPageLoading(true)
-          const page = await getLandingPageById(storeId??"", pageId)
+          const page = await getLandingPageById(pageId)
 
           if (page) {
             setPageName(page.name)
@@ -91,6 +99,12 @@ export function LandingPageEditor({ pageId }: LandingPageEditorProps) {
   useEffect(() => {
     setMounted(true)
   }, [])
+
+  useEffect(() => {
+    if (!isLandingPageBuilderEnabled || !canViewLandingPage || !canEditLandingPage) {
+      router.push("/dashboard/landing-page/pages")
+    }
+  }, [isLandingPageBuilderEnabled, canViewLandingPage, canEditLandingPage, router])
 
   // Don't render anything until after client-side hydration
   if (!mounted) {
@@ -180,6 +194,58 @@ export function LandingPageEditor({ pageId }: LandingPageEditorProps) {
           <p>Error: {productError}</p>
           <p className="mt-2">Please try refreshing the page.</p>
         </div>
+      </div>
+    )
+  }
+
+  if (!isLandingPageBuilderEnabled) {
+    return (
+      <div className="container max-w-4xl py-10">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-2xl flex items-center gap-2">
+              <LayoutTemplate className="w-6 h-6" />
+              Landing Page Builder Not Enabled
+            </CardTitle>
+            <CardDescription>
+              The Landing Page Builder integration is not enabled for your store.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="mb-4">
+              To use the Landing Page Builder, you need to enable it in your settings.
+            </p>
+            <Button onClick={() => router.push("/dashboard/settings/integrations")}>
+              Go to Integrations
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  if (!canViewLandingPage || !canEditLandingPage) {
+    return (
+      <div className="container max-w-4xl py-10">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-2xl flex items-center gap-2">
+              <LayoutTemplate className="w-6 h-6" />
+              Access Denied
+            </CardTitle>
+            <CardDescription>
+              You don{"'"}t have permission to edit landing pages.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="mb-4">
+              Please contact your administrator to get access to this feature.
+            </p>
+            <Button onClick={() => router.push("/dashboard/landing-page/pages")}>
+              Back to Pages
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     )
   }

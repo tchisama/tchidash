@@ -5,6 +5,9 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Slider } from "@/components/ui/slider"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import FilesystemExplorer from "@/components/FilesystemExplorer"
+import { Button } from "@/components/ui/button"
+import { Upload } from "lucide-react"
 
 interface ImageStyleFormProps {
   element: PageElement
@@ -12,7 +15,7 @@ interface ImageStyleFormProps {
 }
 
 export function ImageStyleForm({ element, onUpdate }: ImageStyleFormProps) {
-  const { style } = element
+  const { style, content } = element
 
   const updateStyle = (key: string, value: unknown) => {
     onUpdate({
@@ -23,8 +26,41 @@ export function ImageStyleForm({ element, onUpdate }: ImageStyleFormProps) {
     })
   }
 
+  const updateContent = (key: string, value: unknown) => {
+    onUpdate({
+      content: {
+        ...element.content,
+        [key]: value,
+      },
+    })
+  }
+
   return (
     <div className="space-y-4">
+      <div className="space-y-2">
+        <Label>Image</Label>
+        <FilesystemExplorer
+          callback={(url) => {
+            updateContent("src", url)
+          }}
+        >
+          <Button variant="outline" className="w-full">
+            <Upload className="mr-2 h-4 w-4" />
+            {content.src ? "Change Image" : "Upload Image"}
+          </Button>
+        </FilesystemExplorer>
+      </div>
+
+      <div className="space-y-2">
+        <Label>Alt Text</Label>
+        <Input
+          type="text"
+          value={content.alt || ""}
+          onChange={(e) => updateContent("alt", e.target.value)}
+          placeholder="Image description"
+        />
+      </div>
+
       <div className="space-y-2">
         <Label>Height (px)</Label>
         <Input

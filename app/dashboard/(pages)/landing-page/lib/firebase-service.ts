@@ -49,16 +49,15 @@ export async function getLandingPages(storeId: string): Promise<LandingPage[]> {
 
 /**
  * Get a landing page by ID
- * @param storeId The store ID
  * @param id The landing page ID
  * @returns Promise with the landing page or null if not found
  */
-export async function getLandingPageById(storeId: string, id: string): Promise<LandingPage | null> {
+export async function getLandingPageById( id: string): Promise<LandingPage | null> {
   try {
     const docRef = doc(db, "landingPages", id)
     const docSnap = await getDoc(docRef)
     
-    if (docSnap.exists() && docSnap.data().storeId === storeId) {
+    if (docSnap.exists()) {
       return {
         id: docSnap.id,
         ...docSnap.data()

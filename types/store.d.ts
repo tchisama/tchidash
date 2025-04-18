@@ -72,7 +72,7 @@ export type Employee = {
   active?: boolean;
 };
 
-type Integration = digylogIntegration | whatsappNotificationIntegration;
+type Integration = digylogIntegration | whatsappNotificationIntegration | posIntegration | landingPageBuilderIntegration;
 
 type digylogIntegration = {
   name: "digylog";
@@ -88,6 +88,16 @@ type whatsappNotificationIntegration = {
   name: "whatsapp";
   enabled: boolean;
   connected: boolean;
+};
+
+type posIntegration = {
+  name: "pos";
+  enabled: boolean;
+};
+
+type landingPageBuilderIntegration = {
+  name: "landing-page-builder";
+  enabled: boolean;
 };
 
 export type whatsappNotification = {

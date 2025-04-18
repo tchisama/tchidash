@@ -4,7 +4,6 @@ import { useState, useEffect } from "react"
 import { Preview } from "./../components/preview"
 import { getLandingPageById } from "../lib/firebase-service"
 import type { PageElement } from "../types/elements"
-import { useStore } from "@/store/storeInfos"
 
 interface LandingPageViewProps {
   pageId: string
@@ -15,13 +14,11 @@ export function LandingPageView({ pageId }: LandingPageViewProps) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // In a real app, you would get the storeId from authentication or context
-  const {storeId} = useStore()
   useEffect(() => {
     async function loadPage() {
       try {
         setLoading(true)
-        const page = await getLandingPageById(storeId??"", pageId)
+        const page = await getLandingPageById(pageId)
 
         if (!page) {
           setError("Page not found")
@@ -43,7 +40,7 @@ export function LandingPageView({ pageId }: LandingPageViewProps) {
     }
 
     loadPage()
-  }, [pageId, storeId])
+  }, [pageId])
 
   if (loading) {
     return (

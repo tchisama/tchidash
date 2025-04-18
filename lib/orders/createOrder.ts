@@ -46,6 +46,7 @@ export interface OrderDetails {
   address: string;
   city: string;
   note?: string;
+  userType?: "default" | "specific";
   cartItems: {
     productId: string;
     variantId: string;
@@ -95,8 +96,8 @@ export const createOrder = async (
       name: `${orderDetails.firstName} ${orderDetails.lastName}`,
       phoneNumber: orderDetails.number,
       shippingAddress: {
-        address: orderDetails.address,
-        city: orderDetails.city,
+        address: orderDetails.address || "POS Default Address",
+        city: orderDetails.city || "POS Default City",
       },
     },
     ...(orderDetails.note &&

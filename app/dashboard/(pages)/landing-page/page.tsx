@@ -5,42 +5,41 @@ import { useStore } from "@/store/storeInfos";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Store } from "lucide-react";
+import { LayoutTemplate } from "lucide-react";
 import { Suspense } from "react";
-import PosSystem from "./components/pos-system";
 import { Loader } from "lucide-react";
 import { usePermission } from "@/hooks/use-permission";
 
-export default function POSPage() {
+export default function LandingPage() {
   const { store } = useStore();
   const router = useRouter();
   const hasViewPermission = usePermission();
 
-  const isPOSEnabled = store?.integrations?.find(i => i.name === "pos")?.enabled ?? false;
-  const canViewPOS = hasViewPermission("pos", "view");
+  const isLandingPageBuilderEnabled = store?.integrations?.find(i => i.name === "landing-page-builder")?.enabled ?? false;
+  const canViewLandingPage = hasViewPermission("landing_page", "view");
 
   useEffect(() => {
-    if (!isPOSEnabled || !canViewPOS) {
+    if (!isLandingPageBuilderEnabled || !canViewLandingPage) {
       router.push("/dashboard");
     }
-  }, [isPOSEnabled, canViewPOS, router]);
+  }, [isLandingPageBuilderEnabled, canViewLandingPage, router]);
 
-  if (!isPOSEnabled) {
+  if (!isLandingPageBuilderEnabled) {
     return (
       <div className="container max-w-4xl py-10">
         <Card>
           <CardHeader>
             <CardTitle className="text-2xl flex items-center gap-2">
-              <Store className="w-6 h-6" />
-              POS Integration Not Enabled
+              <LayoutTemplate className="w-6 h-6" />
+              Landing Page Builder Not Enabled
             </CardTitle>
             <CardDescription>
-              The POS integration is not enabled for your store.
+              The Landing Page Builder integration is not enabled for your store.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <p className="mb-4">
-              To use the POS system, you need to enable the POS integration in your settings.
+              To use the Landing Page Builder, you need to enable it in your settings.
             </p>
             <Button onClick={() => router.push("/dashboard/settings/integrations")}>
               Go to Integrations
@@ -51,17 +50,17 @@ export default function POSPage() {
     );
   }
 
-  if (!canViewPOS) {
+  if (!canViewLandingPage) {
     return (
       <div className="container max-w-4xl py-10">
         <Card>
           <CardHeader>
             <CardTitle className="text-2xl flex items-center gap-2">
-              <Store className="w-6 h-6" />
+              <LayoutTemplate className="w-6 h-6" />
               Access Denied
             </CardTitle>
             <CardDescription>
-              You don{"'"}t have permission to access the POS system.
+              You don{"'"}t have permission to access the Landing Page Builder.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -86,8 +85,11 @@ export default function POSPage() {
           </div>
         }
       >
-        <PosSystem />
+        <div className="container max-w-4xl py-10">
+          <h1 className="text-3xl font-bold mb-8">Landing Page Builder</h1>
+          {/* Add your Landing Page Builder content here */}
+        </div>
       </Suspense>
     </main>
   );
-}
+} 
