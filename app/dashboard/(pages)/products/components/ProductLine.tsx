@@ -221,7 +221,7 @@ const ProductLine = ({
               " - " +
               Math.max(...product.variants.map((v) => v.price))
             : product.price}{" "}
-          Dh
+          dh
         </TableCell>
         <TableCell className="hidden md:table-cell">
           <div>{stockQuantity} </div>

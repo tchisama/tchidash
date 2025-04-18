@@ -2,6 +2,7 @@
 "use client";
 import React, { useState } from "react";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { Label } from "@/components/ui/label";
 
 type Props = {
   children: React.ReactNode;
@@ -21,76 +22,55 @@ function UploadImageProvider({ children, folder, name, callback }: Props) {
   const [uploading, setUploading] = useState(false);
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      const storage = getStorage();
-      const storageRef = ref(storage, `${folder}/${name}`);
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-      const size = file.size / 1024 / 1024;
-      if (size > 4) {
-        alert("The file is too large! Please upload a file smaller than 4MB.");
-        return;
-      }
-      const imageExtension = file.name.split(".").pop() as
-        | "jpg"
-        | "png"
-        | "gif"
-        | "webp";
-      const path = `${folder}/${name}`;
+    // Check file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert("File size must be less than 5MB");
+      return;
+    }
 
-      // Read the image to get width and height
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const img = new Image();
-        img.onload = async function () {
-          const width = img.width;
-          const height = img.height;
+    // Read image dimensions
+    const img = new Image();
+    img.src = URL.createObjectURL(file);
+    await new Promise((resolve) => {
+      img.onload = resolve;
+    });
 
-          console.log(`Image width: ${width}px, height: ${height}px`);
+    const width = img.width;
+    const height = img.height;
+    const format = file.type.split("/")[1];
 
-          setUploading(true);
-          try {
-            // Upload the file
-            const snapshot = await uploadBytes(storageRef, file);
-            console.log("Uploaded a blob or file!", snapshot);
-
-            // Get the download URL
-            const downloadURL = await getDownloadURL(storageRef);
-
-            // Pass the URL, size, width, and height to the callback
-            callback(
-              downloadURL,
-              size,
-              width,
-              height,
-              imageExtension ?? "jpg",
-              path,
-            );
-          } catch (error) {
-            console.error("Error uploading file:", error);
-          } finally {
-            setUploading(false);
-          }
-        };
-        img.src = event.target?.result as string;
-      };
-      reader.readAsDataURL(file); // Convert file to data URL for Image
+    setUploading(true);
+    try {
+      const storageRef = ref(getStorage(), `${folder}/${name}.${format}`);
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+      callback(url, file.size, width, height, format, storageRef.fullPath);
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      alert("Error uploading file");
+    } finally {
+      setUploading(false);
     }
   };
 
   return (
-    <div className="">
+    <div className="relative">
       <input
         type="file"
+        accept="image/*"
         onChange={handleChange}
         className="hidden"
-        id={"image" + name}
-        accept="image/*"
-        disabled={uploading}
+        id={`file-upload-${name}`}
       />
-      <label className="cursor-pointer" htmlFor={"image" + name}>
+      <Label 
+        htmlFor={`file-upload-${name}`}
+        className="cursor-pointer"
+      >
         {uploading ? "Uploading..." : children}
-      </label>
+      </Label>
     </div>
   );
 }

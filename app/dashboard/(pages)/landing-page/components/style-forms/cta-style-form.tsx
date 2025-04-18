@@ -14,7 +14,7 @@ interface CTAStyleFormProps {
 export function CTAStyleForm({ element, onUpdate }: CTAStyleFormProps) {
   const { style } = element
 
-  const updateStyle = (key: string, value: unknown) => {
+  const updateStyle = (key: string, value: any) => {
     onUpdate({
       style: {
         ...element.style,

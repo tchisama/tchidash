@@ -32,7 +32,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreVertical } from "lucide-react";
+import { MoreVertical, Image as ImageIcon, Grid, Coffee, Pizza, Shirt, Book, Music, Heart, Star, Gift, Home, Car, Plane, Train, Bus, Bike, Phone, Laptop, Camera, Headphones, Watch, Utensils, Beer, Wine, Cookie, IceCream, Apple, Carrot, Fish, Beef, Egg, Milk, Cake, Candy, GlassWater, Trash2 } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -43,6 +43,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import FilesystemExplorer from "@/components/FilesystemExplorer";
+import Image from "next/image";
 
  const ProductCategoryCard = () => {
   const { storeId } = useStore();
@@ -54,6 +56,9 @@ import {
 
   const [categoryInputName, setCategoryInputName] = useState<string>("");
   const [selectedMotherCategory, setSelectedMotherCategory] = useState<string>("");
+  const [categoryImage, setCategoryImage] = useState<string>("");
+  const [categoryImagePath, setCategoryImagePath] = useState<string>("");
+  const [selectedIcon, setSelectedIcon] = useState<string>("Grid");
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["categories", storeId],
@@ -81,14 +86,28 @@ import {
   }, [data, setCategories]);
 
   const getCategoryPath = (categoryId: string, categories: ProductCategory[]): string => {
-    const category = categories.find((cat) => cat.id === categoryId);
-    if (!category) return "";
-
-    if (category.motherCategory) {
-      return `${getCategoryPath(category.motherCategory, categories)} / ${category.name}`;
-    }
-
-    return category.name;
+    // Create a Set to track visited category IDs to prevent infinite recursion
+    const visited = new Set<string>();
+    
+    const getPath = (id: string): string => {
+      // If we've already visited this category, return empty to break the cycle
+      if (visited.has(id)) return "";
+      
+      const category = categories.find((cat) => cat.id === id);
+      if (!category) return "";
+      
+      // Mark this category as visited
+      visited.add(id);
+      
+      if (category.motherCategory) {
+        const motherPath = getPath(category.motherCategory);
+        return motherPath ? `${motherPath} / ${category.name}` : category.name;
+      }
+      
+      return category.name;
+    };
+    
+    return getPath(categoryId);
   };
 
   const isLeafCategory = (categoryId: string, categories: ProductCategory[]): boolean => {
@@ -101,6 +120,9 @@ import {
       name: categoryInputName,
       storeId,
       motherCategory: selectedMotherCategory,
+      image: categoryImage,
+      imagePath: categoryImagePath,
+      icon: selectedIcon,
     };
 
     if (editCategory) {
@@ -129,6 +151,8 @@ import {
     setAddCategory(false);
     setCategoryInputName("");
     setSelectedMotherCategory("");
+    setCategoryImage("");
+    setCategoryImagePath("");
   };
 
   const handleDeleteCategory = async () => {
@@ -136,6 +160,58 @@ import {
     await deleteDoc(doc(db, "categories", deleteCategoryId));
     setCategories(categories.filter((cat) => cat.id !== deleteCategoryId));
     setDeleteCategoryId(null);
+  };
+
+  const handleImageUpload = (
+    url: string,
+    size: number,
+    width: number,
+    height: number,
+    format: string,
+    path: string,
+  ) => {
+    setCategoryImage(url);
+    setCategoryImagePath(path);
+  };
+
+  const getIconComponent = (iconName: string) => {
+    switch (iconName) {
+      case "Grid": return Grid;
+      case "Coffee": return Coffee;
+      case "Pizza": return Pizza;
+      case "Shirt": return Shirt;
+      case "Book": return Book;
+      case "Music": return Music;
+      case "Heart": return Heart;
+      case "Star": return Star;
+      case "Gift": return Gift;
+      case "Home": return Home;
+      case "Car": return Car;
+      case "Plane": return Plane;
+      case "Train": return Train;
+      case "Bus": return Bus;
+      case "Bike": return Bike;
+      case "Phone": return Phone;
+      case "Laptop": return Laptop;
+      case "Camera": return Camera;
+      case "Headphones": return Headphones;
+      case "Watch": return Watch;
+      case "Utensils": return Utensils;
+      case "Beer": return Beer;
+      case "Wine": return Wine;
+      case "Cookie": return Cookie;
+      case "IceCream": return IceCream;
+      case "Apple": return Apple;
+      case "Carrot": return Carrot;
+      case "Fish": return Fish;
+      case "Beef": return Beef;
+      case "Egg": return Egg;
+      case "Milk": return Milk;
+      case "Cake": return Cake;
+      case "Candy": return Candy;
+      case "GlassWater": return GlassWater;
+      default: return Grid;
+    }
   };
 
   if (isLoading) return <div>Loading...</div>;
@@ -152,6 +228,8 @@ import {
             onClick={() => {
               setAddCategory((p) => !p);
               setEditCategory(null);
+              setCategoryImage("");
+              setCategoryImagePath("");
             }}
           >
             {addCategory ? "Cancel" : "Add Category"}
@@ -169,7 +247,6 @@ import {
                 <Button
                   onClick={handleSaveCategory}
                   size="sm"
-                  variant={"outline"}
                 >
                   {editCategory ? "Update" : "Save"}
                 </Button>
@@ -201,6 +278,73 @@ import {
                     ))}
                 </SelectContent>
               </Select>
+              
+              <div className="flex flex-col gap-2">
+                <Label>Icon</Label>
+                <div className="grid grid-cols-6 gap-2">
+                  {[
+                    "Grid", "Coffee", "Pizza", "Shirt", "Book", "Music", 
+                    "Heart", "Star", "Gift", "Home", "Car", "Plane", 
+                    "Train", "Bus", "Bike", "Phone", "Laptop", "Camera", 
+                    "Headphones", "Watch", "Utensils", "Beer", "Wine", 
+                    "Cookie", "IceCream", "Apple", "Carrot", "Fish", 
+                    "Beef", "Egg", "Milk", "Cake", "Candy", "GlassWater"
+                  ].map((iconName) => {
+                    const IconComponent = getIconComponent(iconName);
+                    return (
+                      <Button
+                        key={iconName}
+                        variant={selectedIcon === iconName ? "default" : "outline"}
+                        size="icon"
+                        className="h-10 w-10"
+                        onClick={() => setSelectedIcon(iconName)}
+                      >
+                        <IconComponent className="h-5 w-5" />
+                      </Button>
+                    );
+                  })}
+                </div>
+              </div>
+              
+              <div className="flex flex-col gap-2">
+                <Label>Image</Label>
+                <div className="flex items-center gap-2">
+                  <FilesystemExplorer
+                    callback={(url) => {
+                      setCategoryImage(url);
+                      setCategoryImagePath(url);
+                    }}
+                  >
+                    <Button variant="outline" className="">
+                      {categoryImage ? "Change Image" : "Select Image"}
+                    </Button>
+                  </FilesystemExplorer>
+                  
+                  {categoryImage && (
+                    <Button 
+                      variant="outline" 
+                      size="icon"
+                      onClick={() => {
+                        setCategoryImage("");
+                        setCategoryImagePath("");
+                      }}
+                      className="h-10 w-10"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+                {categoryImage && (
+                  <div className="relative w-32 h-32">
+                    <Image
+                      src={categoryImage}
+                      alt="Category"
+                      fill
+                      className="object-cover rounded-lg"
+                    />
+                  </div>
+                )}
+              </div>
             </div>
           )}
           {categories && categories.length > 0 ? (
@@ -228,7 +372,26 @@ import {
                         className="flex items-center justify-between"
                       >
                         <SelectItem value={category.id}>
-                          {getCategoryPath(category.id, categories)}
+                          <div className="flex items-center gap-2">
+                            {category.image ? (
+                              <div className="relative w-6 h-6 rounded-full overflow-hidden">
+                                <Image 
+                                  src={category.image} 
+                                  alt={category.name} 
+                                  fill 
+                                  className="object-cover"
+                                />
+                              </div>
+                            ) : (
+                              <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center">
+                                {(() => {
+                                  const IconComponent = getIconComponent(category.icon || "Grid");
+                                  return <IconComponent className="h-3 w-3 text-slate-400" />;
+                                })()}
+                              </div>
+                            )}
+                            <span>{getCategoryPath(category.id, categories)}</span>
+                          </div>
                         </SelectItem>
                         <DropdownMenu>
                           <DropdownMenuTrigger className="w-6 mx-2">
@@ -239,9 +402,10 @@ import {
                               onClick={() => {
                                 setEditCategory(category);
                                 setCategoryInputName(category.name);
-                                setSelectedMotherCategory(
-                                  category.motherCategory,
-                                );
+                                setSelectedMotherCategory(category.motherCategory);
+                                setCategoryImage(category.image || "");
+                                setCategoryImagePath(category?.imagePath || "");
+                                setSelectedIcon(category.icon || "Grid");
                                 setAddCategory(true);
                               }}
                             >

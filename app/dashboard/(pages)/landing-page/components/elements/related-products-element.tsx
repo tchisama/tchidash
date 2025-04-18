@@ -83,7 +83,7 @@ export function RelatedProductsElement({ element }: RelatedProductsElementProps)
 
               {content.showProductPrices !== false && (
                 <p style={productPriceStyle} className="mb-4">
-                  ${product.price.toFixed(2)}
+                  {product.price.toFixed(2)} dh
                 </p>
               )}
 

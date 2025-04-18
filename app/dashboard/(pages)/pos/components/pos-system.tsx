@@ -9,6 +9,45 @@ import {
   Search,
   ShoppingBag,
   Trash2,
+  Grid,
+  Image as ImageIcon,
+  Coffee,
+  Pizza,
+  Shirt,
+  Book,
+  Music,
+  Heart,
+  Star,
+  Gift,
+  Home,
+  Car,
+  Plane,
+  Train,
+  Bus,
+  Bike,
+  Phone,
+  Laptop,
+  Camera,
+  Headphones,
+  Watch,
+  Utensils,
+  Beer,
+  Wine,
+  Cookie,
+  IceCream,
+  Apple,
+  Carrot,
+  Fish,
+  Beef,
+  Egg,
+  Milk,
+  Bread,
+  Cake,
+  Candy,
+  Tea,
+  Juice,
+  Water,
+  GlassWater,
 } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -28,6 +67,11 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useStore } from "@/store/storeInfos";
 import { createOrder, OrderDetails } from "@/lib/orders/createOrder";
+import { useCategories } from "@/store/categories";
+import { ProductCategory } from "@/types/categories";
+import { collection, query, where } from "firebase/firestore";
+import { db } from "@/firebase";
+import { dbGetDocs } from "@/lib/dbFuntions/fbFuns";
 
 // Product Types
 interface ProductVariant {
@@ -58,6 +102,7 @@ interface Product {
   variants: ProductVariant[];
   hasDiscount: boolean;
   status: string;
+  category?: string;
 }
 
 interface CartItem {
@@ -88,6 +133,9 @@ export default function PosSystem() {
   const [isCheckoutDialogOpen, setIsCheckoutDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { storeId: STORE_ID } = useStore();
+  const [categories, setCategories] = useState<ProductCategory[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const { setCategories: setGlobalCategories } = useCategories();
 
   // Checkout form state
   const [checkoutForm, setCheckoutForm] = useState({
@@ -167,10 +215,52 @@ export default function PosSystem() {
     setProductQuantities(quantities);
   }, [cart]);
 
+  // Fetch categories
+  useEffect(() => {
+    const fetchCategories = async () => {
+      if (!STORE_ID) return;
+      
+      try {
+        const response = await dbGetDocs(
+          query(collection(db, "categories"), where("storeId", "==", STORE_ID)),
+          STORE_ID,
+          "",
+        );
+        
+        const categoriesData = response.docs.map(
+          (doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }) as ProductCategory,
+        );
+        
+        setCategories(categoriesData);
+        setGlobalCategories(categoriesData);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load categories. Please try again.",
+          variant: "destructive",
+        });
+      }
+    };
+
+    fetchCategories();
+  }, [STORE_ID, setGlobalCategories]);
+
   const filteredProducts = Array.isArray(products)
-    ? products.filter((product) =>
-        product.title.toLowerCase().includes(searchQuery.toLowerCase()),
-      )
+    ? products.filter((product) => {
+        // Filter by search query
+        const matchesSearch = product.title.toLowerCase().includes(searchQuery.toLowerCase());
+        
+        // Filter by category if selected
+        const matchesCategory = selectedCategory 
+          ? product.category === selectedCategory 
+          : true;
+        
+        return matchesSearch && matchesCategory;
+      })
     : [];
 
   const handleProductSelect = (product: Product) => {
@@ -337,7 +427,7 @@ export default function PosSystem() {
 
       toast({
         title: "Order placed successfully",
-        description: `Total: ${calculateTotal()} Dh`,
+        description: `Total: ${calculateTotal()} dh`,
       });
 
       // Reset cart and close dialog
@@ -367,6 +457,78 @@ export default function PosSystem() {
     }
   };
 
+  // Function to get a default icon based on category name
+  const getDefaultIcon = (categoryName: string) => {
+    const name = categoryName.toLowerCase();
+    
+    if (name.includes('food') || name.includes('restaurant') || name.includes('meal')) return Pizza;
+    if (name.includes('drink') || name.includes('beverage') || name.includes('coffee')) return Coffee;
+    if (name.includes('clothing') || name.includes('fashion') || name.includes('apparel')) return Shirt;
+    if (name.includes('book') || name.includes('magazine') || name.includes('reading')) return Book;
+    if (name.includes('music') || name.includes('audio') || name.includes('song')) return Music;
+    if (name.includes('health') || name.includes('medical') || name.includes('fitness')) return Heart;
+    if (name.includes('favorite') || name.includes('trending') || name.includes('popular')) return Star;
+    if (name.includes('gift') || name.includes('present') || name.includes('special')) return Gift;
+    if (name.includes('home') || name.includes('furniture') || name.includes('decor')) return Home;
+    if (name.includes('car') || name.includes('auto') || name.includes('vehicle')) return Car;
+    if (name.includes('air') || name.includes('flight') || name.includes('travel')) return Plane;
+    if (name.includes('train') || name.includes('railway')) return Train;
+    if (name.includes('bus') || name.includes('transport')) return Bus;
+    if (name.includes('bike') || name.includes('bicycle')) return Bike;
+    if (name.includes('phone') || name.includes('mobile')) return Phone;
+    if (name.includes('laptop') || name.includes('computer')) return Laptop;
+    if (name.includes('camera') || name.includes('photo')) return Camera;
+    if (name.includes('headphone') || name.includes('audio')) return Headphones;
+    if (name.includes('watch') || name.includes('time')) return Watch;
+    
+    return Grid; // Default icon
+  };
+
+  // Function to get an icon component based on the category's icon
+  const getIconComponent = (iconName: string) => {
+    switch (iconName) {
+      case "Grid": return Grid;
+      case "Coffee": return Coffee;
+      case "Pizza": return Pizza;
+      case "Shirt": return Shirt;
+      case "Book": return Book;
+      case "Music": return Music;
+      case "Heart": return Heart;
+      case "Star": return Star;
+      case "Gift": return Gift;
+      case "Home": return Home;
+      case "Car": return Car;
+      case "Plane": return Plane;
+      case "Train": return Train;
+      case "Bus": return Bus;
+      case "Bike": return Bike;
+      case "Phone": return Phone;
+      case "Laptop": return Laptop;
+      case "Camera": return Camera;
+      case "Headphones": return Headphones;
+      case "Watch": return Watch;
+      case "Utensils": return Utensils;
+      case "Beer": return Beer;
+      case "Wine": return Wine;
+      case "Cookie": return Cookie;
+      case "IceCream": return IceCream;
+      case "Apple": return Apple;
+      case "Carrot": return Carrot;
+      case "Fish": return Fish;
+      case "Beef": return Beef;
+      case "Egg": return Egg;
+      case "Milk": return Milk;
+      case "Bread": return Bread;
+      case "Cake": return Cake;
+      case "Candy": return Candy;
+      case "Tea": return Tea;
+      case "Juice": return Juice;
+      case "Water": return Water;
+      case "GlassWater": return GlassWater;
+      default: return Grid;
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -379,11 +541,44 @@ export default function PosSystem() {
     <div className="grid grid-cols-1 lg:grid-cols-4 min-h-screen">
       <div className="lg:col-span-3 p-4 md:p-6 overflow-auto relative">
         <header className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-          <div>
-            <h1 className="text-2xl font-bold">POS System</h1>
-            <p className="text-muted-foreground">
-              Manage your sales efficiently
-            </p>
+          <div className="w-full">
+            <div className="flex flex-wrap gap-2">
+              <Button 
+                variant={selectedCategory === null ? "default" : "outline"} 
+                size="sm"
+                onClick={() => setSelectedCategory(null)}
+                    className="flex items-center gap-2 flex-col w-24 h-20"
+              >
+                <Grid className="h-8 w-8" strokeWidth={1} />
+                All
+              </Button>
+              {categories.map((category) => {
+                const IconComponent = getIconComponent(category.icon || "Grid");
+                return (
+                  <Button
+                    key={category.id}
+                    variant={selectedCategory === category.id ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setSelectedCategory(category.id)}
+                    className="flex items-center gap-2 flex-col w-24 h-20"
+                  >
+                    {category.image ? (
+                      <div className="relative w-4 h-4 rounded-full overflow-hidden">
+                        <Image 
+                          src={category.image} 
+                          alt={category.name} 
+                          fill 
+                          className="object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <IconComponent className="h-8 w-8" strokeWidth={1} />
+                    )}
+                    {category.name}
+                  </Button>
+                );
+              })}
+            </div>
           </div>
 
           <div className="relative w-full md:w-80">
@@ -402,10 +597,10 @@ export default function PosSystem() {
             filteredProducts.map((product) => (
               <Card
                 key={product.id}
-                className="overflow-hidden cursor-pointer hover:shadow-md transition-shadow relative"
+                className="overflow-hidden cursor-pointer hover:shadow-md transition-shadow relative flex flex-col"
                 onClick={() => handleProductSelect(product)}
               >
-                <div className="relative aspect-square">
+                <div className="relative aspect-square w-full">
                   <Image
                     src={
                       product.images[0] ||
@@ -428,10 +623,10 @@ export default function PosSystem() {
                     </div>
                   )}
                 </div>
-                <CardContent className="p-4">
-                  <h3 className="font-medium truncate">{product.title}</h3>
-                  <div className="flex justify-between items-center mt-1">
-                    <p className="font-bold">${product.price}</p>
+                <CardContent className="p-4 flex flex-col gap-1">
+                  <h3 className="font-medium truncate text-center">{product.title}</h3>
+                  <div className="flex justify-between items-center">
+                    <p className="font-bold">{product.price} dh</p>
                     {product.variants.length > 0 && (
                       <p className="text-xs text-muted-foreground">
                         {product.variants.length} variants
@@ -494,7 +689,7 @@ export default function PosSystem() {
                       </p>
                     )}
                     <div className="flex items-center justify-between mt-1">
-                      <span className="text-sm font-medium">${item.price}</span>
+                      <span className="text-sm font-medium">{item.price} dh</span>
                       <span className="text-sm">×{item.quantity}</span>
                     </div>
                   </div>
@@ -518,11 +713,11 @@ export default function PosSystem() {
         <div className="p-4 border-t">
           <div className="flex justify-between mb-2">
             <span>Subtotal</span>
-            <span>${calculateTotal()}</span>
+            <span>{calculateTotal()} dh</span>
           </div>
           <div className="flex justify-between font-medium text-lg mb-4">
             <span>Total</span>
-            <span>${calculateTotal()}</span>
+            <span>{calculateTotal()} dh</span>
           </div>
           <Button
             className="w-full"
@@ -597,7 +792,7 @@ export default function PosSystem() {
               <div>
                 <h2 className="text-xl font-bold">{selectedProduct.title}</h2>
                 <p className="text-2xl font-bold mt-2">
-                  ${selectedVariant.price}
+                  {selectedVariant.price} dh
                 </p>
 
                 {selectedProduct.options.length > 0 && (
@@ -778,14 +973,14 @@ export default function PosSystem() {
                         </span>
                       )}
                     </span>
-                    <span>${item.price * item.quantity}</span>
+                    <span>{item.price * item.quantity} dh</span>
                   </div>
                 ))}
               </div>
 
               <div className="flex justify-between font-medium text-lg mt-4 pt-4 border-t">
                 <span>Total</span>
-                <span>${calculateTotal()}</span>
+                <span>{calculateTotal()} dh</span>
               </div>
             </div>
           </div>

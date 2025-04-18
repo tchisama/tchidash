@@ -5,4 +5,6 @@ export type ProductCategory = {
   motherCategory: string;
   description?: string;
   image?: string;
+  imagePath?: string;
+  icon?: string;
 };
