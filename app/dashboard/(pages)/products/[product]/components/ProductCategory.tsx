@@ -32,7 +32,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreVertical, Image as ImageIcon, Grid, Coffee, Pizza, Shirt, Book, Music, Heart, Star, Gift, Home, Car, Plane, Train, Bus, Bike, Phone, Laptop, Camera, Headphones, Watch, Utensils, Beer, Wine, Cookie, IceCream, Apple, Carrot, Fish, Beef, Egg, Milk, Cake, Candy, GlassWater, Trash2 } from "lucide-react";
+import { MoreVertical , Grid, Coffee, Pizza, Shirt, Book, Music, Heart, Star, Gift, Home, Car, Plane, Train, Bus, Bike, Phone, Laptop, Camera, Headphones, Watch, Utensils, Beer, Wine, Cookie, IceCream, Apple, Carrot, Fish, Beef, Egg, Milk, Cake, Candy, GlassWater, Trash2 } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -162,17 +162,6 @@ import Image from "next/image";
     setDeleteCategoryId(null);
   };
 
-  const handleImageUpload = (
-    url: string,
-    size: number,
-    width: number,
-    height: number,
-    format: string,
-    path: string,
-  ) => {
-    setCategoryImage(url);
-    setCategoryImagePath(path);
-  };
 
   const getIconComponent = (iconName: string) => {
     switch (iconName) {

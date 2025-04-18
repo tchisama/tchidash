@@ -10,7 +10,6 @@ import {
   ShoppingBag,
   Trash2,
   Grid,
-  Image as ImageIcon,
   Coffee,
   Pizza,
   Shirt,
@@ -41,12 +40,8 @@ import {
   Beef,
   Egg,
   Milk,
-  Bread,
   Cake,
   Candy,
-  Tea,
-  Juice,
-  Water,
   GlassWater,
 } from "lucide-react";
 import Image from "next/image";
@@ -457,32 +452,6 @@ export default function PosSystem() {
     }
   };
 
-  // Function to get a default icon based on category name
-  const getDefaultIcon = (categoryName: string) => {
-    const name = categoryName.toLowerCase();
-    
-    if (name.includes('food') || name.includes('restaurant') || name.includes('meal')) return Pizza;
-    if (name.includes('drink') || name.includes('beverage') || name.includes('coffee')) return Coffee;
-    if (name.includes('clothing') || name.includes('fashion') || name.includes('apparel')) return Shirt;
-    if (name.includes('book') || name.includes('magazine') || name.includes('reading')) return Book;
-    if (name.includes('music') || name.includes('audio') || name.includes('song')) return Music;
-    if (name.includes('health') || name.includes('medical') || name.includes('fitness')) return Heart;
-    if (name.includes('favorite') || name.includes('trending') || name.includes('popular')) return Star;
-    if (name.includes('gift') || name.includes('present') || name.includes('special')) return Gift;
-    if (name.includes('home') || name.includes('furniture') || name.includes('decor')) return Home;
-    if (name.includes('car') || name.includes('auto') || name.includes('vehicle')) return Car;
-    if (name.includes('air') || name.includes('flight') || name.includes('travel')) return Plane;
-    if (name.includes('train') || name.includes('railway')) return Train;
-    if (name.includes('bus') || name.includes('transport')) return Bus;
-    if (name.includes('bike') || name.includes('bicycle')) return Bike;
-    if (name.includes('phone') || name.includes('mobile')) return Phone;
-    if (name.includes('laptop') || name.includes('computer')) return Laptop;
-    if (name.includes('camera') || name.includes('photo')) return Camera;
-    if (name.includes('headphone') || name.includes('audio')) return Headphones;
-    if (name.includes('watch') || name.includes('time')) return Watch;
-    
-    return Grid; // Default icon
-  };
 
   // Function to get an icon component based on the category's icon
   const getIconComponent = (iconName: string) => {
@@ -518,12 +487,8 @@ export default function PosSystem() {
       case "Beef": return Beef;
       case "Egg": return Egg;
       case "Milk": return Milk;
-      case "Bread": return Bread;
       case "Cake": return Cake;
       case "Candy": return Candy;
-      case "Tea": return Tea;
-      case "Juice": return Juice;
-      case "Water": return Water;
       case "GlassWater": return GlassWater;
       default: return Grid;
     }
