@@ -14,7 +14,7 @@ interface OrderFormStyleFormProps {
 export function OrderFormStyleForm({ element, onUpdate }: OrderFormStyleFormProps) {
   const { style } = element
 
-  const updateStyle = (key: string, value: any) => {
+  const updateStyle = (key: string, value: unknown) => {
     onUpdate({
       style: {
         ...element.style,

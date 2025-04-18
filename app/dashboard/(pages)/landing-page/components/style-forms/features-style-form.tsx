@@ -14,7 +14,7 @@ interface FeaturesStyleFormProps {
 export function FeaturesStyleForm({ element, onUpdate }: FeaturesStyleFormProps) {
   const { style } = element
 
-  const updateStyle = (key: string, value: any) => {
+  const updateStyle = (key: string, value: unknown) => {
     onUpdate({
       style: {
         ...element.style,

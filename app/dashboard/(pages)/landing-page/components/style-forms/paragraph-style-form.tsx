@@ -14,7 +14,7 @@ interface ParagraphStyleFormProps {
 export function ParagraphStyleForm({ element, onUpdate }: ParagraphStyleFormProps) {
   const { style } = element
 
-  const updateStyle = (key: string, value: any) => {
+  const updateStyle = (key: string, value: unknown) => {
     onUpdate({
       style: {
         ...element.style,

@@ -14,7 +14,7 @@ interface ReviewsStyleFormProps {
 export function ReviewsStyleForm({ element, onUpdate }: ReviewsStyleFormProps) {
   const { style } = element
 
-  const updateStyle = (key: string, value: any) => {
+  const updateStyle = (key: string, value: unknown) => {
     onUpdate({
       style: {
         ...element.style,

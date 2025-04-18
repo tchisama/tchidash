@@ -14,7 +14,7 @@ interface HeaderStyleFormProps {
 export function HeaderStyleForm({ element, onUpdate }: HeaderStyleFormProps) {
   const { style } = element
 
-  const updateStyle = (key: string, value: any) => {
+  const updateStyle = (key: string, value: unknown) => {
     onUpdate({
       style: {
         ...element.style,

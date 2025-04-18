@@ -18,10 +18,10 @@ export interface PageElement {
   id: string
   type: ElementType
   content: {
-    [key: string]: any
+    [key: string]: unknown
   }
   style: {
-    [key: string]: any
+    [key: string]: unknown
   }
 }
 

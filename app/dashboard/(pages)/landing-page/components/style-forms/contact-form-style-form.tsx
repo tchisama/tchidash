@@ -14,7 +14,7 @@ interface ContactFormStyleFormProps {
 export function ContactFormStyleForm({ element, onUpdate }: ContactFormStyleFormProps) {
   const { style } = element
 
-  const updateStyle = (key: string, value: any) => {
+  const updateStyle = (key: string, value: unknown) => {
     onUpdate({
       style: {
         ...element.style,

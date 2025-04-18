@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import { LandingPagesList } from "./../../components/landing-pages-list"
 import { useStore } from "@/store/storeInfos"
 

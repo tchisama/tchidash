@@ -14,7 +14,7 @@ interface SpecificationsStyleFormProps {
 export function SpecificationsStyleForm({ element, onUpdate }: SpecificationsStyleFormProps) {
   const { style } = element
 
-  const updateStyle = (key: string, value: any) => {
+  const updateStyle = (key: string, value: unknown) => {
     onUpdate({
       style: {
         ...element.style,

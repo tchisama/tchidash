@@ -15,7 +15,7 @@ export interface ProductVariant {
     option: string
     value: string
   }>
-  [key: string]: any
+  [key: string]: unknown
 }
 
 export interface Product {
@@ -29,7 +29,7 @@ export interface Product {
     values: string[]
   }>
   variants: ProductVariant[]
-  [key: string]: any
+  [key: string]: unknown
 }
 
 interface ProductContextType {

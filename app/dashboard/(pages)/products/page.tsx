@@ -16,7 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { addDoc, and, collection, query, Timestamp, where } from "firebase/firestore";
+import { addDoc, collection, Timestamp } from "firebase/firestore";
 import { useProducts } from "@/store/products";
 import { db } from "@/firebase";
 import { Product } from "@/types/product";
@@ -27,31 +27,29 @@ import { exportJson } from "./components/exportJson";
 import ImportProducts from "./components/ImportProductsButton";
 import FilteringComponent from "@/components/global/filter";
 import { cleanupObject } from "@/lib/utils/convertDatesToTimestamps";
-import { useQuery } from "@tanstack/react-query";
-import { dbGetDocs } from "@/lib/dbFuntions/fbFuns";
 // Sample product data
 
 export default function Page() {
   const { setCurrentProduct, products = [], setProducts } = useProducts();
   const { storeId } = useStore();
-  const { data, error, isLoading } = useQuery({
-    queryKey: ["products", storeId],
-    queryFn: async () => {
-      const q = query(
-        collection(db, "products"),
-        and(where("storeId", "==", storeId), where("status", "!=", "deleted")),
-      );
-      if (!storeId) return;
-      const response = await dbGetDocs(q, storeId, "");
-      const data = response.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id,
-      }));
-      return data;
-    },
-    refetchOnWindowFocus: false,
-    // staleTime: 20000, // Data stays fresh for 10 seconds
-  });
+  // const { data, error, isLoading } = useQuery({
+  //   queryKey: ["products", storeId],
+  //   queryFn: async () => {
+  //     const q = query(
+  //       collection(db, "products"),
+  //       and(where("storeId", "==", storeId), where("status", "!=", "deleted")),
+  //     );
+  //     if (!storeId) return;
+  //     const response = await dbGetDocs(q, storeId, "");
+  //     const data = response.docs.map((doc) => ({
+  //       ...doc.data(),
+  //       id: doc.id,
+  //     }));
+  //     return data;
+  //   },
+  //   refetchOnWindowFocus: false,
+  //   // staleTime: 20000, // Data stays fresh for 10 seconds
+  // });
   const router = useRouter();
   // useEffect(() => {
   //   setCurrentProduct(null);

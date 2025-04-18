@@ -63,7 +63,7 @@ export function RelatedProductsElement({ element }: RelatedProductsElementProps)
       <p style={subtitleStyle}>{content.subtitle || "Customers who bought this item also purchased"}</p>
 
       <div className={`grid grid-cols-1 md:grid-cols-${columns} gap-6`}>
-        {products.map((product: any) => (
+        {products.map((product: unknown) => (
           <div key={product.id} style={productStyle} className="overflow-hidden">
             {content.showProductImages !== false && product.image && (
               <div className="aspect-square w-full overflow-hidden">

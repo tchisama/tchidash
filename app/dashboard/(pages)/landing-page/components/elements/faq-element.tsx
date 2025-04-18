@@ -59,7 +59,7 @@ export function FAQElement({ element }: FAQElementProps) {
       <p style={subtitleStyle}>{content.subtitle || "Find answers to common questions about our product"}</p>
 
       <Accordion type="single" collapsible className="w-full">
-        {faqs.map((faq: FAQ, index: number) => (
+        {faqs.map((faq: FAQ) => (
           <AccordionItem
             key={faq.id}
             value={faq.id}

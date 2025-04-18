@@ -152,7 +152,7 @@ const OptionRow = ({ option, index }: { option: Option; index: number }) => {
     setNewValue("");
   };
 
-  const updateOption = (field: keyof Option, value: any) => {
+  const updateOption = (field: keyof Option, value: unknown) => {
     if (!currentProduct) return;
 
     const newOptions = [...(currentProduct.options || [])];

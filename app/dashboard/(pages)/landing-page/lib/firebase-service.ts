@@ -10,7 +10,6 @@ import {
   deleteDoc, 
   query, 
   where, 
-  serverTimestamp 
 } from "firebase/firestore"
 
 // Define types for our data structures
