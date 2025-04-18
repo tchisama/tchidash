@@ -10,6 +10,14 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle, Minus, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Card, CardContent } from "@/components/ui/card"
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
 
 interface VariantSelectorElementProps {
   element: PageElement
@@ -82,6 +90,51 @@ export function VariantSelectorElement({ element }: VariantSelectorElementProps)
     <div style={containerStyle}>
       <h2 className="text-xl font-bold mb-4">{productTitle}</h2>
 
+      {/* Variant Image Display */}
+      {selectedVariant?.images && selectedVariant.images.length > 0 && (
+        <div className="mb-6 w-full">
+          {selectedVariant.images.length === 1 ? (
+            <Card className="border-0">
+              <CardContent className="flex items-center justify-center p-2">
+                <div className="relative w-full aspect-square max-w-[500px]">
+                  <Image
+                    src={selectedVariant.images[0]}
+                    alt={`${selectedVariant.title} - Image`}
+                    fill
+                    className="object-cover w-full rounded-md"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <Carousel className="w-full">
+              <CarouselContent>
+                {selectedVariant.images.map((image, index) => (
+                  <CarouselItem key={index}>
+                    <Card className="border-0">
+                      <CardContent className="flex items-center justify-center p-2">
+                        <div className="relative w-full aspect-[16/9] max-h-[500px]">
+                          <Image
+                            src={image}
+                            alt={`${selectedVariant.title} - Image ${index + 1}`}
+                            fill
+                            className="object-contain rounded-md"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
+                          />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="left-2" />
+              <CarouselNext className="right-2" />
+            </Carousel>
+          )}
+        </div>
+      )}
+
       {selectedProduct.options.map((option, index) => (
         <div key={index} className="mb-6 last:mb-0">
           {/* Use custom option name if provided, otherwise use product option name */}
@@ -105,17 +158,6 @@ export function VariantSelectorElement({ element }: VariantSelectorElementProps)
                     htmlFor={variant.id}
                     className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-white p-4 hover:bg-gray-50 hover:border-gray-300 peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                   >
-                    {variant.images && variant.images.length > 0 && (
-                      <div className="mb-3 w-full">
-                        <Image
-                          src={variant.images[0] || "/placeholder.svg"}
-                          alt={variant.title}
-                          width={150}
-                          height={150}
-                          className="w-full h-auto object-cover rounded-md"
-                        />
-                      </div>
-                    )}
                     <div className="font-medium">{variant.title}</div>
                     <div className="mt-1 text-sm">${variant.price}</div>
                   </Label>
@@ -132,19 +174,20 @@ export function VariantSelectorElement({ element }: VariantSelectorElementProps)
             <div className="font-medium text-lg">{getFullProductTitle()}</div>
             <div className="text-sm text-muted-foreground mb-4">Unit Price: ${selectedVariant.price}</div>
 
-            <div className="flex items-center space-x-2 mb-4">
+            <div className="flex flex-col  space-x-2 mb-4">
               <Label htmlFor="quantity" className="font-medium">
                 Quantity:
               </Label>
+              <br />
               <div className="flex items-center">
                 <Button
-                  variant="outline"
+                  variant={"secondary"}
                   size="icon"
-                  className="h-8 w-8 rounded-r-none"
+                  className="h-10 w-10 rounded-r-none bg-gray-300"
                   onClick={() => handleQuantityChange(quantity - 1)}
                   disabled={quantity <= 1}
                 >
-                  <Minus className="h-3 w-3" />
+                  <Minus className="h-4 w-4" />
                   <span className="sr-only">Decrease quantity</span>
                 </Button>
                 <Input
@@ -154,16 +197,16 @@ export function VariantSelectorElement({ element }: VariantSelectorElementProps)
                   max={selectedVariant.inventoryQuantity || 100}
                   value={quantity}
                   onChange={(e) => handleQuantityChange(Number.parseInt(e.target.value) || 1)}
-                  className="h-8 w-16 rounded-none text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  className="h-10 w-16 rounded-none text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
                 <Button
-                  variant="outline"
+                  variant={"secondary"}
                   size="icon"
-                  className="h-8 w-8 rounded-l-none"
+                  className="h-10 w-10 rounded-l-none bg-gray-300"
                   onClick={() => handleQuantityChange(quantity + 1)}
                   disabled={quantity >= (selectedVariant.inventoryQuantity || 100)}
                 >
-                  <Plus className="h-3 w-3" />
+                  <Plus className="h-4 w-4" />
                   <span className="sr-only">Increase quantity</span>
                 </Button>
               </div>

@@ -63,7 +63,7 @@ export function Preview({ elements, previewWidth = 1280, screenSize }: PreviewPr
     <div className="h-full bg-gray-100 overflow-hidden">
       <ScrollArea className="h-full">
         <div
-          className={`mx-auto p-8 transition-all duration-300 ${screenSize === "mobile" ? "max-w-[375px]" : screenSize === "tablet" ? "max-w-[768px]" : "max-w-[1280px]"}`}
+          className={`mx-auto p-0 transition-all duration-300 ${screenSize === "mobile" ? "max-w-[375px]" : screenSize === "tablet" ? "max-w-[768px]" : "max-w-[1280px]"}`}
         >
           <div
             className="bg-white shadow-sm rounded-lg overflow-hidden"
