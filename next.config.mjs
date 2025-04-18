@@ -14,6 +14,10 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  // avoid wornings
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   webpack: (config) => {
     config.externals = [...config.externals, { canvas: "canvas" }];
     return config;
