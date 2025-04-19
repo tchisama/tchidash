@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Loader2, PlusCircle,  StoreIcon } from "lucide-react";
+import { Loader2, PlusCircle, StoreIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { and, collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/firebase";
@@ -22,7 +22,6 @@ import { useStore } from "@/store/storeInfos";
 import useClean from "@/hooks/useClean";
 import { Store } from "@/types/store";
 import Image from "next/image";
-
 
 export default function StoreSwitchCard() {
   const [selectedStore, setSelectedStore] = useState<string>("");
@@ -48,21 +47,28 @@ export default function StoreSwitchCard() {
           and(where("ownerEmail", "==", session?.user?.email)),
         );
         const querySnapshot = await getDocs(q);
-        const stores = querySnapshot.docs.map(
+        const ownedStores = querySnapshot.docs.map(
           (doc) => ({ ...doc.data(), id: doc.id }) as Store,
         );
         cleanAll();
-        setStores(stores);
+        setStores(ownedStores);
 
         const q2 = query(
           collection(db, "stores"),
           and(where("employeesEmails", "array-contains", session?.user?.email)),
         );
         const querySnapshot2 = await getDocs(q2);
-        const workOnStores = querySnapshot2.docs.map(
+        const allWorkOnStores = querySnapshot2.docs.map(
           (doc) => ({ ...doc.data(), id: doc.id }) as Store,
         );
-        setWorkOnStores(workOnStores);
+
+        // Filter out stores that you already own
+        const filteredWorkOnStores = allWorkOnStores.filter(
+          (store) =>
+            !ownedStores.some((ownedStore) => ownedStore.id === store.id),
+        );
+
+        setWorkOnStores(filteredWorkOnStores);
       } catch (error) {
         console.error("Error fetching stores:", error);
       }
@@ -76,7 +82,6 @@ export default function StoreSwitchCard() {
   const handleContinue = () => {
     setLoading(true);
     console.log(`Continuing to dashboard for store: ${selectedStore}`);
-    // Add your logic here to navigate to the dashboard or perform any other action
     setStoreId(selectedStore);
     router.push("/dashboard");
   };
@@ -113,20 +118,20 @@ export default function StoreSwitchCard() {
                     htmlFor={store.id}
                     className="flex items-center cursor-pointer"
                   >
-                    {
-                      store?.logoUrl ?
+                    {store?.logoUrl ? (
                       <Image
-                        src={store.logoUrl ?? ''}
+                        src={store.logoUrl ?? ""}
                         alt={store.name}
                         width={60}
                         height={60}
                         className="w-12 p-2 bg-white mr-3 aspect-square object-contain border rounded-md "
-                      />:
+                      />
+                    ) : (
                       <StoreIcon
                         strokeWidth={1.3}
                         className=" mr-3 text-muted-foreground w-[50px] p-3 bg-white border rounded-md h-[50px]"
                       />
-                    }
+                    )}
                     <div>
                       <div className="font-medium">{store.name}</div>
                       <div className="text-sm text-muted-foreground">
@@ -136,11 +141,11 @@ export default function StoreSwitchCard() {
                   </Label>
                 </div>
               ))}
-            <div className="text-sm text-muted-foreground">
-              Stores you work on
-            </div>
             {workOnStores.length > 0 && (
               <>
+                <div className="text-sm text-muted-foreground">
+                  Stores you work on
+                </div>
                 {workOnStores.map((store: Store) => (
                   <div
                     onClick={() => setSelectedStore(store.id)}
@@ -157,10 +162,20 @@ export default function StoreSwitchCard() {
                       htmlFor={store.id}
                       className="flex items-center cursor-pointer"
                     >
-                      <StoreIcon
-                        strokeWidth={1.3}
-                        className="h-7 w-7 mr-2 text-muted-foreground"
-                      />
+                      {store?.logoUrl ? (
+                        <Image
+                          src={store.logoUrl ?? ""}
+                          alt={store.name}
+                          width={60}
+                          height={60}
+                          className="w-12 p-2 bg-white mr-3 aspect-square object-contain border rounded-md "
+                        />
+                      ) : (
+                        <StoreIcon
+                          strokeWidth={1.3}
+                          className=" mr-3 text-muted-foreground w-[50px] p-3 bg-white border rounded-md h-[50px]"
+                        />
+                      )}
                       <div>
                         <div className="font-medium">{store.name}</div>
                         <div className="text-sm text-muted-foreground">

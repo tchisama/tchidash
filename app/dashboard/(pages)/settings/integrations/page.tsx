@@ -1,5 +1,4 @@
 "use client";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,62 +12,70 @@ import { useStore } from "@/store/storeInfos";
 import { dbUpdateDoc } from "@/lib/dbFuntions/fbFuns";
 import { doc } from "firebase/firestore";
 import { db } from "@/firebase";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { Store } from "@/types/store";
 import { usePermission } from "@/hooks/use-permission";
+import {
+  BellRing,
+  Bot,
+  Layout,
+  MessageSquare,
+  Package,
+  StoreIcon,
+} from "lucide-react";
 
-// Define the structure of an integration
 interface Integration {
   id: string;
   title: string;
   description: string;
-  imageUrl: string;
+  icon: React.ReactNode;
+  color: string; // Add this
 }
 
-// Sample data for integrations
 const integrations: Integration[] = [
   {
     id: "digylog",
     title: "DigyLog",
     description: "DigyLog is a Moroccan Shipping Provider",
-    imageUrl:
-      "https://firebasestorage.googleapis.com/v0/b/tchidash-fd7aa.appspot.com/o/294424033_375002151434645_2765565352434267578_n%201.png?alt=media&token=99502b5f-b5c9-4ba0-acf5-a810eb4e3a34",
+    color: "#4ade80", // green-400
+    icon: <Package className="w-[30px] h-[30px]" />,
   },
   {
     id: "pos",
     title: "POS",
     description: "Point of Sale integration for managing in-store sales",
-    imageUrl:
-      "https://firebasestorage.googleapis.com/v0/b/tchidash-fd7aa.appspot.com/o/pos-icon.png?alt=media&token=pos-token",
+    color: "#f59e0b", // amber-500
+    icon: <StoreIcon className="w-[30px] h-[30px]" />,
   },
   {
     id: "landing-page-builder",
     title: "Landing Page Builder",
-    description: "Create beautiful landing pages for your products and campaigns",
-    imageUrl:
-      "https://firebasestorage.googleapis.com/v0/b/tchidash-fd7aa.appspot.com/o/landing-page-icon.png?alt=media&token=landing-page-token",
+    description:
+      "Create beautiful landing pages for your products and campaigns",
+    color: "#3b82f6", // blue-500
+    icon: <Layout className="w-[30px] h-[30px]" />,
   },
   {
     id: "whatsapp-notification",
     title: "WhatsApp Notification",
-    description: "receive notifications on WhatsApp on sertain events",
-    imageUrl:
-      "https://firebasestorage.googleapis.com/v0/b/tchidash-fd7aa.appspot.com/o/whatsapp-logo-whatsapp-logo-transparent-whatsapp-icon-transparent-free-free-png.webp?alt=media&token=38019c55-c90f-42ba-8d26-3bc025a758a4",
+    description: "Receive notifications on WhatsApp on certain events",
+    color: "#10b981", // emerald-500
+    icon: <BellRing className="w-[30px] h-[30px]" />,
   },
   {
     id: "whatsapp",
     title: "WhatsApp",
     description: "Send messages to customers on WhatsApp",
-    imageUrl:
-      "https://firebasestorage.googleapis.com/v0/b/tchidash-fd7aa.appspot.com/o/whatsapp-logo-whatsapp-logo-transparent-whatsapp-icon-transparent-free-free-png.webp?alt=media&token=38019c55-c90f-42ba-8d26-3bc025a758a4",
+    color: "#22c55e", // green-500
+    icon: <MessageSquare className="w-[30px] h-[30px]" />,
   },
   {
     id: "ai-assistant",
     title: "AI Assistant",
     description: "Chat with our AI assistant to get answers to your questions",
-    imageUrl:
-      "https://firebasestorage.googleapis.com/v0/b/tchidash-fd7aa.appspot.com/o/generate-ai-artificial-intelligence-logo-600nw-2492648973.webp?alt=media&token=5c8559fc-9ad5-48f5-9c2f-67d4a56aba58",
+    color: "#8b5cf6", // violet-500
+    icon: <Bot className="w-[30px] h-[30px]" />,
   },
 ];
 
@@ -135,16 +142,27 @@ const IntegrationCard = ({ integration }: { integration: Integration }) => {
       <Card key={integration.id} className="flex flex-col">
         <CardHeader>
           <div className="flex items-center space-x-4">
-            <Image
-              src={integration.imageUrl}
-              alt={`${integration.title} logo`}
-              width={80}
-              height={80}
-              className="rounded-md w-[70px] h-[70px]"
-            />
+            <div
+              className="p-2 rounded-md"
+              style={{
+                backgroundColor: integration.color + "10",
+                border: 1,
+                borderColor: integration.color + "20",
+                borderStyle: "solid",
+              }} // light bg with transparency
+            >
+              {React.cloneElement(integration.icon as React.ReactElement, {
+                style: { color: integration.color },
+                strokeWidth: 1.5,
+                width: 20,
+                height: 20,
+                className: "w-[25px] h-[25px]",
+              })}
+            </div>
             <CardTitle>{integration.title}</CardTitle>
           </div>
         </CardHeader>
+
         <CardContent>
           <CardDescription>{integration.description}</CardDescription>
         </CardContent>

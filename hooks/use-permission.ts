@@ -88,6 +88,7 @@ export const usePermission = () => {
     resource: Section,
     action: SectionActions[Section],
   ) => {
+    if (session?.user?.email === store?.ownerEmail) return true;
     return userRules.some((rule) =>
       rule.sections.some(
         (section) =>

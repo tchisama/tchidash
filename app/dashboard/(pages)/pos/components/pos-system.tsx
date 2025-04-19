@@ -43,6 +43,7 @@ import {
   Cake,
   Candy,
   GlassWater,
+  ArrowLeft,
 } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -132,7 +133,9 @@ export default function PosSystem() {
   const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const { setCategories: setGlobalCategories } = useCategories();
-  const [userSelectionType, setUserSelectionType] = useState<"default" | "specific">("default");
+  const [userSelectionType, setUserSelectionType] = useState<
+    "default" | "specific"
+  >("default");
 
   // Checkout form state
   const [checkoutForm, setCheckoutForm] = useState({
@@ -225,21 +228,22 @@ export default function PosSystem() {
   useEffect(() => {
     const fetchCategories = async () => {
       if (!STORE_ID) return;
-      
+
       try {
         const response = await dbGetDocs(
           query(collection(db, "categories"), where("storeId", "==", STORE_ID)),
           STORE_ID,
           "",
         );
-        
+
         const categoriesData = response.docs.map(
-          (doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }) as ProductCategory,
+          (doc) =>
+            ({
+              id: doc.id,
+              ...doc.data(),
+            }) as ProductCategory,
         );
-        
+
         setCategories(categoriesData);
         setGlobalCategories(categoriesData);
       } catch (error) {
@@ -258,13 +262,15 @@ export default function PosSystem() {
   const filteredProducts = Array.isArray(products)
     ? products.filter((product) => {
         // Filter by search query
-        const matchesSearch = product.title.toLowerCase().includes(searchQuery.toLowerCase());
-        
+        const matchesSearch = product.title
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase());
+
         // Filter by category if selected
-        const matchesCategory = selectedCategory 
-          ? product.category === selectedCategory 
+        const matchesCategory = selectedCategory
+          ? product.category === selectedCategory
           : true;
-        
+
         return matchesSearch && matchesCategory;
       })
     : [];
@@ -505,41 +511,76 @@ export default function PosSystem() {
   // Function to get an icon component based on the category's icon
   const getIconComponent = (iconName: string) => {
     switch (iconName) {
-      case "Grid": return Grid;
-      case "Coffee": return Coffee;
-      case "Pizza": return Pizza;
-      case "Shirt": return Shirt;
-      case "Book": return Book;
-      case "Music": return Music;
-      case "Heart": return Heart;
-      case "Star": return Star;
-      case "Gift": return Gift;
-      case "Home": return Home;
-      case "Car": return Car;
-      case "Plane": return Plane;
-      case "Train": return Train;
-      case "Bus": return Bus;
-      case "Bike": return Bike;
-      case "Phone": return Phone;
-      case "Laptop": return Laptop;
-      case "Camera": return Camera;
-      case "Headphones": return Headphones;
-      case "Watch": return Watch;
-      case "Utensils": return Utensils;
-      case "Beer": return Beer;
-      case "Wine": return Wine;
-      case "Cookie": return Cookie;
-      case "IceCream": return IceCream;
-      case "Apple": return Apple;
-      case "Carrot": return Carrot;
-      case "Fish": return Fish;
-      case "Beef": return Beef;
-      case "Egg": return Egg;
-      case "Milk": return Milk;
-      case "Cake": return Cake;
-      case "Candy": return Candy;
-      case "GlassWater": return GlassWater;
-      default: return Grid;
+      case "Grid":
+        return Grid;
+      case "Coffee":
+        return Coffee;
+      case "Pizza":
+        return Pizza;
+      case "Shirt":
+        return Shirt;
+      case "Book":
+        return Book;
+      case "Music":
+        return Music;
+      case "Heart":
+        return Heart;
+      case "Star":
+        return Star;
+      case "Gift":
+        return Gift;
+      case "Home":
+        return Home;
+      case "Car":
+        return Car;
+      case "Plane":
+        return Plane;
+      case "Train":
+        return Train;
+      case "Bus":
+        return Bus;
+      case "Bike":
+        return Bike;
+      case "Phone":
+        return Phone;
+      case "Laptop":
+        return Laptop;
+      case "Camera":
+        return Camera;
+      case "Headphones":
+        return Headphones;
+      case "Watch":
+        return Watch;
+      case "Utensils":
+        return Utensils;
+      case "Beer":
+        return Beer;
+      case "Wine":
+        return Wine;
+      case "Cookie":
+        return Cookie;
+      case "IceCream":
+        return IceCream;
+      case "Apple":
+        return Apple;
+      case "Carrot":
+        return Carrot;
+      case "Fish":
+        return Fish;
+      case "Beef":
+        return Beef;
+      case "Egg":
+        return Egg;
+      case "Milk":
+        return Milk;
+      case "Cake":
+        return Cake;
+      case "Candy":
+        return Candy;
+      case "GlassWater":
+        return GlassWater;
+      default:
+        return Grid;
     }
   };
 
@@ -557,11 +598,23 @@ export default function PosSystem() {
         <header className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
           <div className="w-full">
             <div className="flex flex-wrap gap-2">
-              <Button 
-                variant={selectedCategory === null ? "default" : "outline"} 
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  // go to /dashboard
+                  window.location.href = "/dashboard";
+                }}
+                className="flex items-center gap-2 flex-col w-24 h-20 "
+              >
+                <ArrowLeft className="h-8 w-8" strokeWidth={1} />
+                Dashboard
+              </Button>
+              <Button
+                variant={selectedCategory === null ? "default" : "outline"}
                 size="sm"
                 onClick={() => setSelectedCategory(null)}
-                    className="flex items-center gap-2 flex-col w-24 h-20"
+                className="flex items-center gap-2 flex-col w-24 h-20"
               >
                 <Grid className="h-8 w-8" strokeWidth={1} />
                 All
@@ -571,17 +624,19 @@ export default function PosSystem() {
                 return (
                   <Button
                     key={category.id}
-                    variant={selectedCategory === category.id ? "default" : "outline"}
+                    variant={
+                      selectedCategory === category.id ? "default" : "outline"
+                    }
                     size="sm"
                     onClick={() => setSelectedCategory(category.id)}
-                    className="flex items-center gap-2 flex-col w-24 h-20"
+                    className={"flex items-center gap-2 flex-col w-24 h-20"}
                   >
                     {category.image ? (
                       <div className="relative w-4 h-4 rounded-full overflow-hidden">
-                        <Image 
-                          src={category.image} 
-                          alt={category.name} 
-                          fill 
+                        <Image
+                          src={category.image}
+                          alt={category.name}
+                          fill
                           className="object-cover"
                         />
                       </div>
@@ -599,14 +654,14 @@ export default function PosSystem() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
               placeholder="Search products..."
-              className="pl-10"
+              className="pl-10 bg-white"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
         </header>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:gap-4">
           {filteredProducts.length > 0 ? (
             filteredProducts.map((product) => (
               <Card
@@ -622,7 +677,7 @@ export default function PosSystem() {
                     }
                     alt={product.title}
                     fill
-                    className="object-cover"
+                    className="object-cover bg-slate-50  border-b"
                   />
                   {product.hasDiscount && (
                     <Badge className="absolute top-2 right-2 bg-red-500 hover:bg-red-600">
@@ -638,7 +693,9 @@ export default function PosSystem() {
                   )}
                 </div>
                 <CardContent className="p-4 flex flex-col gap-1">
-                  <h3 className="font-medium truncate text-center">{product.title}</h3>
+                  <h3 className="font-medium truncate text-center">
+                    {product.title}
+                  </h3>
                   <div className="flex justify-between items-center">
                     <p className="font-bold">{product.price} dh</p>
                     {product.variants.length > 0 && (
@@ -658,7 +715,7 @@ export default function PosSystem() {
         </div>
       </div>
 
-      <div className="lg:col-span-1 border-l flex flex-col sticky top-[4rem] h-[calc(100vh-4rem)] bg-white">
+      <div className="lg:col-span-1 border-l flex flex-col sticky top-[0] h-[calc(100vh)] bg-white">
         <div className="p-4 border-b">
           <h2 className="font-bold text-lg flex items-center gap-2">
             <ShoppingCart className="h-5 w-5" />
@@ -703,7 +760,9 @@ export default function PosSystem() {
                       </p>
                     )}
                     <div className="flex items-center justify-between mt-1">
-                      <span className="text-sm font-medium">{item.price} dh</span>
+                      <span className="text-sm font-medium">
+                        {item.price} dh
+                      </span>
                       <span className="text-sm">×{item.quantity}</span>
                     </div>
                   </div>
@@ -908,14 +967,18 @@ export default function PosSystem() {
               <Label>Customer Type</Label>
               <div className="flex gap-2">
                 <Button
-                  variant={userSelectionType === "default" ? "default" : "outline"}
+                  variant={
+                    userSelectionType === "default" ? "default" : "outline"
+                  }
                   className="flex-1"
                   onClick={() => handleUserSelectionChange("default")}
                 >
                   Default User
                 </Button>
                 <Button
-                  variant={userSelectionType === "specific" ? "default" : "outline"}
+                  variant={
+                    userSelectionType === "specific" ? "default" : "outline"
+                  }
                   className="flex-1"
                   onClick={() => handleUserSelectionChange("specific")}
                 >
