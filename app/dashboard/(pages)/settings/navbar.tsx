@@ -6,6 +6,7 @@ import {
   MessageCircle,
   Settings2,
   Shield,
+  BookOpen,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -36,6 +37,11 @@ const links = [
     href: "/dashboard/settings/integrations",
     label: "Integrations",
     icon: <Blocks className="w-4 h-4" />,
+  },
+  {
+    href: "/dashboard/settings/api-docs",
+    label: "API Documentation",
+    icon: <BookOpen className="w-4 h-4" />,
   },
   {
     href: "/dashboard/settings/support",

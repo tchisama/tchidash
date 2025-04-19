@@ -10,5 +10,9 @@ interface CategoriesState {
 // Create the Zustand store
 export const useCategories = create<CategoriesState>((set) => ({
   categories: [],
-  setCategories: (categories) => set({ categories }),
+  setCategories: (categories) => {
+    console.log("Setting categories in store:", categories.length);
+    console.log("Categories data:", categories);
+    set({ categories });
+  },
 }));

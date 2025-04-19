@@ -69,6 +69,11 @@ import { ProductCategory } from "@/types/categories";
 import { collection, query, where } from "firebase/firestore";
 import { db } from "@/firebase";
 import { dbGetDocs } from "@/lib/dbFuntions/fbFuns";
+import { 
+  getActiveVariants, 
+  isOptionValueAvailable, 
+  findValidVariant 
+} from "@/lib/utils/variant-utils";
 
 // Product Types
 interface ProductVariant {
@@ -268,7 +273,25 @@ export default function PosSystem() {
 
         // Filter by category if selected
         const matchesCategory = selectedCategory
-          ? product.category === selectedCategory
+          ? (() => {
+              // If the product's category matches the selected category directly
+              if (product.category === selectedCategory) {
+                return true;
+              }
+
+              // Check if the product's category is a child of the selected category
+              const productCategory = categories.find(cat => cat.id === product.category);
+              if (productCategory) {
+                let currentCategory = productCategory;
+                while (currentCategory.motherCategory) {
+                  if (currentCategory.motherCategory === selectedCategory) {
+                    return true;
+                  }
+                  currentCategory = categories.find(cat => cat.id === currentCategory.motherCategory)!;
+                }
+              }
+              return false;
+            })()
           : true;
 
         return matchesSearch && matchesCategory;
@@ -287,7 +310,16 @@ export default function PosSystem() {
 
     // Otherwise, show variant selection dialog
     setSelectedProduct(product);
-    setSelectedVariant(product.variants[0]);
+    
+    // Get active variants and use the first one as default
+    const activeVariants = getActiveVariants(product);
+    if (activeVariants.length > 0) {
+      setSelectedVariant(activeVariants[0]);
+    } else {
+      // Fallback to first variant if no active variants
+      setSelectedVariant(product.variants[0]);
+    }
+    
     setQuantity(1);
     setIsVariantDialogOpen(true);
   };
@@ -882,7 +914,7 @@ export default function PosSystem() {
                             )?.value || ""
                           }
                           onValueChange={(value) => {
-                            // Find variant that matches this option value and current selected values for other options
+                            // Create new options object with current selections
                             const currentValues = {
                               ...Object.fromEntries(
                                 selectedVariant.variantValues.map((v) => [
@@ -893,21 +925,8 @@ export default function PosSystem() {
                             };
                             currentValues[option.name] = value;
 
-                            // Find a variant that matches all these values
-                            const matchingVariant =
-                              selectedProduct.variants.find((variant) => {
-                                const variantOptionMap = Object.fromEntries(
-                                  variant.variantValues.map((v) => [
-                                    v.option,
-                                    v.value,
-                                  ]),
-                                );
-
-                                // Check if all current values match this variant
-                                return Object.entries(currentValues).every(
-                                  ([opt, val]) => variantOptionMap[opt] === val,
-                                );
-                              });
+                            // Find a valid variant based on current selections
+                            const matchingVariant = findValidVariant(selectedProduct, currentValues);
 
                             if (matchingVariant) {
                               setSelectedVariant(matchingVariant);
@@ -915,21 +934,44 @@ export default function PosSystem() {
                           }}
                           className="flex flex-wrap gap-2"
                         >
-                          {option.values.map((value) => (
-                            <div key={value} className="flex items-center">
-                              <RadioGroupItem
-                                value={value}
-                                id={`${option.name}-${value}`}
-                                className="peer sr-only"
-                              />
-                              <Label
-                                htmlFor={`${option.name}-${value}`}
-                                className="px-3 py-1.5 border rounded-md text-sm cursor-pointer peer-data-[state=checked]:bg-primary peer-data-[state=checked]:text-primary-foreground peer-data-[state=checked]:border-primary"
-                              >
-                                {value}
-                              </Label>
-                            </div>
-                          ))}
+                          {option.values.map((value) => {
+                            // Check if this option value is available
+                            const currentSelections = Object.fromEntries(
+                              selectedVariant.variantValues.map((v) => [
+                                v.option,
+                                v.value,
+                              ]),
+                            );
+                            
+                            const isAvailable = isOptionValueAvailable(
+                              selectedProduct,
+                              option.name,
+                              value,
+                              currentSelections
+                            );
+                            
+                            return (
+                              <div key={value} className="flex items-center">
+                                <RadioGroupItem
+                                  value={value}
+                                  id={`${option.name}-${value}`}
+                                  className="peer sr-only"
+                                  disabled={!isAvailable}
+                                />
+                                <Label
+                                  htmlFor={`${option.name}-${value}`}
+                                  className={`px-3 py-1.5 border rounded-md text-sm cursor-pointer peer-data-[state=checked]:bg-primary peer-data-[state=checked]:text-primary-foreground peer-data-[state=checked]:border-primary ${
+                                    !isAvailable ? 'opacity-50 cursor-not-allowed' : ''
+                                  }`}
+                                >
+                                  {value}
+                                  {!isAvailable && (
+                                    <span className="text-xs text-red-500 ml-1">(Not available)</span>
+                                  )}
+                                </Label>
+                              </div>
+                            );
+                          })}
                         </RadioGroup>
                       </div>
                     ))}

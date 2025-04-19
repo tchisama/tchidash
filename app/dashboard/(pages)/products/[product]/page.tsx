@@ -11,6 +11,7 @@ import ProductOptionsCard from "./components/ProductOptions";
 import ProductVariantsCard from "./components/ProductVariant";
 import ProductStatusCard from "./components/ProductStatus";
 import ProductImagesCard from "./components/ProductImage";
+// import ProductBundle from "./components/ProductBundle";
 import { useEffect } from "react";
 import { useProducts } from "@/store/products";
 import {
@@ -49,6 +50,51 @@ function Page({ params }: { params: { product: string } }) {
   const { data, isLoading, error } = useQuery({
     queryKey: [productId],
     queryFn: async () => {
+      if (productId === "new") {
+        const newProductRef = doc(collection(db, "products"));
+        const newProduct: Product = {
+          id: newProductRef.id,
+          title: "New Product",
+          price: 0,
+          status: "draft",
+          storeId: storeId || "",
+          createdAt: Timestamp.now(),
+          updatedAt: Timestamp.now(),
+          options: [],
+          variants: [],
+          images: [],
+          description: "",
+          category: "",
+          hasBundle: false,
+          hasDiscount: false,
+          stockQuantity: 0,
+          variantsAreOneProduct: false,
+          canBeSaled: true,
+          discount: {
+            amount: 0,
+            type: "fixed",
+            startDate: Timestamp.now(),
+          },
+        };
+        
+        // Create the product immediately
+        if (storeId) {
+          await dbUpdateDoc(
+            newProductRef,
+            newProduct,
+            storeId,
+            "",
+          );
+          setProducts([...products, newProduct]);
+          setLastUploadedProduct(newProduct);
+          setCurrentProduct(newProduct);
+          
+          // Redirect to the new product
+          window.location.href = `/dashboard/products/${newProduct.title.replaceAll(" ", "_")}`;
+        }
+        
+        return newProduct;
+      }
       const q = query(
         collection(db, "products"),
         and(
@@ -56,7 +102,6 @@ function Page({ params }: { params: { product: string } }) {
           where("title", "==", productId.replaceAll("_", " ")),
         ),
       );
-      if (productId == "new") return null;
       if (!storeId) return;
       const response = await dbGetDocs(q, storeId, "");
       console.log(response.docs[0].data());
@@ -85,25 +130,46 @@ function Page({ params }: { params: { product: string } }) {
     console.log(currentProduct);
     // Check if all the required fields are present
     if (title && price) {
-      // Update an existing product
       if (!storeId) return;
-      dbUpdateDoc(
-        doc(db, "products", currentProduct.id),
-        {
-          ...currentProduct,
-          updatedAt: Timestamp.now(),
-        },
-        storeId,
-        "",
-      );
-      setLastUploadedProduct(currentProduct);
-      setProducts(
-        products.map((p) => (p.id === currentProduct.id ? currentProduct : p)),
-      );
+      
+      if (productId === "new") {
+        // Create a new product
+        const newProductRef = doc(collection(db, "products"));
+        dbUpdateDoc(
+          newProductRef,
+          {
+            ...currentProduct,
+            id: newProductRef.id,
+            createdAt: Timestamp.now(),
+            updatedAt: Timestamp.now(),
+          },
+          storeId,
+          "",
+        );
+        setLastUploadedProduct({ ...currentProduct, id: newProductRef.id });
+        setProducts([...products, { ...currentProduct, id: newProductRef.id }]);
+      } else {
+        // Update an existing product
+        dbUpdateDoc(
+          doc(db, "products", currentProduct.id),
+          {
+            ...currentProduct,
+            updatedAt: Timestamp.now(),
+          },
+          storeId,
+          "",
+        );
+        setLastUploadedProduct(currentProduct);
+        setProducts(
+          products.map((p) => (p.id === currentProduct.id ? currentProduct : p)),
+        );
+      }
       setActions([]);
       toast({
-        title: "Product updated",
-        description: "Product has been updated successfully",
+        title: productId === "new" ? "Product created" : "Product updated",
+        description: productId === "new" 
+          ? "Product has been created successfully" 
+          : "Product has been updated successfully",
       });
     } else {
       // Handle missing fields (e.g., show an error or notification)
@@ -117,18 +183,24 @@ function Page({ params }: { params: { product: string } }) {
     if (!lastUploadedProduct && currentProduct) {
       setLastUploadedProduct(currentProduct);
     }
-    window.history.pushState(
-      null,
-      "",
-      `/dashboard/products/${currentProduct?.title.replaceAll(" ", "_")}`,
-    );
-  }, [lastUploadedProduct, currentProduct, setLastUploadedProduct]);
+    // Only update URL if we're not in the "new" product case
+    if (productId !== "new") {
+      window.history.pushState(
+        null,
+        "",
+        `/dashboard/products/${currentProduct?.title.replaceAll(" ", "_")}`,
+      );
+    }
+  }, [lastUploadedProduct, currentProduct, setLastUploadedProduct, productId]);
 
   const [preProduct, setPreProduct] = React.useState<Product | null>(null);
   const [nextProduct, setNextProduct] = React.useState<Product | null>(null);
 
   useEffect(() => {
     if (!products) return;
+    // Skip navigation setup for new product
+    if (productId === "new") return;
+    
     const index = products.findIndex((p) => p.title == currentProduct?.title);
     if (index > 0) {
       setPreProduct(products[index - 1]);
@@ -140,7 +212,7 @@ function Page({ params }: { params: { product: string } }) {
     } else {
       setNextProduct(products[0]);
     }
-  }, [products, currentProduct]);
+  }, [products, currentProduct, productId]);
 
   if (isLoading)
     return (
@@ -214,9 +286,7 @@ function Page({ params }: { params: { product: string } }) {
                 )}
             </>
           )}
-          {/*
-          <ProductBundel />
-           */}
+          {/* <ProductBundle /> */}
         </div>
         <div className="grid auto-rows-max items-start gap-4 lg:gap-8">
           <ProductImagesCard />

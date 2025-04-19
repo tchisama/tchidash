@@ -73,7 +73,7 @@ export async function fetchFirestoreDocs(
 
   // ✅ Execute query and return results
   const snapshot: QuerySnapshot = await query.get();
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  return snapshot.docs.map((doc) => ({  ...doc.data(),id: doc.id }));
 }
 
 export function generateFilterOptions(docStructure: Record<string, unknown>) {

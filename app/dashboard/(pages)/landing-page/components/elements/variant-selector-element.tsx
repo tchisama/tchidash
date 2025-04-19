@@ -18,13 +18,26 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel"
+import { 
+  getActiveVariants, 
+  isOptionValueAvailable, 
+  findValidVariant 
+} from "@/lib/utils/variant-utils"
 
 interface VariantSelectorElementProps {
   element: PageElement
 }
 
+// Define the content type for the variant selector element
+interface VariantSelectorContent {
+  customTitle?: string
+  customOptionName?: string
+  optionImageSettings?: Record<string, unknown>
+}
+
 export function VariantSelectorElement({ element }: VariantSelectorElementProps) {
   const { style, content } = element
+  const variantContent = content as VariantSelectorContent
   const {
     selectedProduct,
     selectedVariant,
@@ -52,30 +65,74 @@ export function VariantSelectorElement({ element }: VariantSelectorElementProps)
   // Set default options when product changes
   React.useEffect(() => {
     if (selectedProduct) {
-      const defaultOptions = selectedProduct.options.reduce((acc, option) => ({
-        ...acc,
-        [option.name]: option.values[0]
-      }), {})
-      setSelectedOptions(defaultOptions)
+      console.log("Product changed:", selectedProduct.title)
+      
+      // Get active variants
+      const activeVariants = getActiveVariants(selectedProduct)
+      
+      if (activeVariants.length > 0) {
+        // Use the first active variant
+        const firstActive = activeVariants[0]
+        console.log("Setting default from first active variant:", firstActive)
+        
+        // Extract options from the variant
+        const defaultOptions: Record<string, string> = {}
+        firstActive.variantValues.forEach((vv: { option: string; value: string }) => {
+          defaultOptions[vv.option] = vv.value
+        })
+        
+        setSelectedOptions(defaultOptions)
+        setSelectedVariant(firstActive)
+      } else {
+        console.log("No active variants found, using first option values")
+        // Fallback to first option values
+        const defaultOptions: Record<string, string> = {}
+        selectedProduct.options.forEach(option => {
+          defaultOptions[option.name] = option.values[0]
+        })
+        
+        setSelectedOptions(defaultOptions)
+      }
     }
   }, [selectedProduct])
 
-  // Update selected variant when options change
+  // Handle option selection
+  const handleOptionSelect = (optionName: string, optionValue: string) => {
+    console.log(`Selecting ${optionName}: ${optionValue}`)
+    
+    // Create new options object
+    const newOptions = {
+      ...selectedOptions,
+      [optionName]: optionValue
+    }
+    
+    console.log("New options:", newOptions)
+    
+    // Update options
+    setSelectedOptions(newOptions)
+    
+    // Find and set matching variant
+    const matchingVariant = findValidVariant(selectedProduct, newOptions)
+    console.log("Matching variant:", matchingVariant)
+    
+    if (matchingVariant) {
+      setSelectedVariant(matchingVariant)
+    }
+  }
+
+  // After options change, check that we have a valid variant
   React.useEffect(() => {
-    if (selectedProduct && Object.keys(selectedOptions).length === selectedProduct.options.length) {
-      const matchingVariant = selectedProduct.variants.find(variant => 
-        selectedProduct.options.every(option => 
-          variant.variantValues.some(variantValue => 
-            variantValue.option === option.name && 
-            variantValue.value === selectedOptions[option.name]
-          )
-        )
-      )
-      if (matchingVariant) {
-        setSelectedVariant(matchingVariant)
+    if (selectedProduct && Object.keys(selectedOptions).length > 0) {
+      console.log("Options changed, checking for valid variant")
+      
+      const validVariant = findValidVariant(selectedProduct, selectedOptions)
+      console.log("Valid variant found:", validVariant)
+      
+      if (validVariant) {
+        setSelectedVariant(validVariant)
       }
     }
-  }, [selectedOptions, selectedProduct, setSelectedVariant])
+  }, [selectedOptions, selectedProduct])
 
   const containerStyle = {
     padding: `${style.padding || 16}px`,
@@ -126,7 +183,7 @@ export function VariantSelectorElement({ element }: VariantSelectorElementProps)
   }
 
   // Use custom title if provided, otherwise use product title
-  const productTitle = content.customTitle || selectedProduct.title
+  const productTitle = variantContent.customTitle || selectedProduct.title
 
   return (
     <div style={containerStyle}>
@@ -184,27 +241,36 @@ export function VariantSelectorElement({ element }: VariantSelectorElementProps)
         <div className="w-full lg:w-1/2">
           {selectedProduct.options.map((option, index) => (
             <div key={index} className="mb-6 last:mb-0">
-              <div style={titleStyle}>Select {content.customOptionName || option.name || ""}</div>
+              <div style={titleStyle}>Select {variantContent.customOptionName || option.name || ""}</div>
 
               <RadioGroup
                 value={selectedOptions[option.name] || ""}
                 onValueChange={(value) => {
-                  setSelectedOptions(prev => ({
-                    ...prev,
-                    [option.name]: value
-                  }))
+                  handleOptionSelect(option.name, value)
                 }}
                 className="grid gap-4"
               >
                 <div className="grid grid-cols-3 md:grid-cols-3 gap-4">
                   {option.values.map((value) => {
-                    const variantImage = content.optionImageSettings?.[option.name] ? getVariantImageForOption(option.name, value) : null
+                    const optionImageSettings = variantContent.optionImageSettings
+                    const variantImage = optionImageSettings && optionImageSettings[option.name] 
+                      ? getVariantImageForOption(option.name, value) 
+                      : null
+                    const isAvailable = isOptionValueAvailable(selectedProduct, option.name, value, selectedOptions)
+                    
                     return (
                       <div key={value} className="relative">
-                        <RadioGroupItem value={value} id={`${option.name}-${value}`} className="peer sr-only" />
+                        <RadioGroupItem 
+                          value={value} 
+                          id={`${option.name}-${value}`} 
+                          className="peer sr-only" 
+                          disabled={!isAvailable}
+                        />
                         <Label
                           htmlFor={`${option.name}-${value}`}
-                          className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-white p-4 hover:bg-gray-50 hover:border-gray-300 peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                          className={`flex flex-col items-center justify-between rounded-md border-2 border-muted bg-white p-4 hover:bg-gray-50 hover:border-gray-300 peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary ${
+                            !isAvailable ? 'opacity-50 cursor-not-allowed' : ''
+                          }`}
                         >
                           {variantImage && (
                             <div className="relative w-16 h-16 mb-2">
@@ -217,6 +283,9 @@ export function VariantSelectorElement({ element }: VariantSelectorElementProps)
                             </div>
                           )}
                           <div className="font-medium">{value}</div>
+                          {!isAvailable && (
+                            <div className="text-xs text-red-500 mt-1">Not available</div>
+                          )}
                         </Label>
                       </div>
                     )

@@ -60,7 +60,7 @@ export function CanvasElement({
       case "reviews":
         return <ReviewsElement element={element} />
       case "contact-form":
-        return <ContactFormElement element={element} />
+        return <ContactFormElement element={element} storeId={storeId??""} />
       case "features":
         return <FeaturesElement element={element} />
       case "faq":

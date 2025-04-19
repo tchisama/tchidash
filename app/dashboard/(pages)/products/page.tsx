@@ -1,13 +1,12 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { File, PlusCircle } from "lucide-react";
+import {  PlusCircle, FolderTree } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardFooter,
-  CardHeader,
 } from "@/components/ui/card";
 import {
   Table,
@@ -16,50 +15,55 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { addDoc, collection, Timestamp } from "firebase/firestore";
+import {  collection, Timestamp } from "firebase/firestore";
 import { useProducts } from "@/store/products";
 import { db } from "@/firebase";
 import { Product } from "@/types/product";
 import { useStore } from "@/store/storeInfos";
 import { ProductLine } from "./components/ProductLine";
 import { usePermission } from "@/hooks/use-permission";
-import { exportJson } from "./components/exportJson";
-import ImportProducts from "./components/ImportProductsButton";
 import FilteringComponent from "@/components/global/filter";
 import { cleanupObject } from "@/lib/utils/convertDatesToTimestamps";
-// Sample product data
+import { dbAddDoc } from "@/lib/dbFuntions/fbFuns";
+import { toast } from "@/hooks/use-toast";
+import { useCategories } from "@/store/categories";
+import { useQuery } from "@tanstack/react-query";
+import { query, where } from "firebase/firestore";
+import { dbGetDocs } from "@/lib/dbFuntions/fbFuns";
+import { ProductCategory } from "@/types/categories";
 
 export default function Page() {
-  const { setCurrentProduct, products = [], setProducts } = useProducts();
+  const { setCurrentProduct, products = [], setProducts, setLastUploadedProduct } = useProducts();
   const { storeId } = useStore();
-  // const { data, error, isLoading } = useQuery({
-  //   queryKey: ["products", storeId],
-  //   queryFn: async () => {
-  //     const q = query(
-  //       collection(db, "products"),
-  //       and(where("storeId", "==", storeId), where("status", "!=", "deleted")),
-  //     );
-  //     if (!storeId) return;
-  //     const response = await dbGetDocs(q, storeId, "");
-  //     const data = response.docs.map((doc) => ({
-  //       ...doc.data(),
-  //       id: doc.id,
-  //     }));
-  //     return data;
-  //   },
-  //   refetchOnWindowFocus: false,
-  //   // staleTime: 20000, // Data stays fresh for 10 seconds
-  // });
   const router = useRouter();
-  // useEffect(() => {
-  //   setCurrentProduct(null);
-  //   if (Array.isArray(data)) {
-  //     setProducts(data as Product[]);
-  //     console.log(data);
-  //   }
-  // }, [data, setProducts, setCurrentProduct]);
+  const { setCategories } = useCategories();
 
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+
+  // Fetch categories when the page loads
+  const { data: categoriesData } = useQuery({
+    queryKey: ["categories", storeId],
+    queryFn: async () => {
+      if (!storeId) return [];
+      const response = await dbGetDocs(
+        query(collection(db, "categories"), where("storeId", "==", storeId)),
+        storeId,
+        "",
+      );
+      return response.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as ProductCategory[];
+    },
+    enabled: !!storeId,
+  });
+
+  // Update categories in the store when data is fetched
+  useEffect(() => {
+    if (categoriesData) {
+      setCategories(categoriesData);
+    }
+  }, [categoriesData, setCategories]);
 
   // Check if the user has view permission
   const hasViewPermission = usePermission();
@@ -68,152 +72,161 @@ export default function Page() {
     return <div>You dont have permission to view this page</div>;
   }
 
-  // if (isLoading)
-  //   return (
-  //     <div className="w-full h-[50vh] flex justify-center items-center">
-  //       Loading...
-  //     </div>
-  //   );
-  // if (error) return <div>Error: {error.message}</div>;
-
-  const addProduct = () => {
-    const productName = "new product " + Math.random().toString().slice(3, 9);
-    alert(productName);
-    const newProduct = {
-      title: productName,
-      status: "draft",
-      createdAt: Timestamp.now(),
-      images: [],
-      price: 100,
-      description: "description of the product",
-      tags: [],
-      vendor: "",
-      category: "",
-      variants: [],
-      options: [],
-      updatedAt: Timestamp.now(),
-      storeId,
-      stockQuantity: 0,
-      hasDiscount: false,
-      hasBundle: false,
-      canBeSaled: true,
-      variantsAreOneProduct: false,
-    };
-    if (!storeId) return;
-    addDoc(collection(db, "products"), newProduct)
-      .then((docRef) => {
-        setCurrentProduct({ ...newProduct, id: docRef.id } as Product);
-        setProducts([...products, { ...newProduct, id: docRef.id } as Product]);
-        router.push(`/dashboard/products/${productName.replaceAll(" ", "_")}`);
-      })
-      .catch((error) => {
-        alert("Error adding document: " + error.message);
-      });
-  };
 
   return (
-    products && (
-      <div>
-        <div className="flex mb-2 items-center">
+    <div className="container mx-auto py-6">
+      <div className="flex flex-col gap-6">
+        <div className="flex items-center justify-between">
           <div>
-            <FilteringComponent
-              collectionName="products"
-              defaultFilters={[
-                { field: "status", operator: "!=", value: "deleted" },
-              ]}
-              docStructure={{
-                status: "string",
-                createdAt: "date",
+            <h1 className="text-3xl font-bold tracking-tight">Products</h1>
+            <p className="text-muted-foreground">
+              Manage your products and their variants
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => router.push("/dashboard/categories")}
+              className="flex items-center gap-2"
+            >
+              <FolderTree className="h-4 w-4" />
+              Manage Categories
+            </Button>
+            <Button
+              onClick={async () => {
+                if (!storeId) return;
+                const productsCollection = collection(db, "products");
+                
+                // Create a new product without an ID first
+                const newProduct: Omit<Product, 'id'> = {
+                  title: "New Product",
+                  price: 0,
+                  status: "draft" as const,
+                  storeId: storeId,
+                  createdAt: Timestamp.now(),
+                  updatedAt: Timestamp.now(),
+                  options: [],
+                  variants: [],
+                  images: [],
+                  description: "",
+                  category: "",
+                  hasBundle: false,
+                  hasDiscount: false,
+                  stockQuantity: 0,
+                  variantsAreOneProduct: false,
+                  canBeSaled: true,
+                  discount: {
+                    amount: 0,
+                    type: "fixed",
+                    startDate: Timestamp.now(),
+                  },
+                };
+                
+                try {
+                  // Add the document to Firestore and get the reference
+                  const docRef = await dbAddDoc(
+                    productsCollection,
+                    newProduct,
+                    storeId,
+                    "",
+                  );
+                  
+                  // Create a complete product with the ID from Firestore
+                  const completeProduct: Product = {
+                    ...newProduct,
+                    id: docRef.id,
+                  };
+                  
+                  // Update the local state
+                  setProducts([...products, completeProduct]);
+                  setCurrentProduct(completeProduct);
+                  setLastUploadedProduct(completeProduct);
+                  
+                  // Navigate to the new product
+                  router.push(`/dashboard/products/${completeProduct.title.replaceAll(" ", "_")}`);
+                } catch (error) {
+                  console.error("Error creating product:", error);
+                  toast({
+                    title: "Error",
+                    description: "Failed to create product. Please try again.",
+                    variant: "destructive",
+                  });
+                }
               }}
-              searchField="title"
-              callback={(data) => {
-                if (!data) return;
-                console.log(data);
-                const cleanData = cleanupObject(data);
-                setProducts(cleanData as Product[]);
-              }}
-            />
+              className="flex items-center gap-2"
+            >
+              <PlusCircle className="h-4 w-4" />
+              Add Product
+            </Button>
           </div>
         </div>
-        <div>
-          <Card x-chunk="dashboard-06-chunk-0">
-            <CardHeader className="flex flex-row items-start">
-              <h1>Products</h1>
-              <div className="ml-auto flex items-center gap-2">
-                <ImportProducts />
-                {selectedProducts && selectedProducts.length > 0 && (
-                  <Button
-                    onClick={() => {
-                      // export json file
-                      console.log("export json file");
-                      exportJson(
-                        products.filter((p) => selectedProducts.includes(p.id)),
-                        "products",
-                      );
-                    }}
-                    size="sm"
-                    variant="outline"
-                    className="h-8 gap-1"
-                  >
-                    <File className="h-3.5 w-3.5" />
-                    <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                      Export
-                    </span>
-                  </Button>
-                )}
-                <Button onClick={addProduct} size="sm" className="h-8 gap-1">
-                  <PlusCircle className="h-3.5 w-3.5" />
-                  <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                    Add Product
-                  </span>
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="p-2">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Select</TableHead>
-                    <TableHead className="hidden w-[100px] sm:table-cell">
-                      <span className="sr-only">Image</span>
-                    </TableHead>
-                    <TableHead>Title</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="hidden md:table-cell">
-                      Price
-                    </TableHead>
-                    <TableHead className="hidden md:table-cell">
-                      Stock
-                    </TableHead>
-                    <TableHead className="hidden md:table-cell">
-                      Total Sales
-                    </TableHead>
-                    <TableHead>
-                      <span className="sr-only">Actions</span>
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {products &&
-                    products.map((product) => (
-                      <ProductLine
-                        selected={{ selectedProducts, setSelectedProducts }}
-                        key={product.id}
-                        product={product}
-                      />
-                    ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-            <CardFooter>
-              <div className="text-xs text-muted-foreground">
-                Showing <strong>1-10</strong> of{" "}
-                <strong>{products.length}</strong> products
-              </div>
-            </CardFooter>
-          </Card>
+
+        <div className="flex mb-2 items-center">
+          <FilteringComponent
+            collectionName="products"
+            defaultFilters={[
+              { field: "status", operator: "!=", value: "deleted" },
+            ]}
+            docStructure={{
+              status: "string",
+              createdAt: "date",
+            }}
+            searchField="title"
+            callback={(data) => {
+              if (!data) return;
+              console.log(data);
+              const cleanData = cleanupObject(data);
+              setProducts(cleanData as Product[]);
+            }}
+          />
         </div>
+
+        <Card>
+          <CardContent className="p-2">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Select</TableHead>
+                  <TableHead className="hidden w-[100px] sm:table-cell">
+                    <span className="sr-only">Image</span>
+                  </TableHead>
+                  <TableHead>Title</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="hidden md:table-cell">
+                    Price
+                  </TableHead>
+                  <TableHead className="hidden md:table-cell">
+                    Stock
+                  </TableHead>
+                  <TableHead className="hidden md:table-cell">
+                    Total Sales
+                  </TableHead>
+                  <TableHead>
+                    <span className="sr-only">Actions</span>
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {products &&
+                  products.map((product) => (
+                    <ProductLine
+                      selected={{ selectedProducts, setSelectedProducts }}
+                      key={product.id}
+                      product={product}
+                    />
+                  ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+          <CardFooter>
+            <div className="text-xs text-muted-foreground">
+              Showing <strong>1-10</strong> of{" "}
+              <strong>{products.length}</strong> products
+            </div>
+          </CardFooter>
+        </Card>
       </div>
-    )
+    </div>
   );
 }

@@ -1,116 +1,137 @@
-import React, { useState } from "react";
+import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Product } from "@/types/product";
 import { useProducts } from "@/store/products";
-import { Checkbox } from "@/components/ui/checkbox";
-import { and, collection, query, where } from "firebase/firestore";
+import { Product } from "@/types/product";
+import { Button } from "@/components/ui/button";
+import { Plus, X } from "lucide-react";
+import { useStore } from "@/store/storeInfos";
+import { collection, query, where } from "firebase/firestore";
 import { db } from "@/firebase";
 import { useQuery } from "@tanstack/react-query";
-import { useStore } from "@/store/storeInfos";
-import { Button } from "@/components/ui/button";
 import { dbGetDocs } from "@/lib/dbFuntions/fbFuns";
 
-function ProductBundel() {
-  const { setCurrentProduct, currentProduct } = useProducts();
+const ProductBundle = () => {
+  const { currentProduct, setCurrentProduct } = useProducts();
   const { storeId } = useStore();
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const {
-    data: products,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ["products with out bundel", storeId],
+
+  const { data: allProducts } = useQuery({
+    queryKey: ["products", storeId],
     queryFn: async () => {
-      if (!storeId) return null;
+      if (!storeId) return [];
       const q = query(
         collection(db, "products"),
-        and(
-          where("storeId", "==", storeId),
-          where("status", "==", "active"),
-          where("hasBundle", "!=", true),
-        ),
+        where("storeId", "==", storeId)
       );
-      if (!storeId) return;
-      const products = dbGetDocs(q, storeId, "").then((res) => ({
-        docs: res.docs.map(
-          (doc) =>
-            ({
-              ...doc.data(),
-              id: doc.id,
-            }) as Product,
-        ),
-      }));
-      return products;
+      const response = await dbGetDocs(q, storeId, "");
+      return response.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      })) as Product[];
     },
-    refetchOnWindowFocus: false,
   });
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error...{error.message}</div>;
+
+  const handleBundleToggle = (checked: boolean) => {
+    if (!currentProduct) return;
+    setCurrentProduct({
+      ...currentProduct,
+      hasBundle: checked,
+      bundles: checked ? currentProduct.bundles || [] : [],
+    });
+  };
+
+  const addBundleProduct = (product: Product) => {
+    if (!currentProduct) return;
+    const newBundle = {
+      id: product.id,
+      title: product.title,
+    };
+    setCurrentProduct({
+      ...currentProduct,
+      bundles: [...(currentProduct.bundles || []), newBundle],
+    });
+  };
+
+  const removeBundleProduct = (bundleId: string) => {
+    if (!currentProduct) return;
+    setCurrentProduct({
+      ...currentProduct,
+      bundles: currentProduct.bundles?.filter((b) => b.id !== bundleId) || [],
+    });
+  };
+
+  if (!currentProduct) return null;
+
   return (
-    currentProduct && (
-      <Card x-chunk="dashboard-07-chunk-3">
-        <CardHeader>
-          <CardTitle>Product Bundel</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-6">
-            <div className="grid gap-3">
-              <div className="flex gap-2 mb-2 items-center">
-                <Checkbox
-                  id="hasBundle"
-                  checked={currentProduct.hasBundle}
-                  onCheckedChange={(e) =>
-                    setCurrentProduct({
-                      ...currentProduct,
-                      hasBundle: e,
-                    } as Product)
-                  }
-                />
-                <Label htmlFor="hasBundle">Has Bundel</Label>
-              </div>
-              <div>
-                <Label htmlFor="bundleProducts">Select Bundel Products</Label>
-                <div className="flex gap-2 mt-2">
-                  <Select
-                    value={selectedProduct?.id}
-                    onValueChange={(value) =>
-                      setSelectedProduct(
-                        products?.docs.find(
-                          (product) => product.id === value,
-                        ) ?? null,
-                      )
-                    }
+    <Card>
+      <CardHeader>
+        <CardTitle>Product Bundle</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="bundle-toggle"
+            checked={currentProduct.hasBundle}
+            onCheckedChange={handleBundleToggle}
+          />
+          <Label htmlFor="bundle-toggle">Enable Product Bundle</Label>
+        </div>
+
+        {currentProduct.hasBundle && (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Bundle Products</Label>
+              <div className="grid gap-2">
+                {currentProduct.bundles?.map((bundle) => (
+                  <div
+                    key={bundle.id}
+                    className="flex items-center justify-between p-2 border rounded-md"
                   >
-                    <SelectTrigger>
-                      <SelectValue>
-                        {selectedProduct?.title ?? "Select Product"}
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {products?.docs.map((product) => (
-                        <SelectItem key={product.id} value={product.id}>
-                          {product.title}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Button>Add Product</Button>
-                </div>
+                    <span>{bundle.title}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeBundleProduct(bundle.id)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Add Products to Bundle</Label>
+              <div className="grid gap-2">
+                {allProducts
+                  ?.filter(
+                    (p) =>
+                      p.id !== currentProduct.id &&
+                      !currentProduct.bundles?.some((b) => b.id === p.id)
+                  )
+                  .map((product) => (
+                    <div
+                      key={product.id}
+                      className="flex items-center justify-between p-2 border rounded-md"
+                    >
+                      <span>{product.title}</span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => addBundleProduct(product)}
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
               </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
-    )
+        )}
+      </CardContent>
+    </Card>
   );
-}
+};
 
-export default ProductBundel;
+export default ProductBundle;

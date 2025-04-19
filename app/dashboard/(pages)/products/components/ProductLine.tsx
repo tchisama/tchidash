@@ -38,24 +38,25 @@ import Photo from "@/public/images/svgs/icons/photo.svg";
 import Link from "next/link";
 import {
   collection,
-  deleteDoc,
   doc,
   getAggregateFromServer,
   query,
   sum,
   updateDoc,
   where,
+  Timestamp,
 } from "firebase/firestore";
 import { useProducts } from "@/store/products";
 import { db } from "@/firebase";
 import { Product, Variant } from "@/types/product";
-import { uniqueId } from "lodash";
 import { useStore } from "@/store/storeInfos";
 import { getStock } from "@/lib/fetchs/stock";
-import { useQuery } from "@tanstack/react-query";
-import { dbAddDoc, dbUpdateDoc } from "@/lib/dbFuntions/fbFuns";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { dbAddDoc, dbUpdateDoc, dbDeleteDoc } from "@/lib/dbFuntions/fbFuns";
 import { Checkbox } from "@/components/ui/checkbox";
 import { VariantStateChanger } from "../[product]/components/ProductVariant";
+import { useCategories } from "@/store/categories";
+import { toast } from "@/hooks/use-toast";
 
 const ProductLine = ({
   product,
@@ -72,20 +73,58 @@ const ProductLine = ({
     useProducts();
   const { store, storeId } = useStore();
   const router = useRouter();
+  const { categories } = useCategories();
+  const queryClient = useQueryClient();
 
   const toggleVariants = () => {
     setShowVariants(!showVariants);
   };
 
-  const duplicateProduct = () => {
-    const newProduct = {
-      ...product,
-      title: product.title + " copy",
-      id: uniqueId(),
-    };
+  const duplicateProduct = async () => {
     if (!storeId) return;
-    setProducts([...products, newProduct]);
-    dbAddDoc(collection(db, "products"), newProduct, storeId, "");
+    
+    try {
+      // Create a new product without an ID first
+      const newProductData = {
+        ...product,
+        title: product.title + " copy",
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now(),
+      };
+      
+      // Remove the id field to let Firestore generate a new one
+      const {  ...productWithoutId } = newProductData;
+      
+      // Add the document to Firestore and get the reference
+      const docRef = await dbAddDoc(
+        collection(db, "products"),
+        productWithoutId,
+        storeId,
+        ""
+      );
+      
+      // Create a complete product with the ID from Firestore
+      const newProduct = {
+        ...newProductData,
+        id: docRef.id,
+      };
+      
+      // Update the local state
+      setProducts([...products, newProduct]);
+      
+      // Show success message
+      toast({
+        title: "Product duplicated",
+        description: "Product has been duplicated successfully",
+      });
+    } catch (error) {
+      console.error("Error duplicating product:", error);
+      toast({
+        title: "Error",
+        description: "Failed to duplicate product. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const archiveProduct = () => {
@@ -111,14 +150,34 @@ const ProductLine = ({
     
     if (confirm("Are you sure you want to delete this product?")) {
       try {
-        // Delete the product document from Firestore
-        await deleteDoc(doc(db, "products", product.id)).then(() => {
-          // Update the local state after successful deletion
-          setProducts(products.filter((p) => p.id !== product.id));
+        // Get the document reference using the product's id
+        const productRef = doc(db, "products", product.id);
+        
+        // Delete the document using dbDeleteDoc
+        await dbDeleteDoc(
+          productRef,
+          storeId,
+          ""
+        );
+        
+        // Update the local state after successful deletion
+        setProducts(products.filter((p) => p.id !== product.id));
+        
+        // Invalidate the products query to force a refresh
+        queryClient.invalidateQueries({ queryKey: ["products", storeId] });
+        
+        // Show success message
+        toast({
+          title: "Product deleted",
+          description: "Product has been permanently deleted",
         });
       } catch (error) {
         console.error("Error deleting product:", error);
-        alert("Failed to delete product. Please try again.");
+        toast({
+          title: "Error",
+          description: "Failed to delete product. Please try again.",
+          variant: "destructive",
+        });
       }
     }
   };
@@ -209,6 +268,18 @@ const ProductLine = ({
           >
             <b>{product.title}</b>
           </Link>
+        </TableCell>
+        <TableCell>
+          {product.category ? (
+            <Link
+              href={`/dashboard/categories`}
+              className="text-muted-foreground hover:text-primary"
+            >
+              {categories.find(cat => cat.id === product.category)?.name || 'Uncategorized'}
+            </Link>
+          ) : (
+            <span className="text-muted-foreground">Uncategorized</span>
+          )}
         </TableCell>
         <TableCell>
           <ProductStateChanger product={product} />

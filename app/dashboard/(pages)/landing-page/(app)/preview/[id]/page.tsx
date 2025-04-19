@@ -1,3 +1,4 @@
+'use client'
 import { LandingPagePreview } from "../../../components/landing-page-preview";
 import { ProductProvider } from "../../../context/product-context";
 import { useStore } from "@/store/storeInfos";

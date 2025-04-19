@@ -40,7 +40,7 @@ export function Preview({ elements, previewWidth = 1280, screenSize, storeId }: 
       case "reviews":
         return <ReviewsElement key={element.id} element={element} />
       case "contact-form":
-        return <ContactFormElement key={element.id} element={element} />
+        return <ContactFormElement key={element.id} element={element} storeId={storeId??""} />
       case "features":
         return <FeaturesElement key={element.id} element={element} />
       case "faq":
