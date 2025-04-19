@@ -15,6 +15,7 @@ import { usePageElements } from "../hooks/use-page-elements"
 import { useProduct } from "../context/product-context"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import type { ScreenSize } from "../types/elements"
+import { useStore } from "@/store/storeInfos"
 
 export function LandingPageBuilder() {
   const [activeTab, setActiveTab] = useState<"editor" | "preview">("editor")
@@ -29,7 +30,7 @@ export function LandingPageBuilder() {
     { id: "tablet", name: "Tablet", width: 768, icon: "Tablet" },
     { id: "desktop", name: "Desktop", width: 1280, icon: "Monitor" },
   ]
-
+  const { storeId } = useStore()
   // Use useEffect to handle client-side rendering
   useEffect(() => {
     setMounted(true)
@@ -141,7 +142,7 @@ export function LandingPageBuilder() {
               </TabsContent>
 
               <TabsContent value="preview" className="h-full data-[state=active]:block">
-                <Preview elements={elements} previewWidth={getPreviewWidth()} screenSize={activeScreenSize} />
+                <Preview storeId={storeId ??""} elements={elements} previewWidth={getPreviewWidth()} screenSize={activeScreenSize} />
               </TabsContent>
             </div>
           </Tabs>

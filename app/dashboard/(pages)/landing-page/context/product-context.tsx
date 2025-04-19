@@ -60,7 +60,13 @@ const ProductContext = createContext<ProductContextType>({
   getFullProductTitle: () => "",
 })
 
-export function ProductProvider({ children }: { children: ReactNode }) {
+export function ProductProvider({ 
+  children, 
+  storeId: propStoreId 
+}: { 
+  children: ReactNode
+  storeId?: string 
+}) {
   const [products, setProducts] = useState<Product[]>([])
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null)
@@ -92,13 +98,14 @@ export function ProductProvider({ children }: { children: ReactNode }) {
     return `${selectedProduct.title} - ${selectedVariant.title}`
   }
 
-  const {storeId} = useStore()
+  const {storeId: contextStoreId} = useStore()
+  const storeId = propStoreId || contextStoreId || ""
 
   useEffect(() => {
     async function loadProducts() {
       try {
         setLoading(true)
-        const data = await fetchProducts({storeId: storeId??""})
+        const data = await fetchProducts({storeId})
 
         // Ensure data is an array before setting it
         const productsArray = Array.isArray(data) ? data : []
@@ -120,8 +127,10 @@ export function ProductProvider({ children }: { children: ReactNode }) {
       }
     }
 
-    loadProducts()
-  }, [])
+    if (storeId) {
+      loadProducts()
+    }
+  }, [storeId])
 
   return (
     <ProductContext.Provider

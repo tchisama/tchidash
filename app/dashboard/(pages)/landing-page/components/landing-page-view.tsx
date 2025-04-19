@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { Preview } from "./../components/preview"
 import { getLandingPageById } from "../lib/firebase-service"
 import type { PageElement } from "../types/elements"
+import { useStore } from "@/store/storeInfos"
 
 interface LandingPageViewProps {
   pageId: string
@@ -13,7 +14,7 @@ export function LandingPageView({ pageId }: LandingPageViewProps) {
   const [elements, setElements] = useState<PageElement[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-
+  const { storeId } = useStore()
   useEffect(() => {
     async function loadPage() {
       try {
@@ -71,7 +72,7 @@ export function LandingPageView({ pageId }: LandingPageViewProps) {
           </div>
         </div>
       ) : (
-        <Preview elements={elements} previewWidth={1280} screenSize="desktop" />
+        <Preview storeId={storeId??""} elements={elements} previewWidth={1280} screenSize="desktop" />
       )}
     </div>
   )

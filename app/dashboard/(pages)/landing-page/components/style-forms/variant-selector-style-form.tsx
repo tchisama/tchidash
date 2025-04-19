@@ -5,6 +5,8 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Slider } from "@/components/ui/slider"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Switch } from "@/components/ui/switch"
+import { useProduct } from "../../context/product-context"
 
 interface VariantSelectorStyleFormProps {
   element: PageElement
@@ -12,7 +14,8 @@ interface VariantSelectorStyleFormProps {
 }
 
 export function VariantSelectorStyleForm({ element, onUpdate }: VariantSelectorStyleFormProps) {
-  const { style } = element
+  const { style, content } = element
+  const { selectedProduct } = useProduct()
 
   const updateStyle = (key: string, value: unknown) => {
     onUpdate({
@@ -23,8 +26,43 @@ export function VariantSelectorStyleForm({ element, onUpdate }: VariantSelectorS
     })
   }
 
+  const updateContent = (key: string, value: unknown) => {
+    onUpdate({
+      content: {
+        ...element.content,
+        [key]: value,
+      },
+    })
+  }
+
+  const updateOptionImageSettings = (optionName: string, showImages: boolean) => {
+    const currentSettings = content.optionImageSettings || {}
+    updateContent("optionImageSettings", {
+      ...currentSettings,
+      [optionName]: showImages
+    })
+  }
+
   return (
     <div className="space-y-4">
+      <div className="space-y-4">
+        <Label className="text-base font-semibold">Option Image Settings</Label>
+        {selectedProduct?.options.map((option) => (
+          <div key={option.name} className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <Switch
+                id={`show-images-${option.name}`}
+                checked={content.optionImageSettings?.[option.name] || false}
+                onCheckedChange={(checked) => updateOptionImageSettings(option.name, checked)}
+              />
+              <Label htmlFor={`show-images-${option.name}`} className="text-sm text-muted-foreground">
+                Show images for {option.name} options
+              </Label>
+            </div>
+          </div>
+        ))}
+      </div>
+
       <div className="space-y-2">
         <Label>Title Font Size (px)</Label>
         <Slider

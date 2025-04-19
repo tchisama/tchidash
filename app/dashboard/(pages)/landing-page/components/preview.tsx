@@ -21,9 +21,10 @@ interface PreviewProps {
   elements: PageElement[]
   previewWidth?: number
   screenSize: string
+  storeId: string
 }
 
-export function Preview({ elements, previewWidth = 1280, screenSize }: PreviewProps) {
+export function Preview({ elements, previewWidth = 1280, screenSize, storeId }: PreviewProps) {
   const renderElement = (element: PageElement) => {
     switch (element.type) {
       case "image":
@@ -35,7 +36,7 @@ export function Preview({ elements, previewWidth = 1280, screenSize }: PreviewPr
       case "variant-selector":
         return <VariantSelectorElement key={element.id} element={element} />
       case "order-form":
-        return <OrderFormElement key={element.id} element={element} />
+        return <OrderFormElement key={element.id} element={element} storeId={storeId??""} />
       case "reviews":
         return <ReviewsElement key={element.id} element={element} />
       case "contact-form":

@@ -352,7 +352,7 @@ export function LandingPageEditor({ pageId }: LandingPageEditorProps) {
               </TabsContent>
 
               <TabsContent value="preview" className="h-full data-[state=active]:block">
-                <Preview elements={elements} previewWidth={getPreviewWidth()} screenSize={activeScreenSize} />
+                <Preview storeId={storeId??""} elements={elements} previewWidth={getPreviewWidth()} screenSize={activeScreenSize} />
               </TabsContent>
             </div>
           </Tabs>

@@ -1,6 +1,6 @@
 "use client"
 
-import type React from "react"
+import React from "react"
 import Image from "next/image"
 import type { PageElement } from "../../types/elements"
 import { useProduct } from "../../context/product-context"
@@ -35,13 +35,55 @@ export function VariantSelectorElement({ element }: VariantSelectorElementProps)
     getFullProductTitle,
   } = useProduct()
 
+  const [selectedOptions, setSelectedOptions] = React.useState<Record<string, string>>({})
+
+  // Function to get variant image for a specific option value
+  const getVariantImageForOption = (optionName: string, optionValue: string) => {
+    if (!selectedProduct) return null
+    const variant = selectedProduct.variants.find(v => 
+      v.variantValues.some(vv => 
+        vv.option === optionName && 
+        vv.value === optionValue
+      )
+    )
+    return variant?.images?.[0]
+  }
+
+  // Set default options when product changes
+  React.useEffect(() => {
+    if (selectedProduct) {
+      const defaultOptions = selectedProduct.options.reduce((acc, option) => ({
+        ...acc,
+        [option.name]: option.values[0]
+      }), {})
+      setSelectedOptions(defaultOptions)
+    }
+  }, [selectedProduct])
+
+  // Update selected variant when options change
+  React.useEffect(() => {
+    if (selectedProduct && Object.keys(selectedOptions).length === selectedProduct.options.length) {
+      const matchingVariant = selectedProduct.variants.find(variant => 
+        selectedProduct.options.every(option => 
+          variant.variantValues.some(variantValue => 
+            variantValue.option === option.name && 
+            variantValue.value === selectedOptions[option.name]
+          )
+        )
+      )
+      if (matchingVariant) {
+        setSelectedVariant(matchingVariant)
+      }
+    }
+  }, [selectedOptions, selectedProduct, setSelectedVariant])
+
   const containerStyle = {
     padding: `${style.padding || 16}px`,
     margin: `${style.margin || 0}px`,
     borderRadius: `${style.borderRadius || 8}px`,
     border: style.borderWidth ? `${style.borderWidth}px solid ${style.borderColor || "#e5e7eb"}` : "1px solid #e5e7eb",
     backgroundColor: style.backgroundColor || "#f9fafb",
-  }
+  } as React.CSSProperties
 
   const titleStyle = {
     color: style.titleColor || "#000",
@@ -88,134 +130,151 @@ export function VariantSelectorElement({ element }: VariantSelectorElementProps)
 
   return (
     <div style={containerStyle}>
-      <h2 className="text-xl font-bold mb-4">{productTitle}</h2>
+      <h2 className="text-xl font-bold mb-4">{productTitle || ""}</h2>
 
-      {/* Variant Image Display */}
-      {selectedVariant?.images && selectedVariant.images.length > 0 && (
-        <div className="mb-6 w-full">
-          {selectedVariant.images.length === 1 ? (
-            <Card className="border-0">
-              <CardContent className="flex items-center justify-center p-2">
-                <div className="relative w-full aspect-square max-w-[500px]">
-                  <Image
-                    src={selectedVariant.images[0]}
-                    alt={`${selectedVariant.title} - Image`}
-                    fill
-                    className="object-cover w-full rounded-md"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          ) : (
-            <Carousel className="w-full">
-              <CarouselContent>
-                {selectedVariant.images.map((image, index) => (
-                  <CarouselItem key={index}>
-                    <Card className="border-0">
-                      <CardContent className="flex items-center justify-center p-2">
-                        <div className="relative w-full aspect-[16/9] max-h-[500px]">
-                          <Image
-                            src={image}
-                            alt={`${selectedVariant.title} - Image ${index + 1}`}
-                            fill
-                            className="object-contain rounded-md"
-                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
-                          />
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious className="left-2" />
-              <CarouselNext className="right-2" />
-            </Carousel>
+      <div className="flex flex-col lg:flex-row lg:gap-8">
+        {/* Left side - Image Display */}
+        <div className="w-full lg:w-1/2">
+          {selectedVariant?.images && selectedVariant.images.length > 0 && (
+            <div className="mb-6 w-full">
+              {selectedVariant.images.length === 1 ? (
+                <Card className="border-0">
+                  <CardContent className="flex items-center justify-center p-2">
+                    <div className="relative w-full aspect-square max-w-[500px]">
+                      <Image
+                        src={selectedVariant.images[0]}
+                        alt={`${selectedVariant.title} - Image`}
+                        fill
+                        className="object-cover w-full rounded-md"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : (
+                <Carousel className="w-full">
+                  <CarouselContent>
+                    {selectedVariant.images.map((image, index) => (
+                      <CarouselItem key={index}>
+                        <Card className="border-0">
+                          <CardContent className="flex items-center justify-center p-2">
+                            <div className="relative w-full aspect-square max-w-[500px]">
+                              <Image
+                                src={image}
+                                alt={`${selectedVariant.title} - Image ${index + 1}`}
+                                fill
+                                className="object-cover w-full rounded-md"
+                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
+                              />
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious className="left-2" />
+                  <CarouselNext className="right-2" />
+                </Carousel>
+              )}
+            </div>
           )}
         </div>
-      )}
 
-      {selectedProduct.options.map((option, index) => (
-        <div key={index} className="mb-6 last:mb-0">
-          {/* Use custom option name if provided, otherwise use product option name */}
-          <div style={titleStyle}>Select {content.customOptionName || option.name}</div>
+        {/* Right side - Options and Quantity */}
+        <div className="w-full lg:w-1/2">
+          {selectedProduct.options.map((option, index) => (
+            <div key={index} className="mb-6 last:mb-0">
+              <div style={titleStyle}>Select {content.customOptionName || option.name || ""}</div>
 
-          <RadioGroup
-            value={selectedVariant?.id || ""}
-            onValueChange={(value) => {
-              const variant = selectedProduct.variants.find((v) => v.id === value)
-              if (variant) {
-                setSelectedVariant(variant)
-              }
-            }}
-            className="grid gap-4"
-          >
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {selectedProduct.variants.map((variant) => (
-                <div key={variant.id} className="relative">
-                  <RadioGroupItem value={variant.id} id={variant.id} className="peer sr-only" />
-                  <Label
-                    htmlFor={variant.id}
-                    className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-white p-4 hover:bg-gray-50 hover:border-gray-300 peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-                  >
-                    <div className="font-medium">{variant.title}</div>
-                    <div className="mt-1 text-sm">${variant.price}</div>
-                  </Label>
+              <RadioGroup
+                value={selectedOptions[option.name] || ""}
+                onValueChange={(value) => {
+                  setSelectedOptions(prev => ({
+                    ...prev,
+                    [option.name]: value
+                  }))
+                }}
+                className="grid gap-4"
+              >
+                <div className="grid grid-cols-3 md:grid-cols-3 gap-4">
+                  {option.values.map((value) => {
+                    const variantImage = content.optionImageSettings?.[option.name] ? getVariantImageForOption(option.name, value) : null
+                    return (
+                      <div key={value} className="relative">
+                        <RadioGroupItem value={value} id={`${option.name}-${value}`} className="peer sr-only" />
+                        <Label
+                          htmlFor={`${option.name}-${value}`}
+                          className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-white p-4 hover:bg-gray-50 hover:border-gray-300 peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                        >
+                          {variantImage && (
+                            <div className="relative w-16 h-16 mb-2">
+                              <Image
+                                src={variantImage}
+                                alt={`${value} preview`}
+                                fill
+                                className="object-cover rounded-md"
+                              />
+                            </div>
+                          )}
+                          <div className="font-medium">{value}</div>
+                        </Label>
+                      </div>
+                    )
+                  })}
                 </div>
-              ))}
+              </RadioGroup>
             </div>
-          </RadioGroup>
-        </div>
-      ))}
+          ))}
 
-      {selectedVariant && (
-        <div className="mt-6 space-y-4">
-          <div className="p-4 bg-white rounded-md border">
-            <div className="font-medium text-lg">{getFullProductTitle()}</div>
-            <div className="text-sm text-muted-foreground mb-4">Unit Price: ${selectedVariant.price}</div>
+          {selectedVariant && (
+            <div className="mt-6 space-y-4">
+              <div className="p-4 bg-white rounded-md border">
+                <div className="font-medium text-lg">{getFullProductTitle()}</div>
+                <div className="text-sm text-muted-foreground mb-4">Unit Price: ${selectedVariant.price}</div>
 
-            <div className="flex flex-col  space-x-2 mb-4">
-              <Label htmlFor="quantity" className="font-medium">
-                Quantity:
-              </Label>
-              <br />
-              <div className="flex items-center">
-                <Button
-                  variant={"secondary"}
-                  size="icon"
-                  className="h-10 w-10 rounded-r-none bg-gray-300"
-                  onClick={() => handleQuantityChange(quantity - 1)}
-                  disabled={quantity <= 1}
-                >
-                  <Minus className="h-4 w-4" />
-                  <span className="sr-only">Decrease quantity</span>
-                </Button>
-                <Input
-                  id="quantity"
-                  type="number"
-                  min="1"
-                  max={selectedVariant.inventoryQuantity || 100}
-                  value={quantity}
-                  onChange={(e) => handleQuantityChange(Number.parseInt(e.target.value) || 1)}
-                  className="h-10 w-16 rounded-none text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                />
-                <Button
-                  variant={"secondary"}
-                  size="icon"
-                  className="h-10 w-10 rounded-l-none bg-gray-300"
-                  onClick={() => handleQuantityChange(quantity + 1)}
-                  disabled={quantity >= (selectedVariant.inventoryQuantity || 100)}
-                >
-                  <Plus className="h-4 w-4" />
-                  <span className="sr-only">Increase quantity</span>
-                </Button>
+                <div className="flex flex-col space-y-2 mb-4">
+                  <Label htmlFor="quantity" className="font-medium">
+                    Quantity:
+                  </Label>
+                  <div className="flex items-center">
+                    <Button
+                      variant="secondary"
+                      size="icon"
+                      className="h-10 w-10 rounded-r-none bg-gray-300"
+                      onClick={() => handleQuantityChange(quantity - 1)}
+                      disabled={quantity <= 1}
+                    >
+                      <Minus className="h-4 w-4" />
+                      <span className="sr-only">Decrease quantity</span>
+                    </Button>
+                    <Input
+                      id="quantity"
+                      type="number"
+                      min="1"
+                      max={selectedVariant.inventoryQuantity || 100}
+                      value={quantity}
+                      onChange={(e) => handleQuantityChange(Number.parseInt(e.target.value) || 1)}
+                      className="h-10 w-16 rounded-none text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    />
+                    <Button
+                      variant="secondary"
+                      size="icon"
+                      className="h-10 w-10 rounded-l-none bg-gray-300"
+                      onClick={() => handleQuantityChange(quantity + 1)}
+                      disabled={quantity >= (selectedVariant.inventoryQuantity || 100)}
+                    >
+                      <Plus className="h-4 w-4" />
+                      <span className="sr-only">Increase quantity</span>
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="text-lg font-bold">Total: ${getTotalPrice().toFixed(2)}</div>
               </div>
             </div>
-
-            <div className="text-lg font-bold">Total: ${getTotalPrice().toFixed(2)}</div>
-          </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   )
 }

@@ -26,7 +26,7 @@ export function LandingPagePreview({ pageId }: LandingPagePreviewProps) {
     async function loadPage() {
       try {
         setLoading(true)
-        const page = await getLandingPageById(storeId??"", pageId)
+        const page = await getLandingPageById(pageId)
 
         if (page) {
           setPageName(page.name)
@@ -86,7 +86,7 @@ export function LandingPagePreview({ pageId }: LandingPagePreviewProps) {
             </div>
           </div>
         ) : (
-          <Preview elements={elements} previewWidth={1280} screenSize="desktop" />
+          <Preview storeId={storeId??""} elements={elements} previewWidth={1280} screenSize="desktop" />
         )}
       </main>
     </div>

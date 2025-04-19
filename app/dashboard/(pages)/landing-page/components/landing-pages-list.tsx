@@ -216,7 +216,7 @@ export function LandingPagesList({ storeId }: LandingPagesListProps) {
                   </div>
                   {page.published && (
                     <Button variant="outline" size="sm" asChild>
-                      <a href={`/dashboard/landing-page/view/${page.id}`} target="_blank" rel="noopener noreferrer">
+                      <a href={`/landing-page/${page.id}`} target="_blank" rel="noopener noreferrer">
                         <Globe className="h-4 w-4 mr-1" />
                         Public URL
                       </a>

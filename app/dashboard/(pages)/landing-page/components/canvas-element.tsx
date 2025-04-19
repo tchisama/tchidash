@@ -18,6 +18,7 @@ import { SpecificationsElement } from "./../components/elements/specifications-e
 import { RelatedProductsElement } from "./../components/elements/related-products-element"
 import { NewsletterElement } from "./../components/elements/newsletter-element"
 import { HeroElement } from "./../components/elements/hero-element"
+import { useStore } from "@/store/storeInfos"
 
 interface CanvasElementProps {
   element: PageElement
@@ -42,6 +43,7 @@ export function CanvasElement({
     e.stopPropagation()
     onSelect()
   }
+  const { storeId } = useStore()
 
   const renderElement = () => {
     switch (element.type) {
@@ -54,7 +56,7 @@ export function CanvasElement({
       case "variant-selector":
         return <VariantSelectorElement element={element} />
       case "order-form":
-        return <OrderFormElement element={element} />
+        return <OrderFormElement element={element} storeId={storeId??""} />
       case "reviews":
         return <ReviewsElement element={element} />
       case "contact-form":
